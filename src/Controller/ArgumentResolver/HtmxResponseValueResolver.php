@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
- * It automatically resolves htmx response, just use "HtmxRequest $request" as an argument in your controller.
+ * It automatically resolves htmx request, just use "HtmxRequest $request" as an argument in your controller.
  */
 class HtmxResponseValueResolver implements ValueResolverInterface
 {
