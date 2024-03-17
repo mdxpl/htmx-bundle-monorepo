@@ -9,8 +9,9 @@ Read the documentation at:
 [docs/index.md](docs/index.md)
 
 ## Examples
-- [Asynchronous form handling is easy!](docs/examples/form.md)
-- [Loading content without the whole page reloading is a piece of cake](docs/examples/simple_page.md)
+- [Infinite scroll without a single line of JavaScript, let's go!](docs/examples/infinite_scroll.md)
+- [Change content without the whole page reloading is a piece of cake.](docs/examples/simple_page.md)
+- [Asynchronous form handling, no problem!](docs/examples/form.md)
 
 ## Credits
 

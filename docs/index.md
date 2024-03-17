@@ -61,5 +61,6 @@ Inject `HtmxRequest` to the action method and use `HtmxRequest` to create the re
 Examples
 ============
 
-- [Asynchronous form handling is easy!](examples/form.md)
-- [Loading a simple page content is a piece of cake](examples/simple_page.md)
+- [Infinite scroll without a single line of JavaScript, let's go!](examples/infinite_scroll.md)
+- [Change content without the whole page reloading is a piece of cake.](examples/simple_page.md)
+- [Asynchronous form handling, no problem!](examples/form.md)
