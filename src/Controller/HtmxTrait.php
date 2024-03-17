@@ -56,7 +56,7 @@ trait HtmxTrait
     {
         if (!$this instanceof AbstractController) {
             throw new LogicException(
-                sprintF(
+                sprintf(
                     'The %s can only be used in a class that extends %s.',
                     HtmxTrait::class,
                     AbstractController::class,
