@@ -1,7 +1,7 @@
-Handle form submission with HTMX
+Handle form submission with htmx
 =========================
 
-This bundle provides a simple way to handle form submission with HTMX.
+This bundle provides a simple way to handle form submission with htmx.
 
 ### Step 1: Create a controller extending `AbstractController`
 
@@ -28,7 +28,7 @@ class DemoController extends AbstractController
     use HtmxTrait;
     
      // 2. Use inject HtmxRequest attribute
-     // It will automatically parse the HTMX attributes from the request using HtmxResponseValueResolver
+     // It will automatically parse the htmx attributes from the request using HtmxResponseValueResolver
     #[Route('/demo', name: 'app_demo')]
     public function index(HtmxRequest $request): Response
     {
@@ -52,7 +52,7 @@ class DemoController extends AbstractController
             return $this->renderHtmxFailure($responseBuilder->withFailuredForm($form));
         }
         
-        // 6. Render a 'formComponent' block from the template or the whole page if it's not HTMX request
+        // 6. Render a 'formComponent' block from the template or the whole page if it's not htmx request
         return $this->renderHtmx($responseBuilder->withForm($form));
     }
 
@@ -88,7 +88,7 @@ class DemoController extends AbstractController
 <head>
     <meta charset="UTF-8">
 
-    <!-- The following example includes HTMX from the CDN, please do not use it in production.-->
+    <!-- The following example includes htmx from the CDN, please do not use it in production.-->
     <script src="https://unpkg.com/htmx.org@1.9.11"
             integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
             crossorigin="anonymous"></script>
@@ -98,7 +98,7 @@ class DemoController extends AbstractController
 {% block body %}{% endblock %}
 
 <script>
-    // HTMX by default wont swap error responses. 
+    // htmx by default wont swap error responses. 
     // Included script will handle the 422 status code and swap the form with the failure component.
     document.body.addEventListener('htmx:beforeOnLoad', function (evt) {
         console.log('beforeOnLoad', evt);
@@ -115,7 +115,7 @@ class DemoController extends AbstractController
 ### Step 3: Create a page template
 
 Twig does not render blocks that are not defined in the base template. 
-When the request comes from HTMX, it will automatically return a specific block from the template instead of the entire page.
+When the request comes from htmx, it will automatically return a specific block from the template instead of the entire page.
 
 ```html
 {# templates/demo/index.html.twig #}

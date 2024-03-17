@@ -31,7 +31,7 @@ class DemoController extends AbstractController
             ->withViewParam('items', $this->generateItemsForPage($pageNumber))
             ->withViewParam('nextPageNumber', $pageNumber + 1);
 
-        // 2. If request is HTMX, it will automatically return certain block from the template
+        // 2. If request is htmx, it will automatically return certain block from the template
         if ($request->isHtmx) {
             sleep(1); // Simulate a slow response
             $responseBuilder->withBlock('items');
@@ -94,7 +94,7 @@ Add some basic styles for indicator. See: https://htmx.org/attributes/hx-indicat
 
 ### Step 3: Create a page template
 
-See infinite scroll in [HTMX documentation](https://htmx.org/examples/infinite-scroll/).
+See infinite scroll in [htmx documentation](https://htmx.org/examples/infinite-scroll/).
 
 ```html
 {# templates/demo/index.html.twig #}

@@ -1,13 +1,14 @@
-HTMX for Symfony!
+htmx for Symfony!
 =========================
 
-This bundle makes it easy to use [HTMX](https://htmx.org/) with
+This bundle makes it easy to use [htmx](https://htmx.org/) with
 `[Twig](https://twig.symfony.com/) and [Symfony's controllers](https://symfony.com/doc/current/controller.html)
 
-- Automatically parses the HTMX attributes from the request;
-- Easy create HTMX responses with the `HtmxResponse` class;
+- Automatically parses the htmx attributes from the request;
+- Easy create htmx responses with the `HtmxResponse` class;
 - Easy return responses with the `HtmxTrait`;
-- If request is HTMX, it will automatically return certain block from the template;
+- If request is htmx, it will automatically return certain block from the template;
+
 
 Installation
 ============
@@ -15,18 +16,6 @@ Installation
 Make sure Composer is installed globally, as explained in the
 [installation chapter](https://getcomposer.org/doc/00-intro.md)
 of the Composer documentation.
-
-Applications that use Symfony Flex
-----------------------------------
-
-Open a command console, enter your project directory and execute:
-
-```console
-composer require mdxpl/htmx-bundle
-```
-
-Applications that don't use Symfony Flex
-----------------------------------------
 
 ### Step 1: Download the Bundle
 
@@ -51,11 +40,15 @@ return [
 ];
 ```
 
-### Step 3: Create controller
 
-Inject `HtmxRequest` to the action method and use `HtmxRequest` to create the response.
+Usage
+============
 
-### Step 4: That's it! You're ready to go!
+1. Inject `HtmxRequest` parameter to the action method.
+2. Build the request using `HtmxResponseBuilder`.
+3. Use `HtmxTrait` to return the response.
+4. Use [htmx attributes](https://htmx.org/reference/#attributes) in your templates.
+5. Check the following examples to see how to use it.
 
 
 Examples

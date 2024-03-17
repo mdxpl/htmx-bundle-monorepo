@@ -34,18 +34,18 @@ class DemoController extends AbstractController
     #[Route('/simple-page/{slug}', name: 'app_demo_simple_page')]
     public function index(HtmxRequest $request, string $slug = 'home'): Response
     {
-        // Just for demonstration purposes, nothing to do with HTMX
+        // Just for demonstration purposes, nothing to do with htmx
         $page = self::PAGES[$slug] ?? throw $this->createNotFoundException('The page does not exist');
 
         //4. Create the response builder and set the template
         $responseBuilder = HtmxResponseBuilder::init($request->isHtmx, 'demo/simple_page.html.twig')
             // 5. Add view data, which will then be available in the template.
-            // In a real-world application, the menu would be added only for non-HTMX requests.
+            // In a real-world application, the menu would be added only for non-htmx requests.
             ->withViewParam('menu', self::PAGES)
             ->withViewParam('page', $page);
 
         if ($request->isHtmx) {
-            // 6. Specify the block to render for HTMX requests, by default it's 'successComponent'
+            // 6. Specify the block to render for htmx requests, by default it's 'successComponent'
             $responseBuilder->withBlock('pageContentPartial');
         }
 
@@ -78,7 +78,7 @@ class DemoController extends AbstractController
 ### Step 3: Create a page template
 
 Twig does not render blocks that are not defined in the base template.
-When the request is HTMX, it will automatically return certain block from the template instead of the whole page.
+When the request is htmx, it will automatically return certain block from the template instead of the whole page.
 
 ```html
 {# templates/demo/simple_page.html.twig #}
