@@ -1,0 +1,33 @@
+{
+  "name": "mdxpl/htmx-bundle",
+  "description": "HTMX support for Symfony",
+  "license": "MIT",
+  "type": "library",
+  "keywords": ["htmx"],
+  "authors": [
+    {
+      "name": "Mateusz Dołęga",
+      "homepage": "https://mdx.pl"
+    }
+  ],
+  "require": {
+    "php": ">=8.2",
+    "symfony/framework-bundle": "^7.0",
+    "symfony/twig-bundle": "^7.0",
+    "twig/twig": "^2.12|^3.0"
+  },
+  "require-dev": {
+    "symfony/phpunit-bridge": "^7.0"
+  },
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "Mdxpl\\HtmxBundle\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Mdxpl\\HtmxBundle\\Tests\\": "tests/"
+    }
+  }
+}
