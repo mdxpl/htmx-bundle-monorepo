@@ -1,7 +1,7 @@
-Switch page content without reloading the whole page
+Infinite scroll without a single line of JavaScript, let's go!
 =========================
 
-Switching pages without reloading has never been easier.
+Implementing infinite scroll has never been easier.
 We don't even need a single line of JavaScript!
 
 ### Step 1: Create a controller
