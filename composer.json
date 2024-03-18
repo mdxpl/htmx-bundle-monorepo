@@ -13,11 +13,11 @@
   "require": {
     "php": ">=8.2",
     "symfony/framework-bundle": "^7.0",
-    "symfony/twig-bundle": "^7.0",
+    "symfony/twig-bundle": "7.1.x-dev",
     "twig/twig": "^2.12|^3.0"
   },
   "require-dev": {
-    "symfony/phpunit-bridge": "^7.0"
+    "symfony/phpunit-bridge": "7.1.x-dev"
   },
   "minimum-stability": "dev",
   "autoload": {

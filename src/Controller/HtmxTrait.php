@@ -16,6 +16,8 @@ trait HtmxTrait
      */
     protected function renderHtmx(HtmxResponseBuilder $htmxResponseBuilder, array $extraHeaders = []): Response
     {
+        $this->assertExtendsSymfonyAbstractController();
+
         $htmxResponse = $htmxResponseBuilder->build();
 
         $response = new Response(null, $htmxResponse->responseCode);
@@ -23,8 +25,6 @@ trait HtmxTrait
             $response->headers->set($header->type->value, $header->value);
         }
         $response->headers->add($extraHeaders);
-
-        $this->assertExtendsSymfonyAbstractController();
 
         if ($htmxResponseBuilder->fromHtmxRequest) {
             return $this->renderBlock(
@@ -47,7 +47,7 @@ trait HtmxTrait
 
     protected function renderHtmxFailure(HtmxResponseBuilder $htmxResponseBuilder, array $extraHeaders = []): Response
     {
-        $htmxResponseBuilder->withBadRequest();
+        $htmxResponseBuilder->withFailure();
 
         return $this->renderHtmx($htmxResponseBuilder, $extraHeaders);
     }
