@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mdxpl\HtmxBundle\Response;
+namespace Mdxpl\HtmxBundle\Response\Headers;
 
 /**
  * @link https://htmx.org/reference/#response_headers
@@ -25,7 +25,7 @@ enum HtmxResponseHeaderType: string
     case REDIRECT = 'HX-Redirect';
 
     /**
-     * If set to “true,” the client-side will do a full refresh of the page.
+     * If set to “true” the client-side will do a full refresh of the page.
      */
     case REFRESH = 'HX-Refresh';
 

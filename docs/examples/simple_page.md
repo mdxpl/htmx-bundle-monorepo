@@ -11,7 +11,7 @@ We don't even need a single line of JavaScript!
 
 namespace App\Controller;
 
-use Mdxpl\HtmxBundle\Controller\HtmxTrait;
+use Mdxpl\HtmxBundle\Controller\HtmxControllerTrait;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class DemoController extends AbstractController
 {
     // 2. Use HtmxTrait form the bundle
-    use HtmxTrait;
+    use HtmxControllerTrait;
 
     private const PAGES = [
         'home' => ['name' => 'Home', 'description' => 'This is the home page'],
@@ -38,7 +38,7 @@ class DemoController extends AbstractController
         $page = self::PAGES[$slug] ?? throw $this->createNotFoundException('The page does not exist');
 
         //4. Create the response builder and set the template
-        $responseBuilder = HtmxResponseBuilder::init($request->isHtmx, 'demo/simple_page.html.twig')
+        $responseBuilder = HtmxResponseBuilder::create($request->isHtmx, 'demo/simple_page.html.twig')
             // 5. Add view data, which will then be available in the template.
             // In a real-world application, the menu would be added only for non-htmx requests.
             ->withViewParam('menu', self::PAGES)

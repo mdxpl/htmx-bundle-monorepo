@@ -4,97 +4,74 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Tests\Response;
 
-use LogicException;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
-use Mdxpl\HtmxBundle\Response\HtmxResponseHeader;
-use Mdxpl\HtmxBundle\Response\HtmxResponseHeaderType;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
+//TODO: test each header separately
 class HtmxResponseBuilderTest extends TestCase
 {
     public function testInitForNonHtmxRequest(): void
     {
-        $builder = HtmxResponseBuilder::init(false, 'template.html.twig');
+        $builder = HtmxResponseBuilder::create(false);
 
         $htmxResponse = $builder->build();
 
-        Assert::assertEquals('template.html.twig', $htmxResponse->template);
-
+        Assert::assertNull($htmxResponse->template);
         Assert::assertNull($htmxResponse->blockName);
-
-        Assert::assertIsArray($htmxResponse->viewData);
-        Assert::assertEmpty($htmxResponse->viewData);
-
         Assert::assertEquals(200, $htmxResponse->responseCode);
-
-        Assert::assertIsArray($htmxResponse->headers);
-        Assert::assertEmpty($htmxResponse->headers);
     }
 
     public function testInitForHtmxRequest(): void
     {
-        $builder = HtmxResponseBuilder::init(true, 'template.html.twig');
+        $builder = HtmxResponseBuilder::create(true);
 
         $htmxResponse = $builder->build();
 
-        Assert::assertEquals('template.html.twig', $htmxResponse->template);
-
-        Assert::assertEquals('successComponent', $htmxResponse->blockName);
-
-        Assert::assertIsArray($htmxResponse->viewData);
-        Assert::assertEmpty($htmxResponse->viewData);
-
+        Assert::assertNull($htmxResponse->template);
+        Assert::assertNull($htmxResponse->blockName);
         Assert::assertEquals(200, $htmxResponse->responseCode);
-
-        Assert::assertIsArray($htmxResponse->headers);
-        Assert::assertEmpty($htmxResponse->headers);
     }
 
-    public function testWithHeaders(): void
+    public function testWithRedirect(): void
     {
-        $builder = HtmxResponseBuilder::init(true, 'template.html.twig')
-            ->withHeaders(new HtmxResponseHeader(HtmxResponseHeaderType::REDIRECT, 'https://mdx.pl'));
+        $builder = HtmxResponseBuilder::create(true)
+            ->withRedirect('https://mdx.pl');
 
         $htmxResponse = $builder->build();
 
-        Assert::assertIsArray($htmxResponse->headers);
-        Assert::assertCount(1, $htmxResponse->headers);
-        Assert::assertEquals('HX-Redirect', $htmxResponse->headers[0]->type->value);
-        Assert::assertEquals('https://mdx.pl', $htmxResponse->headers[0]->value);
+        Assert::assertEquals('HX-Redirect', $htmxResponse->headers['HX-Redirect']->getType()->value);
+        Assert::assertEquals('https://mdx.pl', $htmxResponse->headers['HX-Redirect']->getValue());
     }
 
     public function testWithViewParamAddsNewParam(): void
     {
-        $builder = HtmxResponseBuilder::init(true, 'template.html.twig')
+        $builder = HtmxResponseBuilder::create(true)
             ->withViewParam('param1', 'value1');
 
         $htmxResponse = $builder->build();
 
-        Assert::assertIsArray($htmxResponse->viewData);
-        Assert::assertCount(1, $htmxResponse->viewData);
-        Assert::assertArrayHasKey('param1', $htmxResponse->viewData);
-        Assert::assertContains('value1', $htmxResponse->viewData);
+        Assert::assertIsArray($htmxResponse->viewParams);
+        Assert::assertArrayHasKey('param1', $htmxResponse->viewParams);
+        Assert::assertContains('value1', $htmxResponse->viewParams);
     }
 
     public function testWithViewDataReplacesAllParams(): void
     {
-        $builder = HtmxResponseBuilder::init(true, 'template.html.twig')
+        $builder = HtmxResponseBuilder::create(true, 'template.html.twig')
             ->withViewParam('param1', 'value1')
-            ->withViewData(['param2' => 'value2']);
+            ->withViewParams(['param2' => 'value2']);
 
         $htmxResponse = $builder->build();
 
-        Assert::assertIsArray($htmxResponse->viewData);
-        Assert::assertCount(1, $htmxResponse->viewData);
-        Assert::assertArrayNotHasKey('param1', $htmxResponse->viewData);
-        Assert::assertArrayHasKey('param2', $htmxResponse->viewData);
-        Assert::assertContains('value2', $htmxResponse->viewData);
+        Assert::assertArrayNotHasKey('param1', $htmxResponse->viewParams);
+        Assert::assertArrayHasKey('param2', $htmxResponse->viewParams);
+        Assert::assertContains('value2', $htmxResponse->viewParams);
     }
 
     public function testWithTemplateReplacesTemplate(): void
     {
-        $builder = HtmxResponseBuilder::init(true, 'template.html.twig')
+        $builder = HtmxResponseBuilder::create(true)
             ->withTemplate('new-template.html.twig');
 
         $htmxResponse = $builder->build();
@@ -104,19 +81,11 @@ class HtmxResponseBuilderTest extends TestCase
 
     public function testWithBlockSetsBlockName(): void
     {
-        $builder = HtmxResponseBuilder::init(true, 'template.html.twig')
+        $builder = HtmxResponseBuilder::create(true)
             ->withBlock('newBlockName');
 
         $htmxResponse = $builder->build();
 
         Assert::assertEquals($htmxResponse->blockName, 'newBlockName');
-    }
-
-    public function testBlockCannotBeRenderedForNonHtmxRequest(): void
-    {
-        $this->expectException(LogicException::class);
-
-        HtmxResponseBuilder::init(false, 'template.html.twig')
-            ->withBlock('newBlockName');
     }
 }

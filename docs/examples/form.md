@@ -10,7 +10,7 @@ This bundle provides a simple way to handle form submission with htmx.
 
 namespace App\Controller;
 
-use Mdxpl\HtmxBundle\Controller\HtmxTrait;
+use Mdxpl\HtmxBundle\Controller\HtmxControllerTrait;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,7 +25,7 @@ class DemoController extends AbstractController
 {
 
     // 1. Include HtmxTrait
-    use HtmxTrait;
+    use HtmxControllerTrait;
     
      // 2. Use inject HtmxRequest attribute
      // It will automatically parse the htmx attributes from the request using HtmxResponseValueResolver
@@ -35,7 +35,7 @@ class DemoController extends AbstractController
     
         // 3. Use HtmxResponseBuilder to select a template and create a response
         // Check HtmxResponseBuilder methods for more options
-        $responseBuilder = HtmxResponseBuilder::init($request->isHtmx, 'demo/index.html.twig');
+        $responseBuilder = HtmxResponseBuilder::create($request->isHtmx, 'demo/index.html.twig');
         $form = $this->handleForm($request->httpRequest);
 
         if ($form->isSubmitted()) {

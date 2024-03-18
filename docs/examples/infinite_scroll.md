@@ -11,7 +11,7 @@ We don't even need a single line of JavaScript!
 
 namespace App\Controller;
 
-use Mdxpl\HtmxBundle\Controller\HtmxTrait;
+use Mdxpl\HtmxBundle\Controller\HtmxControllerTrait;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,13 +21,13 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class DemoController extends AbstractController
 {
-    use HtmxTrait;
+    use HtmxControllerTrait;
 
     #[Route('/infinite-scroll', name: 'app_demo_infinite_scroll')]
     public function index(HtmxRequest $request, #[MapQueryParameter] int $pageNumber = 1): Response
     {
         // 1. Create the response builder, set the template and add view data
-        $responseBuilder = HtmxResponseBuilder::init($request->isHtmx, 'demo/infinite_scroll.html.twig')
+        $responseBuilder = HtmxResponseBuilder::create($request->isHtmx, 'demo/infinite_scroll.html.twig')
             ->withViewParam('items', $this->generateItemsForPage($pageNumber))
             ->withViewParam('nextPageNumber', $pageNumber + 1);
 

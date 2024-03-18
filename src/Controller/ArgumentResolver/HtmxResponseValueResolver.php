@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Controller\ArgumentResolver;
 
+use Mdxpl\HtmxBundle\EventSubscriber\HtmxRequestSubscriber;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
- * It automatically resolves htmx request, just use "HtmxRequest $request" as an argument in your controller.
+ * It automatically resolves htmx request.
+ * Just use "HtmxRequest $htmx" as an argument in your controller.
  */
 class HtmxResponseValueResolver implements ValueResolverInterface
 {
@@ -21,6 +23,6 @@ class HtmxResponseValueResolver implements ValueResolverInterface
             return [];
         }
 
-        return [HtmxRequest::createFromSymfonyHttpRequest($request)];
+        return [$request->attributes->get(HtmxRequestSubscriber::REQUEST_ATTRIBUTE_NAME)];
     }
 }

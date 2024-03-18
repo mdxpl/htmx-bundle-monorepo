@@ -19,5 +19,24 @@ Read the documentation at:
 
 ## License
 
-MIT License (MIT): see the [License File](LICENSE.md) for more details.
+MIT License (MIT): see the [License File](LICENSE) for more details.
 
+## TODO
+
+- Rewrite tests
+- Support more symfony and PHP versions
+- Describe new service approach
+- Describe default view params
+- Describe how to check if request is htmx
+- Describe builder blocks
+- Describe how to check request headers
+- Describe how to add response header
+- Describe flow when block is generated
+- Add hx events
+- Add more sophisticated HX header objects
+- Add an example with separate templates for partials
+- Describe result
+- More examples
+- Add tests to Ci
+- Add badges to README
+- Add a super simple example

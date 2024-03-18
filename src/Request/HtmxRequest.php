@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\Request;
 readonly class HtmxRequest
 {
     public function __construct(
-        public Request $httpRequest,
         public bool $isHtmx = false,
         public bool $isBoosted = false,
         public ?bool $isForHistoryRestoration = false,
@@ -25,8 +24,8 @@ readonly class HtmxRequest
     public static function createFromSymfonyHttpRequest(Request $httpRequest): self
     {
         $headers = $httpRequest->headers;
+
         return new self(
-            httpRequest: $httpRequest,
             isHtmx: (bool)$headers->get(HtmxRequestHeaderType::REQUEST->value),
             isBoosted: (bool)$headers->get(HtmxRequestHeaderType::BOOSTED->value),
             isForHistoryRestoration: (bool)$headers->get(HtmxRequestHeaderType::HISTORY_RESTORE_REQUEST->value),

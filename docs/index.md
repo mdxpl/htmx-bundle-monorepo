@@ -57,3 +57,4 @@ Examples
 - [Infinite scroll without a single line of JavaScript, let's go!](examples/infinite_scroll.md)
 - [Change content without the whole page reloading is a piece of cake.](examples/simple_page.md)
 - [Asynchronous form handling, no problem!](examples/form.md)
+

@@ -10,20 +10,31 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-
 class HtmxResponseValueResolverTest extends TestCase
 {
     public function testSupportsHtmxRequest(): void
     {
         $resolver = new HtmxResponseValueResolver();
         $request = Request::create('/');
+        $request->headers->set('HX-Request', 'true');
+        $request->attributes->set('htmxRequest', HtmxRequest::createFromSymfonyHttpRequest($request));
+
         $argument = $this->createMock(ArgumentMetadata::class);
         $argument->method('getType')->willReturn(HtmxRequest::class);
 
         $resolved = iterator_to_array($resolver->resolve($request, $argument));
 
-        $this->assertCount(1, $resolved, 'Expected exactly one resolved argument.');
-        $this->assertInstanceOf(HtmxRequest::class, $resolved[0], 'The resolved argument should be an instance of HtmxRequest.');
+        $this->assertCount(
+            1,
+            $resolved,
+            'Expected exactly one resolved argument.',
+        );
+
+        $this->assertInstanceOf(
+            HtmxRequest::class,
+            $resolved[0],
+            'The resolved argument should be an instance of HtmxRequest.',
+        );
     }
 
     public function testDoesNotSupportOtherRequestTypes(): void
