@@ -8,11 +8,11 @@ namespace Mdxpl\HtmxBundle\Response\Swap\Modifiers;
  * You can also change the scrolling behavior of the target element
  * @inheritDoc
  */
-class ScrollingShow implements SwapModifier
+readonly class ScrollingShow implements SwapModifier
 {
     public function __construct(
-        private readonly ScrollingDirection $direction,
-        private readonly ?string $element = null,
+        private ScrollingDirection $direction,
+        private ?string $element = null,
     )
     {
     }

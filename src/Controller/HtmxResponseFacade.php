@@ -9,11 +9,11 @@ use Mdxpl\HtmxBundle\Response\HtmxResponseBuilderFactory;
 use Mdxpl\HtmxBundle\Response\ResponseFactory;
 use Symfony\Component\HttpFoundation\Response;
 
-class HtmxResponseFacade
+readonly class HtmxResponseFacade
 {
     public function __construct(
-        private readonly HtmxResponseBuilderFactory $responseBuilderFactory,
-        private readonly ResponseFactory $responseFactory,
+        private HtmxResponseBuilderFactory $responseBuilderFactory,
+        private ResponseFactory $responseFactory,
     )
     {
     }

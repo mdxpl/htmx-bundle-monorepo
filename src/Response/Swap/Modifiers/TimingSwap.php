@@ -10,12 +10,12 @@ namespace Mdxpl\HtmxBundle\Response\Swap\Modifiers;
  *
  * @inheritDoc
  */
-class TimingSwap implements SwapModifier
+readonly class TimingSwap implements SwapModifier
 {
-    public function __construct(private readonly int $delayInMilliseconds) { }
+    public function __construct(private int $delayInMilliseconds) { }
 
     public function __toString(): string
     {
-        return sprintf('swap:%ds', $this->delayInMilliseconds);
+        return sprintf('swap:%dms', $this->delayInMilliseconds);
     }
 }

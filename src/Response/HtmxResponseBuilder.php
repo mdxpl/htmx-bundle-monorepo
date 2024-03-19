@@ -273,8 +273,6 @@ class HtmxResponseBuilder
 
     public function build(): HtmxResponse
     {
-        $this->assertResponseCodeIsSet();
-
         return new HtmxResponse(
             $this->template,
             $this->block,
@@ -298,17 +296,10 @@ class HtmxResponseBuilder
 
     private function assertNotOverridesReservedViewParams(mixed ...$params): void
     {
-        foreach (HtmxResponseBuilder::RESERVED_VIEW_PARAMS as $reservedViewParam) {
+        foreach (self::RESERVED_VIEW_PARAMS as $reservedViewParam) {
             if (in_array($reservedViewParam, $params, true)) {
                 throw ReservedViewParamCannotBeOverriddenException::withViewParamName($reservedViewParam);
             }
-        }
-    }
-
-    private function assertResponseCodeIsSet(): void
-    {
-        if ($this->responseCode === null) {
-            throw ResponseCodeNotSetException::create();
         }
     }
 }

@@ -10,9 +10,9 @@ namespace Mdxpl\HtmxBundle\Response\Swap\Modifiers;
  *
  * @inheritDoc
  */
-class TimingSettle implements SwapModifier
+readonly class TimingSettle implements SwapModifier
 {
-    public function __construct(private readonly int $delayInMilliseconds) { }
+    public function __construct(private int $delayInMilliseconds) { }
 
     public function __toString(): string
     {
