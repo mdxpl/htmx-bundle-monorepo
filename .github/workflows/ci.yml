@@ -1,81 +1,46 @@
-name: CI
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+# GitHub Action for Symfony
+name: Testing Symfony
+on: [push, pull_request]
 jobs:
-  phpunit:
-    name: "PHPUnit"
-    runs-on: "ubuntu-22.04"
-    continue-on-error: ${{ matrix.can-fail }}
-
+  symfony:
+    name: Symfony (PHP ${{ matrix.php-versions }} on ${{ matrix.operating-system }})
+    runs-on: ${{ matrix.operating-system }}
     strategy:
+      fail-fast: false
       matrix:
-        include:
-#          - php-version: 8.0
-#            composer-flags: ""
-#            can-fail: false
-#            symfony-require: "6.0.*"
-#          - php-version: 8.1
-#            composer-flags: ""
-#            can-fail: false
-#            symfony-require: "6.1.*"
-#          - php-version: 8.2
-#            composer-flags: ""
-#            can-fail: false
-#            symfony-require: "6.2.*"
-          - php-version: 8.3
-            composer-flags: ""
-            can-fail: false
-            symfony-require: "7.0.*"
-#          - php-version: 8.2
-#            composer-flags: ""
-#            can-fail: true # we don't want to fail the build if we are incompatible with the next (unstable) Symfony version
-
+        operating-system: [ubuntu-latest, windows-latest, macos-latest]
+        php-versions: ['8.2', '8.3']
     steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v4"
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: "Install PHP with XDebug"
-        uses: "shivammathur/setup-php@v2"
-        if: "${{ matrix.coverage != '' }}"
+      # Docs: https://github.com/shivammathur/setup-php
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: "${{ matrix.php-version }}"
-          coverage: "xdebug"
-          tools: "composer:v2,flex"
+          php-version: ${{ matrix.php-versions }}
+          tools: phpunit-bridge
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite
+          coverage: xdebug
 
-      - name: "Install PHP without coverage"
-        uses: "shivammathur/setup-php@v2"
-        if: "${{ matrix.coverage == '' }}"
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v3
         with:
-          php-version: "${{ matrix.php-version }}"
-          coverage: "none"
-          tools: "composer:v2,flex"
+          path: ${{ steps.composer-cache.outputs.dir }}
+          # Use composer.json for key, if composer.lock is not committed.
+          # key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
 
-      - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v3"
-        with:
-          path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-locked-${{ hashFiles('composer.lock') }}"
-          restore-keys: "php-${{ matrix.php-version }}-composer-locked-"
+      - name: Install Composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
 
-      - name: "Install dependencies with composer"
-        env:
-          SYMFONY_REQUIRE: "${{ matrix.symfony-require }}"
-        run: |
-          composer remove friendsofphp/php-cs-fixer --dev --no-update
-          composer update --no-interaction --no-progress ${{ matrix.composer-flags }}
+      - name: Install PHPUnit
+        run: simple-phpunit install
 
-      - name: "Run PHPUnit"
-        if: "${{ matrix.coverage != '' }}"
-        run: |
-          XDEBUG_MODE=coverage ./phpunit --coverage-clover=coverage.clover
-          wget https://scrutinizer-ci.com/ocular.phar
-          php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-
-      - name: "Run PHPUnit"
-        if: "${{ matrix.coverage == '' }}"
-        run: "./phpunit"
+      - name: Run tests
+        run: simple-phpunit --coverage-text
