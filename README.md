@@ -15,6 +15,13 @@ Read the documentation at:
 - [Change content without the whole page reloading is a piece of cake.](docs/examples/simple_page.md)
 - [Asynchronous form handling, no problem!](docs/examples/form.md)
 
+## Supported versions
+
+| PHP Version | Symfony Version |
+|-------------|-----------------|
+| 8.2         | 5.4, 6.4, 7.0   |
+| 8.3         | 5.4, 6.4, 7.0   |
+
 ## Credits
 
 - [Mateusz Dołęga](https://mdx.pl)
