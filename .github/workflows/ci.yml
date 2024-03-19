@@ -3,7 +3,7 @@ name: Testing Symfony
 on: [push, pull_request]
 jobs:
   symfony:
-    name: Symfony ${{ matrix.symfony }} (PHP ${{ matrix.php-versions }} on ${{ matrix.operating-system }})
+    name: Symfony ${{ matrix.symfony }} (PHP ${{ matrix.php-versions }}
     runs-on: ${{ matrix.operating-system }}
     strategy:
       fail-fast: false
