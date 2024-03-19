@@ -31,19 +31,3 @@ Read the documentation at:
 ## License
 
 MIT License (MIT): see the [License File](LICENSE) for more details.
-
-## TODO
-
-- Describe new service approach
-- Describe default view params
-- Describe how to check if request is htmx
-- Describe builder blocks
-- Describe how to check request headers
-- Describe how to add response header
-- Describe flow when block is generated
-- Describe result
-- Add a super simple example
-- allow to render multiple blocks, templates in one request
-- global / local errors handling
-- more examples using symfony forms like multi select list, submitting
-- Create a demo repository/live webpage with all examples https://htmx.mdx.pl
