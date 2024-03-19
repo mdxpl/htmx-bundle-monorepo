@@ -35,7 +35,6 @@ MIT License (MIT): see the [License File](LICENSE) for more details.
 
 ## TODO
 
-- Rewrite tests
 - Describe new service approach
 - Describe default view params
 - Describe how to check if request is htmx
@@ -47,3 +46,4 @@ MIT License (MIT): see the [License File](LICENSE) for more details.
 - Describe result
 - More examples
 - Add a super simple example
+- Create a demo repository/live webpage with all examples https://htmx.mdx.pl
