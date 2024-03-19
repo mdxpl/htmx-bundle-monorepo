@@ -33,8 +33,12 @@ readonly class HtmxResponseFacade
         return $this->responseBuilderFactory->create($fromHtmxRequest);
     }
 
+    /**
+     * If you return the HtmxResponse from your controller, the HtmxResponseSubscriber will handle it.
+     * Use it if you want to create the Symfony response manually.
+     */
     public function createResponse(HtmxResponseBuilder $responseBuilder): Response
     {
-        return $this->responseFactory->create($responseBuilder);
+        return $this->responseFactory->create($responseBuilder->build());
     }
 }

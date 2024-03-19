@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 readonly class HtmxRequest
 {
+    public const REQUEST_ATTRIBUTE_NAME = 'htmxRequest';
+
     public function __construct(
         public bool $isHtmx = false,
         public bool $isBoosted = false,

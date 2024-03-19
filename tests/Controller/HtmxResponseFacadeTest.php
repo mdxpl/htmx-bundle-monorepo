@@ -8,8 +8,10 @@ use Mdxpl\HtmxBundle\Controller\HtmxResponseFacade;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilderFactory;
 use Mdxpl\HtmxBundle\Response\ResponseFactory;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 class HtmxResponseFacadeTest extends TestCase
 {
@@ -56,16 +58,14 @@ class HtmxResponseFacadeTest extends TestCase
 
     public function testCreateResponse(): void
     {
-        $responseBuilderFactory = $this->createMock(HtmxResponseBuilderFactory::class);
-        $responseFactory = $this->createMock(ResponseFactory::class);
-        $responseBuilder = $this->createMock(HtmxResponseBuilder::class);
+        $twigMock = $this->createMock(Environment::class);
+        $responseBuilderFactory = new HtmxResponseBuilderFactory();
+        $responseFactory = new ResponseFactory($twigMock);
+        $responseBuilder = HtmxResponseBuilder::create(true);
 
-        $responseFactory->expects($this->once())
-            ->method('create')
-            ->with($responseBuilder)
-            ->willReturn($this->createMock(Response::class));
-
-        (new HtmxResponseFacade($responseBuilderFactory, $responseFactory))
+        $response = (new HtmxResponseFacade($responseBuilderFactory, $responseFactory))
             ->createResponse($responseBuilder);
+
+        Assert::assertInstanceOf(Response::class, $response);
     }
 }

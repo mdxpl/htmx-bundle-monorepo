@@ -16,9 +16,8 @@ class ResponseFactory
     /**
      * Creates a Symfony http, html response
      */
-    public function create(HtmxResponseBuilder $htmxResponseBuilder): Response
+    public function create(HtmxResponse $htmxResponse): Response
     {
-        $htmxResponse = $htmxResponseBuilder->build();
         $response = new Response(null, $htmxResponse->responseCode);
         $this->setHeaders($htmxResponse, $response);
 
@@ -28,7 +27,7 @@ class ResponseFactory
         }
 
         // Render block if from htmx request and block name is set
-        if ($htmxResponseBuilder->fromHtmxRequest && $htmxResponse->blockName !== null) {
+        if ($htmxResponse->isFromHtmxRequest && $htmxResponse->blockName !== null) {
             return $response->setContent(
                 $this->twig->load($htmxResponse->template)->renderBlock(
                     $htmxResponse->blockName,

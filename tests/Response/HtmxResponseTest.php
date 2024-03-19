@@ -12,12 +12,14 @@ class HtmxResponseTest extends TestCase
     public function testCreate(): void
     {
         $htmxResponse = new HtmxResponse(
+            true,
             'template',
             'block',
             ['test' => 'ok'],
             201
         );
 
+        $this->assertEquals(true, $htmxResponse->isFromHtmxRequest);
         $this->assertEquals('template', $htmxResponse->template);
         $this->assertEquals('block', $htmxResponse->blockName);
         $this->assertArrayHasKey('test', $htmxResponse->viewParams);

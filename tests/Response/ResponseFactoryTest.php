@@ -16,7 +16,7 @@ class ResponseFactoryTest extends TestCase
     {
         $builder = HtmxResponseBuilder::create(false);
         $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder);
+        $response = $factory->create($builder->build());
 
         self::assertEmpty($response->getContent());
         self::assertEquals(200, $response->getStatusCode());
@@ -27,7 +27,7 @@ class ResponseFactoryTest extends TestCase
         $builder = HtmxResponseBuilder::create(false)
             ->withTemplate('withDefaultBlocks.html.twig');
         $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder);
+        $response = $factory->create($builder->build());
 
         self::assertEquals('Body text', $response->getContent());
         self::assertEquals(200, $response->getStatusCode());
@@ -38,7 +38,7 @@ class ResponseFactoryTest extends TestCase
         $builder = HtmxResponseBuilder::create(true)
             ->withTemplate('withDefaultBlocks.html.twig');
         $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder);
+        $response = $factory->create($builder->build());
 
         self::assertEquals('Body text', $response->getContent());
         self::assertEquals(200, $response->getStatusCode());
@@ -51,7 +51,7 @@ class ResponseFactoryTest extends TestCase
             ->withBlock('custom');
 
         $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder);
+        $response = $factory->create($builder->build());
 
         self::assertEquals('Body text', $response->getContent());
         self::assertEquals(200, $response->getStatusCode());
@@ -63,7 +63,7 @@ class ResponseFactoryTest extends TestCase
             ->withTemplate('withDefaultBlocks.html.twig')
             ->withBlock('custom');
         $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder);
+        $response = $factory->create($builder->build());
 
         self::assertEquals('Custom block text', $response->getContent());
         self::assertEquals(200, $response->getStatusCode());
@@ -73,7 +73,7 @@ class ResponseFactoryTest extends TestCase
     {
         $builder = HtmxResponseBuilder::create(true)->withFailure();
         $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder);
+        $response = $factory->create($builder->build());
 
         self::assertEquals(422, $response->getStatusCode());
     }
@@ -83,7 +83,7 @@ class ResponseFactoryTest extends TestCase
         $builder = HtmxResponseBuilder::create(true)
             ->withRedirect('https://mdx.pl');
         $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder);
+        $response = $factory->create($builder->build());
 
         self::assertTrue($response->headers->has('HX-Redirect'));
         self::assertEquals('https://mdx.pl', $response->headers->get('HX-Redirect'));
@@ -95,7 +95,7 @@ class ResponseFactoryTest extends TestCase
             ->withTemplate('withParam.html.twig')
             ->withViewParam('testParam', 'MDX');
         $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder);
+        $response = $factory->create($builder->build());
 
         self::assertEquals('Body text MDX', $response->getContent());
     }
@@ -107,7 +107,7 @@ class ResponseFactoryTest extends TestCase
             ->withBlock('custom')
             ->withViewParam('testParam', 'MDX');
         $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder);
+        $response = $factory->create($builder->build());
 
         self::assertEquals('Custom block text MDX', $response->getContent());
     }

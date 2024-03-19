@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Controller\ArgumentResolver;
 
-use Mdxpl\HtmxBundle\EventSubscriber\HtmxRequestSubscriber;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -23,6 +22,6 @@ class HtmxResponseValueResolver implements ValueResolverInterface
             return [];
         }
 
-        return [$request->attributes->get(HtmxRequestSubscriber::REQUEST_ATTRIBUTE_NAME)];
+        return [$request->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME)];
     }
 }

@@ -29,7 +29,7 @@ class HtmxRequestSubscriberTest extends TestCase
 
         $this->assertInstanceOf(
             HtmxRequest::class,
-            $request->attributes->get(HtmxRequestSubscriber::REQUEST_ATTRIBUTE_NAME),
+            $request->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME),
         );
     }
 
@@ -44,7 +44,8 @@ class HtmxRequestSubscriberTest extends TestCase
         $subscriber = new HtmxRequestSubscriber();
         $subscriber->onKernelRequest($event);
 
-        $this->assertNull($request->attributes->get(HtmxRequestSubscriber::REQUEST_ATTRIBUTE_NAME));
+        $this->assertTrue($request->attributes->has(HtmxRequest::REQUEST_ATTRIBUTE_NAME));
+        $this->assertFalse($request->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME)->isHtmx);
     }
 
     public function testGetSubscribedEvents(): void

@@ -13,6 +13,7 @@ readonly class HtmxResponse
     public const IS_HTMX_REQUEST_VIEW_PARAM_NAME = 'is_htmx_request';
 
     public function __construct(
+        public bool $isFromHtmxRequest,
         public ?string $template,
         public ?string $blockName,
         public array $viewParams,

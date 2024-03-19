@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mdxpl\HtmxBundle\Response;
 
 use Mdxpl\HtmxBundle\Exception\ReservedViewParamCannotBeOverriddenException;
-use Mdxpl\HtmxBundle\Exception\ResponseCodeNotSetException;
 use Mdxpl\HtmxBundle\Response\Headers\HtmxResponseHeader;
 use Mdxpl\HtmxBundle\Response\Headers\Location;
 use Mdxpl\HtmxBundle\Response\Headers\PushUrl;
@@ -274,6 +273,7 @@ class HtmxResponseBuilder
     public function build(): HtmxResponse
     {
         return new HtmxResponse(
+            $this->fromHtmxRequest,
             $this->template,
             $this->block,
             $this->viewParams,
