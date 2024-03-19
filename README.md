@@ -6,7 +6,7 @@ This bundle makes it easy to use [HTMX](https://htmx.com) with
 [Symfony's Controllers](https://symfony.com/doc/current/controller.html)
 
 
-![Tests](https://github.com/mdxpl/htmx-bundle/actions/workflows/ci.yml/badge.svg) ![Static Badge](https://img.shields.io/badge/Code%20coverage-100%25-success?logo=php)
+[![Tests](https://github.com/mdxpl/htmx-bundle/actions/workflows/ci.yml/badge.svg)](#) [![Static Badge](https://img.shields.io/badge/Code%20coverage-100%25-success?logo=php)](#)
 
 ## Documentation
 
