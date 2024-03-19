@@ -1,7 +1,9 @@
 # Htmx for Symfony controllers
 
-This bundle makes it easy to use [HTMX](https://tailwindcss.com/) with
+This bundle makes it easy to use [HTMX](https://htmx.com) with
 [Symfony's Controllers](https://symfony.com/doc/current/controller.html)
+
+![Test](https://github.com/mdxpl/htmx-bundle/actions/workflows/symfony.yml/badge.svg)
 
 ## Documentation
 
