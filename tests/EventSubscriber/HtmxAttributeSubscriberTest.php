@@ -37,8 +37,7 @@ class HtmxAttributeSubscriberTest extends TestCase
         bool $htmxRequest,
         bool $annotatedController,
         bool $shouldThrowsException,
-    ): void
-    {
+    ): void {
         if ($shouldThrowsException) {
             $this->expectException(HttpException::class);
         }

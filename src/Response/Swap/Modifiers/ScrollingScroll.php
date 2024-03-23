@@ -13,8 +13,7 @@ readonly class ScrollingScroll implements SwapModifier
     public function __construct(
         private ScrollingDirection $direction,
         private ?string $element = null,
-    )
-    {
+    ) {
     }
 
     public function __toString(): string

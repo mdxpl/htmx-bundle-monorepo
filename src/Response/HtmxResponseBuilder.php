@@ -41,8 +41,7 @@ class HtmxResponseBuilder
         private readonly bool $fromHtmxRequest,
         private readonly array $commonViewData = [],
         private readonly bool $setDefaultViewData = true,
-    )
-    {
+    ) {
         $this->views = new ViewsCollection();
         $this->headers = new HtmxResponseHeaderCollection();
         $this->setDefaultViewData(Result::UNKNOWN, $fromHtmxRequest);

@@ -18,8 +18,7 @@ readonly class HtmxResponse
         public int $responseCode = 204,
         ViewsCollection|View|null $view = null,
         HtmxResponseHeaderCollection|HtmxResponseHeader|null $header = null,
-    )
-    {
+    ) {
         $this->resolveHeaders($header);
         $this->resolveViewsCollection($view);
     }

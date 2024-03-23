@@ -25,7 +25,7 @@ class ResponseFactory
             return $response;
         }
 
-        $renderedViews = $htmxResponse->views->map(fn(View $view) => $this->renderView($view));
+        $renderedViews = $htmxResponse->views->map(fn (View $view) => $this->renderView($view));
         $combinedViews = implode($this->getTemplatesSeparator(), $renderedViews);
 
         return $response->setContent($combinedViews);

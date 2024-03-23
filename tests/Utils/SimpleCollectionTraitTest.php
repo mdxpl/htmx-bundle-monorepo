@@ -54,7 +54,7 @@ class SimpleCollectionTraitTest extends TestCase
         $expected = [2, 3, 4];
 
         $original = $this->createCollection(...$items);
-        $modified = $original->each(fn($item) => $item + 1);
+        $modified = $original->each(fn ($item) => $item + 1);
 
         Assert::assertEquals($expected, $modified->getIterator()->getArrayCopy());
     }
@@ -64,7 +64,7 @@ class SimpleCollectionTraitTest extends TestCase
         $items = [1, 2, 3];
 
         $original = $this->createCollection(...$items);
-        $modified = $original->each(fn($item) => $item + 1);
+        $modified = $original->each(fn ($item) => $item + 1);
 
         Assert::assertNotSame($original, $modified);
         Assert::assertEquals($original, $this->createCollection(...$items));
@@ -76,7 +76,7 @@ class SimpleCollectionTraitTest extends TestCase
         $original = $this->createCollection(... $items);
         $map = [1 => 'c', 2 => 'b', 3 => 'a'];
         $expected = ['c', 'b', 'a'];
-        $modified = $original->map(fn($item) => $map[$item]);
+        $modified = $original->map(fn ($item) => $map[$item]);
 
         Assert::assertEquals($expected, $modified);
     }
@@ -85,7 +85,7 @@ class SimpleCollectionTraitTest extends TestCase
     {
         $items = [1, 2, 3];
         $original = $this->createCollection(... $items);
-        $modified = $original->each(fn($item) => $item + 1);
+        $modified = $original->each(fn ($item) => $item + 1);
 
         Assert::assertNotSame($original, $modified);
         Assert::assertEquals($original, $this->createCollection(...$items));
@@ -97,7 +97,7 @@ class SimpleCollectionTraitTest extends TestCase
         $expected = [1, 2];
 
         $original = $this->createCollection(... $items);
-        $modified = $original->filter(fn($item) => $item < 3);
+        $modified = $original->filter(fn ($item) => $item < 3);
 
         Assert::assertEquals($expected, $modified->getIterator()->getArrayCopy());
     }
@@ -106,7 +106,7 @@ class SimpleCollectionTraitTest extends TestCase
     {
         $items = [1, 2, 3];
         $original = $this->createCollection(... [1, 2, 3]);
-        $modified = $original->filter(fn($item) => $item < 3);
+        $modified = $original->filter(fn ($item) => $item < 3);
 
         Assert::assertNotSame($original, $modified);
         Assert::assertEquals($original, $this->createCollection(...$items));

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Response\View;
 
@@ -15,8 +15,7 @@ readonly class View
         public ?string $template = null,
         public ?string $block = null,
         public array $data = [],
-    )
-    {
+    ) {
         $this->assertTemplate();
     }
 

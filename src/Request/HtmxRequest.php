@@ -19,8 +19,7 @@ readonly class HtmxRequest
         public ?string $target = null,
         public ?string $triggerName = null,
         public ?string $trigger = null,
-    )
-    {
+    ) {
     }
 
     public static function createFromSymfonyHttpRequest(Request $httpRequest): self

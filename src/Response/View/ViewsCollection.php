@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Response\View;
 
@@ -29,7 +29,7 @@ class ViewsCollection implements Countable, IteratorAggregate
 
     private function allViewsHaveNoContent(): bool
     {
-        return $this->filter(fn(View $view) => $view->hasContent())->isEmpty();
+        return $this->filter(fn (View $view) => $view->hasContent())->isEmpty();
     }
 
     public function first(): View

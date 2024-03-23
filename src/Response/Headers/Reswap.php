@@ -26,7 +26,7 @@ class Reswap implements HtmxResponseHeader
 
     public function getValue(): string
     {
-        $modifiers = array_map(fn(SwapModifier $modifier) => (string)$modifier, $this->modifiers);
+        $modifiers = array_map(fn (SwapModifier $modifier) => (string)$modifier, $this->modifiers);
         $modifiersAsString = implode(' ', $modifiers);
 
         return implode(' ', array_filter([$this->style->value, $modifiersAsString]));
