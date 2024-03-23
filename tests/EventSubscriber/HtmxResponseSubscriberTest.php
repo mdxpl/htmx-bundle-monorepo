@@ -30,7 +30,7 @@ class HtmxResponseSubscriberTest extends TestCase
             $this->createMock(KernelInterface::class),
             new Request(),
             1,
-            new HtmxResponse(true, null, null, [], 200)
+            new HtmxResponse(200)
         );
 
         $twig = $this->createMock(Environment::class);

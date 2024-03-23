@@ -12,7 +12,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 readonly class HtmxResponseSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private ResponseFactory $responseFactory) { }
+    public function __construct(private ResponseFactory $responseFactory)
+    {
+    }
 
     public static function getSubscribedEvents(): array
     {

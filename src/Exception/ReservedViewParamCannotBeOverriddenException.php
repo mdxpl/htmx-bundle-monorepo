@@ -6,7 +6,7 @@ namespace Mdxpl\HtmxBundle\Exception;
 
 use LogicException;
 
-class ReservedViewParamCannotBeOverriddenException extends LogicException
+class ReservedViewParamCannotBeOverriddenException extends LogicException implements HtmxBundleException
 {
     public static function withViewParamName(string $viewParamName): self
     {

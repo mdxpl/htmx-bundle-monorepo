@@ -17,7 +17,7 @@ class HtmxResponseValueResolverTest extends TestCase
         $resolver = new HtmxResponseValueResolver();
         $request = Request::create('/');
         $request->headers->set('HX-Request', 'true');
-        $request->attributes->set('htmxRequest', HtmxRequest::createFromSymfonyHttpRequest($request));
+        $request->attributes->set('mdx_htmx_request', HtmxRequest::createFromSymfonyHttpRequest($request));
 
         $argument = $this->createMock(ArgumentMetadata::class);
         $argument->method('getType')->willReturn(HtmxRequest::class);

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Response;
 
-use Mdxpl\HtmxBundle\Exception\ReservedViewParamCannotBeOverriddenException;
 use Mdxpl\HtmxBundle\Response\Headers\HtmxResponseHeader;
+use Mdxpl\HtmxBundle\Response\Headers\HtmxResponseHeaderCollection;
 use Mdxpl\HtmxBundle\Response\Headers\Location;
 use Mdxpl\HtmxBundle\Response\Headers\PushUrl;
 use Mdxpl\HtmxBundle\Response\Headers\Redirect;
@@ -19,105 +19,72 @@ use Mdxpl\HtmxBundle\Response\Headers\TriggerAfterSettle;
 use Mdxpl\HtmxBundle\Response\Headers\TriggerAfterSwap;
 use Mdxpl\HtmxBundle\Response\Swap\Modifiers\SwapModifier;
 use Mdxpl\HtmxBundle\Response\Swap\SwapStyle;
+use Mdxpl\HtmxBundle\Response\View\View;
+use Mdxpl\HtmxBundle\Response\View\ViewsCollection;
 
 class HtmxResponseBuilder
 {
-    /**
-     * The build-in view params that are set automatically and cannot be overridden.
-     */
-    public const RESERVED_VIEW_PARAMS = [
-        HtmxResponse::RESULT_VIEW_PARAM_NAME,
-        HtmxResponse::IS_HTMX_REQUEST_VIEW_PARAM_NAME,
-    ];
+    use HasDefaultViewDataTrait;
 
-    private array $viewParams = [];
+    private HtmxResponseHeaderCollection $headers;
 
-    private array $headers = [];
+    private ViewsCollection $views;
 
-    private int $responseCode = 200;
-
-    private ?string $template = null;
-
-    private ?string $block = null;
+    private int $responseCode = 204;
 
     /**
      * @param bool $fromHtmxRequest Whether the request is from htmx or not.
+     * @param array $commonViewData View data that will be added to each view.
+     * @param bool $setDefaultViewData Whether build-in view params should be added to each view.
      */
-    private function __construct(public readonly bool $fromHtmxRequest)
+    private function __construct(
+        private readonly bool $fromHtmxRequest,
+        private readonly array $commonViewData = [],
+        private readonly bool $setDefaultViewData = true,
+    )
     {
-        $this->viewParams[HtmxResponse::RESULT_VIEW_PARAM_NAME] = Result::UNKNOWN;
-        $this->viewParams[HtmxResponse::IS_HTMX_REQUEST_VIEW_PARAM_NAME] = $fromHtmxRequest;
+        $this->views = new ViewsCollection();
+        $this->headers = new HtmxResponseHeaderCollection();
+        $this->setDefaultViewData(Result::UNKNOWN, $fromHtmxRequest);
     }
 
     /**
      * @param bool $fromHtmxRequest Whether the request is from htmx or not.
      */
-    public static function create(bool $fromHtmxRequest): self
+    public static function create(bool $fromHtmxRequest, array $viewData = []): self
     {
-        return new self($fromHtmxRequest);
+        return new self($fromHtmxRequest, $viewData);
     }
 
-    /**
-     * The template is the path to the Twig template that should be rendered.
-     */
-    public function withTemplate(string $template): self
+    public function responseCode(int $responseCode, Result $result): self
     {
-        $this->template = $template;
+        $this->withResponseCode($responseCode);
+        $this->defaultViewData[View::RESULT_VIEW_PARAM_NAME] = $result;
 
         return $this;
     }
 
-    /**
-     * The block is the name of the block that should be rendered from the template.
-     *
-     * If null, the entire template will be rendered.
-     * The template must contain the block, otherwise an exception will be thrown.
-     */
-    public function withBlock(?string $block): self
+    public function noContent(Result $result = Result::UNKNOWN): self
     {
-        $this->block = $block;
+        $this->clearViews();
+        $this->withResponseCode(204);
+        $this->defaultViewData[View::RESULT_VIEW_PARAM_NAME] = $result;
 
         return $this;
     }
 
-    /**
-     * Consider using withSuccess() or withFailure() if you want to set the response code to a common value.
-     */
-    public function withResponseCode(int $responseCode): self
-    {
-        $this->responseCode = $responseCode;
-
-        return $this;
-    }
-
-    /**
-     * Sets the response code to 422. Which is the common response code for validation errors.
-     */
-    public function withFailure(): self
+    public function failure(): self
     {
         $this->withResponseCode(422);
-        $this->viewParams[HtmxResponse::RESULT_VIEW_PARAM_NAME] = Result::FAILURE;
+        $this->defaultViewData[View::RESULT_VIEW_PARAM_NAME] = Result::FAILURE;
 
         return $this;
     }
 
-    /**
-     * Sets the response code to 200. Which is the common response code for successful requests.
-     */
-    public function withSuccess(): self
+    public function success(): self
     {
         $this->withResponseCode(200);
-        $this->viewParams[HtmxResponse::RESULT_VIEW_PARAM_NAME] = Result::SUCCESS;
-
-        return $this;
-    }
-
-    /**
-     * Overwrites all headers. Use withHeader() to add a single header.
-     */
-    public function withHeaders(HtmxResponseHeader ...$headers): self
-    {
-        $this->headers = $headers;
+        $this->defaultViewData[View::RESULT_VIEW_PARAM_NAME] = Result::SUCCESS;
 
         return $this;
     }
@@ -125,20 +92,9 @@ class HtmxResponseBuilder
     /**
      * Adds a single header.
      */
-    public function withHeader(HtmxResponseHeader $header): self
+    public function header(HtmxResponseHeader $header): self
     {
-        $this->headers[$header->getType()->value] = $header;
-
-        return $this;
-    }
-
-    /**
-     * Overwrites all view params. Use withViewParam() to add a single param.
-     */
-    public function withViewParams(array $viewParams): self
-    {
-        $this->assertNotOverridesReservedViewParams(...array_keys($viewParams));
-        $this->viewParams = array_merge($this->getReservedViewParams(), $viewParams);
+        $this->headers = $this->headers->add($header);
 
         return $this;
     }
@@ -146,10 +102,30 @@ class HtmxResponseBuilder
     /**
      * Adds a single view param.
      */
-    public function withViewParam(string $name, mixed $param): self
+    public function view(string $template, array $viewData = [], ?string $block = null): self
     {
-        $this->assertNotOverridesReservedViewParams($name);
-        $this->viewParams[$name] = $param;
+        $viewData = array_merge($this->commonViewData, $viewData);
+        if ($this->setDefaultViewData) {
+            $this->assertNotOverridesReservedViewParams($viewData);
+            $viewData = array_merge($this->defaultViewData, $viewData);
+        }
+
+        $this->views = $this->views->add(View::create($template, $block, $viewData));
+
+        return $this;
+    }
+
+    public function viewBlock(string $template, string $block, array $viewData = []): self
+    {
+        return $this->view($template, $viewData, $block);
+    }
+
+    /**
+     * Clears all views. Use withView() to add a single view.
+     */
+    public function clearViews(): self
+    {
+        $this->views = new ViewsCollection();
 
         return $this;
     }
@@ -157,9 +133,9 @@ class HtmxResponseBuilder
     /**
      * Allows you to do a client-side redirect that does not do a full page reload
      */
-    public function withLocation(string $url): self
+    public function location(string $url): self
     {
-        $this->withHeader(new Location($url));
+        $this->header(new Location($url));
 
         return $this;
     }
@@ -167,9 +143,9 @@ class HtmxResponseBuilder
     /**
      * Pushes a new url into the history stack
      */
-    public function withPushUrl(string $url): self
+    public function pushUrl(string $url): self
     {
-        $this->withHeader(new PushUrl($url));
+        $this->header(new PushUrl($url));
 
         return $this;
     }
@@ -177,9 +153,9 @@ class HtmxResponseBuilder
     /**
      * Can be used to do a client-side redirect to a new location
      */
-    public function withRedirect(string $url): self
+    public function redirect(string $url): self
     {
-        $this->withHeader(new Redirect($url));
+        $this->header(new Redirect($url));
 
         return $this;
     }
@@ -187,9 +163,9 @@ class HtmxResponseBuilder
     /**
      * The client-side will do a full refresh of the page
      */
-    public function withRefresh(): self
+    public function refresh(): self
     {
-        $this->withHeader(new Refresh());
+        $this->header(new Refresh());
 
         return $this;
     }
@@ -197,9 +173,9 @@ class HtmxResponseBuilder
     /**
      * Replaces the current URL in the location bar
      */
-    public function withReplaceUrl(string $url): self
+    public function replaceUrl(string $url): self
     {
-        $this->withHeader(new ReplaceUrl($url));
+        $this->header(new ReplaceUrl($url));
 
         return $this;
     }
@@ -210,7 +186,7 @@ class HtmxResponseBuilder
      */
     public function withReswap(SwapStyle $style, SwapModifier ...$modifiers): self
     {
-        $this->withHeader(new Reswap($style, ...$modifiers));
+        $this->header(new Reswap($style, ...$modifiers));
 
         return $this;
     }
@@ -218,9 +194,9 @@ class HtmxResponseBuilder
     /**
      * A CSS selector that updates the target of the content update to a different element on the page
      */
-    public function withRetarget(string $cssSelector): self
+    public function retarget(string $cssSelector): self
     {
-        $this->withHeader(new Retarget($cssSelector));
+        $this->header(new Retarget($cssSelector));
 
         return $this;
     }
@@ -229,9 +205,9 @@ class HtmxResponseBuilder
      * A CSS selector that allows you to choose which part of the response is used to be swapped in.
      * Overrides an existing hx-select on the triggering element
      */
-    public function withReselect(string $cssSelector): self
+    public function reselect(string $cssSelector): self
     {
-        $this->withHeader(new Reselect($cssSelector));
+        $this->header(new Reselect($cssSelector));
 
         return $this;
     }
@@ -240,9 +216,9 @@ class HtmxResponseBuilder
      * Trigger events as soon as the response is received.
      * @see \Mdxpl\HtmxBundle\Response\Headers\AbstractTrigger
      */
-    public function withTrigger(string|array $events): self
+    public function trigger(string|array $events): self
     {
-        $this->withHeader(new Trigger($events));
+        $this->header(new Trigger($events));
 
         return $this;
     }
@@ -251,9 +227,9 @@ class HtmxResponseBuilder
      * Trigger events after the settling step.
      * @see \Mdxpl\HtmxBundle\Response\Headers\AbstractTrigger
      */
-    public function withTriggerAfterSettle(string|array $events): self
+    public function triggerAfterSettle(string|array $events): self
     {
-        $this->withHeader(new TriggerAfterSettle($events));
+        $this->header(new TriggerAfterSettle($events));
 
         return $this;
     }
@@ -262,44 +238,26 @@ class HtmxResponseBuilder
      * Allows you to trigger client-side events after the swap step.
      * @see \Mdxpl\HtmxBundle\Response\Headers\AbstractTrigger
      */
-    public function withTriggerAfterSwap(string|array $events): self
+    public function triggerAfterSwap(string|array $events): self
     {
-        $this->withHeader(new TriggerAfterSwap($events));
+        $this->header(new TriggerAfterSwap($events));
 
         return $this;
     }
 
-
     public function build(): HtmxResponse
     {
         return new HtmxResponse(
-            $this->fromHtmxRequest,
-            $this->template,
-            $this->block,
-            $this->viewParams,
             $this->responseCode,
+            $this->views,
             $this->headers,
         );
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    private function getReservedViewParams(): array
+    private function withResponseCode(int $responseCode): self
     {
-        return array_filter(
-            $this->viewParams,
-            fn(string $key) => in_array($key, self::RESERVED_VIEW_PARAMS, true),
-            ARRAY_FILTER_USE_KEY,
-        );
-    }
+        $this->responseCode = $responseCode;
 
-    private function assertNotOverridesReservedViewParams(mixed ...$params): void
-    {
-        foreach (self::RESERVED_VIEW_PARAMS as $reservedViewParam) {
-            if (in_array($reservedViewParam, $params, true)) {
-                throw ReservedViewParamCannotBeOverriddenException::withViewParamName($reservedViewParam);
-            }
-        }
+        return $this;
     }
 }

@@ -19,49 +19,14 @@ class ResponseFactoryTest extends TestCase
         $response = $factory->create($builder->build());
 
         self::assertEmpty($response->getContent());
-        self::assertEquals(200, $response->getStatusCode());
-    }
-
-    public function testCreateWithTemplateNonHtmxRendersFullPage(): void
-    {
-        $builder = HtmxResponseBuilder::create(false)
-            ->withTemplate('withDefaultBlocks.html.twig');
-        $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder->build());
-
-        self::assertEquals('Body text', $response->getContent());
-        self::assertEquals(200, $response->getStatusCode());
-    }
-
-    public function testCreateWithTemplateHtmxRendersFullPage(): void
-    {
-        $builder = HtmxResponseBuilder::create(true)
-            ->withTemplate('withDefaultBlocks.html.twig');
-        $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder->build());
-
-        self::assertEquals('Body text', $response->getContent());
-        self::assertEquals(200, $response->getStatusCode());
-    }
-
-    public function testCreateWithTemplateNonHtmxWithBlockRendersFullPage(): void
-    {
-        $builder = HtmxResponseBuilder::create(false)
-            ->withTemplate('withDefaultBlocks.html.twig')
-            ->withBlock('custom');
-
-        $factory = new ResponseFactory($this->initTwig());
-        $response = $factory->create($builder->build());
-
-        self::assertEquals('Body text', $response->getContent());
-        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals(204, $response->getStatusCode());
     }
 
     public function testCreateWithTemplateHtmxWithBlockRendersSelectedBlock(): void
     {
-        $builder = HtmxResponseBuilder::create(true)
-            ->withTemplate('withDefaultBlocks.html.twig')
-            ->withBlock('custom');
+        $builder = HtmxResponseBuilder::create(true)->success()
+            ->viewBlock('withDefaultBlocks.html.twig', 'custom');
+
         $factory = new ResponseFactory($this->initTwig());
         $response = $factory->create($builder->build());
 
@@ -71,7 +36,7 @@ class ResponseFactoryTest extends TestCase
 
     public function testCreateWithFailureReturnsErrorCode(): void
     {
-        $builder = HtmxResponseBuilder::create(true)->withFailure();
+        $builder = HtmxResponseBuilder::create(true)->failure();
         $factory = new ResponseFactory($this->initTwig());
         $response = $factory->create($builder->build());
 
@@ -81,7 +46,7 @@ class ResponseFactoryTest extends TestCase
     public function testCreateWithHeaderSetsHeader(): void
     {
         $builder = HtmxResponseBuilder::create(true)
-            ->withRedirect('https://mdx.pl');
+            ->redirect('https://mdx.pl');
         $factory = new ResponseFactory($this->initTwig());
         $response = $factory->create($builder->build());
 
@@ -92,8 +57,8 @@ class ResponseFactoryTest extends TestCase
     public function testCreateWithViewParamAddsNewParamToFullPage(): void
     {
         $builder = HtmxResponseBuilder::create(false)
-            ->withTemplate('withParam.html.twig')
-            ->withViewParam('testParam', 'MDX');
+            ->view('withParam.html.twig', ['testParam' => 'MDX']);
+
         $factory = new ResponseFactory($this->initTwig());
         $response = $factory->create($builder->build());
 
@@ -103,13 +68,22 @@ class ResponseFactoryTest extends TestCase
     public function testCreateWithViewParamAddsNewParamToBlock(): void
     {
         $builder = HtmxResponseBuilder::create(true)
-            ->withTemplate('withParam.html.twig')
-            ->withBlock('custom')
-            ->withViewParam('testParam', 'MDX');
+            ->viewBlock('withParam.html.twig', 'custom', ['testParam' => 'MDX']);
+
         $factory = new ResponseFactory($this->initTwig());
         $response = $factory->create($builder->build());
 
         self::assertEquals('Custom block text MDX', $response->getContent());
+    }
+
+    public function testNoContentViewReturnsEmptyString(): void
+    {
+        $builder = HtmxResponseBuilder::create(true)->view('');
+
+        $factory = new ResponseFactory($this->initTwig());
+        $response = $factory->create($builder->build());
+
+        self::assertSame('', $response->getContent());
     }
 
     /**

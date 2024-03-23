@@ -6,14 +6,13 @@ namespace Mdxpl\HtmxBundle\Tests\Response;
 
 use Exception;
 use Mdxpl\HtmxBundle\Exception\ReservedViewParamCannotBeOverriddenException;
-use Mdxpl\HtmxBundle\Response\Headers\Location;
 use Mdxpl\HtmxBundle\Response\Headers\PushUrl;
-use Mdxpl\HtmxBundle\Response\Headers\Refresh;
-use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
+use Mdxpl\HtmxBundle\Response\Result;
 use Mdxpl\HtmxBundle\Response\Swap\Modifiers\TimingSwap;
 use Mdxpl\HtmxBundle\Response\Swap\Modifiers\Transition;
 use Mdxpl\HtmxBundle\Response\Swap\SwapStyle;
+use Mdxpl\HtmxBundle\Response\View\View;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
@@ -25,9 +24,9 @@ class HtmxResponseBuilderTest extends TestCase
 
         $htmxResponse = $builder->build();
 
-        Assert::assertNull($htmxResponse->template);
-        Assert::assertNull($htmxResponse->blockName);
-        Assert::assertEquals(200, $htmxResponse->responseCode);
+        Assert::assertCount(0, $htmxResponse->views);
+        Assert::assertCount(0, $htmxResponse->headers);
+        Assert::assertEquals(204, $htmxResponse->responseCode);
     }
 
     public function testInitForHtmxRequest(): void
@@ -36,132 +35,121 @@ class HtmxResponseBuilderTest extends TestCase
 
         $htmxResponse = $builder->build();
 
-        Assert::assertNull($htmxResponse->template);
-        Assert::assertNull($htmxResponse->blockName);
-        Assert::assertEquals(200, $htmxResponse->responseCode);
+        Assert::assertCount(0, $htmxResponse->views);
+        Assert::assertCount(0, $htmxResponse->headers);
+        Assert::assertEquals(204, $htmxResponse->responseCode);
     }
 
-    public function testWithViewParamAddsNewParam(): void
+    public function testWithViewAddsNewView(): void
     {
         $builder = HtmxResponseBuilder::create(true)
-            ->withViewParam('param1', 'value1');
+            ->view('template.html.twig');
 
         $htmxResponse = $builder->build();
 
-        Assert::assertIsArray($htmxResponse->viewParams);
-        Assert::assertArrayHasKey('param1', $htmxResponse->viewParams);
-        Assert::assertContains('value1', $htmxResponse->viewParams);
+        Assert::assertCount(1, $htmxResponse->views);
+        Assert::assertCount(0, $htmxResponse->headers);
+        Assert::assertEquals('template.html.twig', $htmxResponse->views->first()->template);
     }
 
-    public function testWithViewDataReplacesAllParams(): void
+    public function testWithNoContent(): void
     {
-        $builder = HtmxResponseBuilder::create(true, 'template.html.twig')
-            ->withViewParam('param1', 'value1')
-            ->withViewParams(['param2' => 'value2']);
+        $builder = HtmxResponseBuilder::create(true)->noContent();
 
         $htmxResponse = $builder->build();
 
-        Assert::assertArrayNotHasKey('param1', $htmxResponse->viewParams);
-        Assert::assertArrayHasKey('param2', $htmxResponse->viewParams);
-        Assert::assertContains('value2', $htmxResponse->viewParams);
+        Assert::assertCount(0, $htmxResponse->views);
+        Assert::assertCount(0, $htmxResponse->headers);
+        Assert::assertEquals(204, $htmxResponse->responseCode);
     }
 
-    public function testWithTemplateReplacesTemplate(): void
+    public function testWithResponseCode(): void
     {
-        $builder = HtmxResponseBuilder::create(true)
-            ->withTemplate('new-template.html.twig');
+        $builder = HtmxResponseBuilder::create(true)->responseCode(201, Result::SUCCESS);
 
         $htmxResponse = $builder->build();
 
-        Assert::assertEquals($htmxResponse->template, 'new-template.html.twig');
-    }
-
-    public function testWithBlockSetsBlockName(): void
-    {
-        $builder = HtmxResponseBuilder::create(true)
-            ->withBlock('newBlockName');
-
-        $htmxResponse = $builder->build();
-
-        Assert::assertSame('newBlockName', $htmxResponse->blockName);
+        Assert::assertCount(0, $htmxResponse->views);
+        Assert::assertCount(0, $htmxResponse->headers);
+        Assert::assertEquals(201, $htmxResponse->responseCode);
     }
 
     public function testWithRedirect(): void
     {
         $builder = HtmxResponseBuilder::create(true)
-            ->withRedirect('https://example.com');
+            ->redirect('https://example.com');
 
         $htmxResponse = $builder->build();
 
-        Assert::assertEquals('HX-Redirect', $htmxResponse->headers['HX-Redirect']?->getType()->value);
-        Assert::assertEquals('https://example.com', $htmxResponse->headers['HX-Redirect']?->getValue());
+        Assert::assertEquals('HX-Redirect', $htmxResponse->headers->first()->getType()->value);
+        Assert::assertEquals('https://example.com', $htmxResponse->headers->first()->getValue());
     }
 
     public function testWithLocation(): void
     {
         $builder = HtmxResponseBuilder::create(true)
-            ->withLocation('https://example.com');
+            ->location('https://example.com');
 
         $htmxResponse = $builder->build();
 
-        Assert::assertEquals('HX-Location', $htmxResponse->headers['HX-Location']?->getType()->value);
-        Assert::assertEquals('https://example.com', $htmxResponse->headers['HX-Location']?->getValue());
+        Assert::assertEquals('HX-Location', $htmxResponse->headers->first()->getType()->value);
+        Assert::assertEquals('https://example.com', $htmxResponse->headers->first()->getValue());
     }
 
     public function testWithPushUrl(): void
     {
         $builder = HtmxResponseBuilder::create(true)
-            ->withPushUrl('/test');
+            ->pushUrl('/test');
 
         $htmxResponse = $builder->build();
 
-        Assert::assertEquals('HX-Push-Url', $htmxResponse->headers['HX-Push-Url']?->getType()->value);
-        Assert::assertEquals('/test', $htmxResponse->headers['HX-Push-Url']?->getValue());
+        Assert::assertEquals('HX-Push-Url', $htmxResponse->headers->first()->getType()->value);
+        Assert::assertEquals('/test', $htmxResponse->headers->first()->getValue());
     }
 
     public function testWithRefresh(): void
     {
         $builder = HtmxResponseBuilder::create(true)
-            ->withRefresh();
+            ->refresh();
 
         $htmxResponse = $builder->build();
 
-        Assert::assertEquals('HX-Refresh', $htmxResponse->headers['HX-Refresh']->getType()->value);
+        Assert::assertEquals('HX-Refresh', $htmxResponse->headers->first()->getType()->value);
     }
 
     public function testWithReplaceUrl(): void
     {
         $builder = HtmxResponseBuilder::create(true)
-            ->withReplaceUrl('/test');
+            ->replaceUrl('/test');
 
         $htmxResponse = $builder->build();
 
-        Assert::assertEquals('HX-Replace-Url', $htmxResponse->headers['HX-Replace-Url']->getType()->value);
-        Assert::assertEquals('/test', $htmxResponse->headers['HX-Replace-Url']->getValue());
+        Assert::assertEquals('HX-Replace-Url', $htmxResponse->headers->first()->getType()->value);
+        Assert::assertEquals('/test', $htmxResponse->headers->first()->getValue());
     }
 
     public function testWithReselect(): void
     {
         $cssSelector = '.some-class';
         $builder = HtmxResponseBuilder::create(true)
-            ->withReselect($cssSelector);
+            ->reselect($cssSelector);
 
         $htmxResponse = $builder->build();
 
-        Assert::assertEquals('HX-Reselect', $htmxResponse->headers['HX-Reselect']->getType()->value);
-        Assert::assertEquals($cssSelector, $htmxResponse->headers['HX-Reselect']->getValue());
+        Assert::assertEquals('HX-Reselect', $htmxResponse->headers->first()->getType()->value);
+        Assert::assertEquals($cssSelector, $htmxResponse->headers->first()->getValue());
     }
 
     public function testWithTriggerEventsWithoutData(): void
     {
         $events = 'event1,event2';
         $builder = HtmxResponseBuilder::create(true)
-            ->withTrigger($events);
+            ->trigger($events);
 
         $htmxResponse = $builder->build();
 
-        Assert::assertEquals('HX-Trigger', $htmxResponse->headers['HX-Trigger']->getType()->value);
-        Assert::assertEquals($events, $htmxResponse->headers['HX-Trigger']->getValue());
+        Assert::assertEquals('HX-Trigger', $htmxResponse->headers->first()->getType()->value);
+        Assert::assertEquals($events, $htmxResponse->headers->first()->getValue());
     }
 
     public function testWithTriggerForEventsWithData(): void
@@ -174,12 +162,12 @@ class HtmxResponseBuilderTest extends TestCase
         $expected = '{"event1":"data1","event2":{"key":"value","key2":"value2"}}';
 
         $builder = HtmxResponseBuilder::create(true)
-            ->withTrigger($eventsWithData);
+            ->trigger($eventsWithData);
 
         $htmxResponse = $builder->build();
 
-        Assert::assertEquals('HX-Trigger', $htmxResponse->headers['HX-Trigger']->getType()->value);
-        Assert::assertEquals($expected, $htmxResponse->headers['HX-Trigger']->getValue());
+        Assert::assertEquals('HX-Trigger', $htmxResponse->headers->first()->getType()->value);
+        Assert::assertEquals($expected, $htmxResponse->headers->first()->getValue());
     }
 
     public function testWithViewParamThrowsExceptionOnReservedParam(): void
@@ -187,36 +175,33 @@ class HtmxResponseBuilderTest extends TestCase
         $this->expectException(ReservedViewParamCannotBeOverriddenException::class);
 
         HtmxResponseBuilder::create(true)
-            ->withViewParam(HtmxResponse::RESULT_VIEW_PARAM_NAME, 'value');
+            ->view('template.html.twig', [
+                View::RESULT_VIEW_PARAM_NAME => 'value',
+            ]);
     }
 
     public function testChainAllMethodsDoesNotCrash(): void
     {
         try {
-            $builder = HtmxResponseBuilder::create(true)
-                ->withTemplate('template.html.twig')
-                ->withBlock('custom')
-                ->withResponseCode(200)
-                ->withSuccess()
-                ->withFailure()
-                ->withHeaders(new Location('https://example.com'), new Refresh())
-                ->withHeader(new PushUrl('https://push.example.com'))
-                ->withViewParams(['custom_param' => 'value'])
-                ->withViewParam('another_param', 'another_value')
-                ->withLocation('https://example.comm')
-                ->withPushUrl('https://example.com')
-                ->withRedirect('https://example.com')
-                ->withRefresh()
-                ->withReplaceUrl('https://example.com')
-                ->withReselect('.css-selector')
-                ->withRetarget('.retarget-selector')
-                ->withTrigger(['event1' => 'data1', 'event2' => 'data2'])
-                ->withTriggerAfterSettle('settleEvent')
-                ->withTriggerAfterSwap('swapEvent')
+            HtmxResponseBuilder::create(true)
+                ->view('template.html.twig', ['test' => 'ok'], 'block')
+                ->success()
+                ->success()
+                ->failure()
+                ->header(new PushUrl('https://push.example.com'))
+                ->location('https://example.comm')
+                ->pushUrl('https://example.com')
+                ->redirect('https://example.com')
+                ->refresh()
+                ->replaceUrl('https://example.com')
+                ->reselect('.css-selector')
+                ->retarget('.retarget-selector')
+                ->trigger(['event1' => 'data1', 'event2' => 'data2'])
+                ->triggerAfterSettle('settleEvent')
+                ->triggerAfterSwap('swapEvent')
                 ->withReswap(SwapStyle::OUTER_HTML, new Transition(), new TimingSwap(500))
                 ->build();
 
-            $this->assertInstanceOf(HtmxResponse::class, $builder);
             $this->assertTrue(true, "Chaining all methods did not result in a crash or exception.");
         } catch (Exception $e) {
             $this->fail("Chaining all methods resulted in an exception: " . $e->getMessage());

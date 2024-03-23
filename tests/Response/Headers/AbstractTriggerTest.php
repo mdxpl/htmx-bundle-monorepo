@@ -10,7 +10,7 @@ class AbstractTriggerTest extends TestCase
 {
     public function testAbstractTrigger(): void
     {
-        $abstractTrigger = new class('event1, event2') extends AbstractTrigger {
+        $abstractTrigger = new class ('event1, event2') extends AbstractTrigger {
             public function getType(): HtmxResponseHeaderType
             {
                 return HtmxResponseHeaderType::TRIGGER;

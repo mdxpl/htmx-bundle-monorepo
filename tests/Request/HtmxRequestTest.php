@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class HtmxRequestTest extends TestCase
 {
-
     public function testCreateFromSymfonyHttpRequest(): void
     {
         $request = Request::create('https://example2.com');

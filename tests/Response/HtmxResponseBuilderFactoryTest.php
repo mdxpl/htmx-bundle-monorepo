@@ -11,31 +11,41 @@ class HtmxResponseBuilderFactoryTest extends TestCase
 {
     public function testCreate(): void
     {
-        $builder = (new HtmxResponseBuilderFactory)->create(true);
+        $builder = (new HtmxResponseBuilderFactory())->create(true);
         $htmxResponse = $builder->build();
 
-        $this->assertNull($htmxResponse->template);
-        $this->assertNull($htmxResponse->blockName);
-        $this->assertEquals(200, $htmxResponse->responseCode);
+        $this->assertCount(0, $htmxResponse->views);
+        $this->assertCount(0, $htmxResponse->headers);
+        $this->assertEquals(204, $htmxResponse->responseCode);
+    }
+
+    public function testCreateWithView(): void
+    {
+        $builder = (new HtmxResponseBuilderFactory())->create(true)->view('view');
+        $htmxResponse = $builder->build();
+
+        $this->assertCount(1, $htmxResponse->views);
+        $this->assertCount(0, $htmxResponse->headers);
+        $this->assertEquals(204, $htmxResponse->responseCode);
     }
 
     public function testSuccess(): void
     {
-        $builder = (new HtmxResponseBuilderFactory)->success(true);
+        $builder = (new HtmxResponseBuilderFactory())->success(true);
         $htmxResponse = $builder->build();
 
-        $this->assertNull($htmxResponse->template);
-        $this->assertNull($htmxResponse->blockName);
+        $this->assertCount(0, $htmxResponse->views);
+        $this->assertCount(0, $htmxResponse->headers);
         $this->assertEquals(200, $htmxResponse->responseCode);
     }
 
     public function testFailure(): void
     {
-        $builder = (new HtmxResponseBuilderFactory)->failure(true);
+        $builder = (new HtmxResponseBuilderFactory())->failure(true);
         $htmxResponse = $builder->build();
 
-        $this->assertNull($htmxResponse->template);
-        $this->assertNull($htmxResponse->blockName);
+        $this->assertCount(0, $htmxResponse->views);
+        $this->assertCount(0, $htmxResponse->headers);
         $this->assertEquals(422, $htmxResponse->responseCode);
     }
 }

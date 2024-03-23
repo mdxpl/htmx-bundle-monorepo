@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\EventSubscriber;
 
-use Mdxpl\HtmxBundle\Attribute\Htmx;
+use Mdxpl\HtmxBundle\Attribute\HtmxOnly;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class HtmxAttributeSubscriber implements EventSubscriberInterface
+class HtmxOnlyAttributeSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
@@ -30,7 +30,7 @@ class HtmxAttributeSubscriber implements EventSubscriberInterface
 
     private function hasAttribute(ControllerEvent $event): bool
     {
-        $attributes = $event->getAttributes(Htmx::class);
+        $attributes = $event->getAttributes(HtmxOnly::class);
 
         return !empty($attributes);
     }

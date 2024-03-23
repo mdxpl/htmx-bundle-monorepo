@@ -12,7 +12,9 @@ namespace Mdxpl\HtmxBundle\Response\Swap\Modifiers;
  */
 readonly class TimingSwap implements SwapModifier
 {
-    public function __construct(private int $delayInMilliseconds) { }
+    public function __construct(private int $delayInMilliseconds)
+    {
+    }
 
     public function __toString(): string
     {

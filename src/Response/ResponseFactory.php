@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Response;
 
+use Mdxpl\HtmxBundle\Response\View\View;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 
@@ -14,34 +15,33 @@ class ResponseFactory
     }
 
     /**
-     * Creates a Symfony http, html response
+     * Creates a Symfony HTTP response
      */
     public function create(HtmxResponse $htmxResponse): Response
     {
         $response = new Response(null, $htmxResponse->responseCode);
         $this->setHeaders($htmxResponse, $response);
-
-        // Return empty response if no template is set
-        if ($htmxResponse->template === null) {
+        if ($htmxResponse->views->isEmpty()) {
             return $response;
         }
 
-        // Render block if from htmx request and block name is set
-        if ($htmxResponse->isFromHtmxRequest && $htmxResponse->blockName !== null) {
-            return $response->setContent(
-                $this->twig->load($htmxResponse->template)->renderBlock(
-                    $htmxResponse->blockName,
-                    $htmxResponse->viewParams,
-                )
-            );
+        $renderedViews = $htmxResponse->views->map(fn(View $view) => $this->renderView($view));
+        $combinedViews = implode($this->getTemplatesSeparator(), $renderedViews);
+
+        return $response->setContent($combinedViews);
+    }
+
+    private function renderView(View $view): string
+    {
+        if (!$view->hasContent()) {
+            return '';
         }
 
-        // Otherwise render the whole template
-        return $response->setContent(
-            $this->twig->load($htmxResponse->template)->render(
-                $htmxResponse->viewParams,
-            )
-        );
+        $templateWrapper = $this->twig->load($view->template);
+
+        return $view->block
+            ? $templateWrapper->renderBlock($view->block, $view->data)
+            : $templateWrapper->render($view->data);
     }
 
     private function setHeaders(HtmxResponse $htmxResponse, Response $response): void
@@ -49,5 +49,10 @@ class ResponseFactory
         foreach ($htmxResponse->headers as $header) {
             $response->headers->set($header->getType()->value, $header->getValue());
         }
+    }
+
+    private function getTemplatesSeparator(): string
+    {
+        return str_repeat(PHP_EOL, 2);
     }
 }

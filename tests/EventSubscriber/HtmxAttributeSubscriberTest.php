@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Tests\EventSubscriber;
 
-use Mdxpl\HtmxBundle\Attribute\Htmx;
-use Mdxpl\HtmxBundle\EventSubscriber\HtmxAttributeSubscriber;
+use Mdxpl\HtmxBundle\Attribute\HtmxOnly;
+use Mdxpl\HtmxBundle\EventSubscriber\HtmxOnlyAttributeSubscriber;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use PHPUnit\Framework\TestCase;
@@ -17,7 +17,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class HtmxAttributeSubscriberTest extends TestCase
 {
-
     /**
      * @doesNotPerformAssertions
      */
@@ -47,7 +46,7 @@ class HtmxAttributeSubscriberTest extends TestCase
         $event = $this->createEvent($htmxRequest, $annotatedController);
 
         try {
-            $subscriber = new HtmxAttributeSubscriber();
+            $subscriber = new HtmxOnlyAttributeSubscriber();
             $subscriber->onKernelController($event);
 
             $this->assertTrue(true);
@@ -79,21 +78,21 @@ class HtmxAttributeSubscriberTest extends TestCase
 
     private function createControllerWithAnnotation(): object
     {
-        return new class() {
-            #[Htmx]
+        return new class () {
+            #[HtmxOnly]
             public function __invoke(): HtmxResponse
             {
-                return new HtmxResponse(true, null, null, [], 200, []);
+                return new HtmxResponse();
             }
         };
     }
 
     private function createControllerWithoutAnnotation(): object
     {
-        return new class() {
+        return new class () {
             public function __invoke(): HtmxResponse
             {
-                return new HtmxResponse(true, null, null, [], 200, []);
+                return new HtmxResponse();
             }
         };
     }
@@ -102,7 +101,7 @@ class HtmxAttributeSubscriberTest extends TestCase
     {
         $this->assertSame(
             [KernelEvents::CONTROLLER => ['onKernelController']],
-            HtmxAttributeSubscriber::getSubscribedEvents(),
+            HtmxOnlyAttributeSubscriber::getSubscribedEvents(),
         );
     }
 }

@@ -5,23 +5,56 @@ declare(strict_types=1);
 namespace Mdxpl\HtmxBundle\Response;
 
 use Mdxpl\HtmxBundle\Response\Headers\HtmxResponseHeader;
-use Symfony\Component\HttpFoundation\Response;
+use Mdxpl\HtmxBundle\Response\Headers\HtmxResponseHeaderCollection;
+use Mdxpl\HtmxBundle\Response\View\View;
+use Mdxpl\HtmxBundle\Response\View\ViewsCollection;
 
 readonly class HtmxResponse
 {
-    public const RESULT_VIEW_PARAM_NAME = 'htmx_result';
-    public const IS_HTMX_REQUEST_VIEW_PARAM_NAME = 'is_htmx_request';
+    public ViewsCollection $views;
+    public HtmxResponseHeaderCollection $headers;
 
     public function __construct(
-        public bool $isFromHtmxRequest,
-        public ?string $template,
-        public ?string $blockName,
-        public array $viewParams,
-        public int $responseCode = Response::HTTP_OK,
-
-        /** @var HtmxResponseHeader[] */
-        public array $headers = [],
+        public int $responseCode = 204,
+        ViewsCollection|View|null $view = null,
+        HtmxResponseHeaderCollection|HtmxResponseHeader|null $header = null,
     )
     {
+        $this->resolveHeaders($header);
+        $this->resolveViewsCollection($view);
+    }
+
+    private function resolveViewsCollection(View|ViewsCollection|null $view): void
+    {
+        if ($view instanceof View) {
+            $this->views = new ViewsCollection($view);
+
+            return;
+        }
+
+        if ($view instanceof ViewsCollection) {
+            $this->views = $view;
+
+            return;
+        }
+
+        $this->views = new ViewsCollection();
+    }
+
+    private function resolveHeaders(HtmxResponseHeader|HtmxResponseHeaderCollection|null $header): void
+    {
+        if ($header instanceof HtmxResponseHeader) {
+            $this->headers = new HtmxResponseHeaderCollection($header);
+
+            return;
+        }
+
+        if ($header instanceof HtmxResponseHeaderCollection) {
+            $this->headers = $header;
+
+            return;
+        }
+
+        $this->headers = new HtmxResponseHeaderCollection();
     }
 }

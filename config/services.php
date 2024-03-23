@@ -1,8 +1,7 @@
 <?php
 
 use Mdxpl\HtmxBundle\Controller\ArgumentResolver\HtmxResponseValueResolver;
-use Mdxpl\HtmxBundle\Controller\HtmxResponseFacade;
-use Mdxpl\HtmxBundle\EventSubscriber\HtmxAttributeSubscriber;
+use Mdxpl\HtmxBundle\EventSubscriber\HtmxOnlyAttributeSubscriber;
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxRequestSubscriber;
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxResponseSubscriber;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilderFactory;
@@ -18,16 +17,11 @@ return static function (ContainerConfigurator $container): void {
         ->set(HtmxResponseBuilderFactory::class)
         ->set(ResponseFactory::class)
         ->args([new Reference('twig')])
-        ->set(HtmxResponseFacade::class)
-        ->args([
-            new Reference(HtmxResponseBuilderFactory::class),
-            new Reference(ResponseFactory::class),
-        ])
         ->set(HtmxRequestSubscriber::class)
         ->tag('kernel.event_subscriber')
         ->set(HtmxResponseSubscriber::class)
         ->args([new Reference(ResponseFactory::class)])
         ->tag('kernel.event_subscriber')
-        ->set(HtmxAttributeSubscriber::class)
+        ->set(HtmxOnlyAttributeSubscriber::class)
         ->tag('kernel.event_subscriber');
 };
