@@ -1,15 +1,3 @@
-htmx for Symfony!
-=========================
-
-This bundle makes it easy to use [htmx](https://htmx.org/) with
-`[Twig](https://twig.symfony.com/) and [Symfony's controllers](https://symfony.com/doc/current/controller.html)
-
-- Automatically parses the htmx attributes from the request;
-- Easy create htmx responses with the `HtmxResponse` class;
-- Easy return responses with the `HtmxTrait`;
-- If request is htmx, it will automatically return certain block from the template;
-
-
 Installation
 ============
 
@@ -40,16 +28,13 @@ return [
 ];
 ```
 
-
 Usage
 ============
 
 1. Inject `HtmxRequest` parameter to the action method.
 2. Build the request using `HtmxResponseBuilder`.
-3. Use `HtmxTrait` to return the response.
-4. Use [htmx attributes](https://htmx.org/reference/#attributes) in your templates.
-5. Check the following examples to see how to use it.
-
+3. Use [htmx attributes](https://htmx.org/reference/#attributes) in your templates.
+4. Check the following examples to see how to use it.
 
 Examples
 ============
