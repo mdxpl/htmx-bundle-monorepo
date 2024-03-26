@@ -1,11 +1,16 @@
-# Htmx for Symfony controllers
+# Symfony Integration with htmx tools
 
-[![PHP](https://img.shields.io/badge/php-%23777BB4.svg?&logo=php&logoColor=white)](#) [![Symfony](https://img.shields.io/badge/Symfony-black?logo=symfony)](#) [![HTMX](https://img.shields.io/badge/%3C/%3E%20HTMX-3D72D7?logo=mysl&logoColor=white)](#)
+This bundle enables full **htmx** integration and opens up new possibilities for **Symfony** applications using **Twig**. 
+Effortlessly enrich your projects with dynamic features like on-demand content loading and asynchronous form submissions, all within the familiar Symfony environment, without the need for additional JavaScript.
 
-This bundle makes it easy to use [HTMX](https://htmx.com) with
-[Symfony's Controllers](https://symfony.com/doc/current/controller.html)
+This bundle is designed for developers who want to make their applications faster, more interactive, and user-friendly with minimal effort. 
+Unlock the power of [HTMX](https://htmx.com)  and [Twig](https://twig.symfony.com) in your [Symfony](https://symfony.com/doc/current/controller.html) applications for dynamic user interfaces.
 
-[![Tests](https://github.com/mdxpl/htmx-bundle/actions/workflows/ci.yml/badge.svg)](#) [![Static Badge](https://img.shields.io/badge/Code%20coverage-100%25-success?logo=php)](#)
+-------
+
+[![PHP](https://img.shields.io/badge/php-%23777BB4.svg?&logo=php&logoColor=white)](#) [![Symfony](https://img.shields.io/badge/Symfony-black?logo=symfony)](#) [![HTMX](https://img.shields.io/badge/%3C/%3E%20HTMX-3D72D7?logo=mysl&logoColor=white)](#) [![Tests](https://github.com/mdxpl/htmx-bundle/actions/workflows/ci.yml/badge.svg)](#) [![Static Badge](https://img.shields.io/badge/Code%20coverage-100%25-success?logo=php)](#)
+
+-------
 
 ## Documentation
 
@@ -22,8 +27,8 @@ Read the documentation at:
     public function index(HtmxRequest $request): Response
     {
         return $this->render($request->isHtmx
-            ? 'demo/_partial.html.twig'
-            : 'demo/index.html.twig');
+            ? '_partial.html.twig'
+            : 'index.html.twig');
     }
 ```
 
@@ -34,7 +39,7 @@ Read the documentation at:
 ```php
     public function htmxResponse(): HtmxResponse
     {
-        return new HtmxResponse(200, View::template('demo/_partial.html.twig'));
+        return new HtmxResponse(200, View::template('_partial.html.twig'));
     }
 ```
 
@@ -45,8 +50,8 @@ Read the documentation at:
     {
         $builder = HtmxResponseBuilder::create($request->isHtmx)
             ->success()
-            ->view('demo/_partial.html.twig')
-            ->viewBlock('demo/_multiple_partials.html.twig', 'partial2')
+            ->view('_partial.html.twig')
+            ->viewBlock('_multiple_partials.html.twig', 'partial2')
             ->header(
                 new Reswap(
                     SwapStyle::AFTER_END,
@@ -80,7 +85,7 @@ Read the documentation at:
 ```php
     public function form(HtmxRequest $htmx, Request $request): HtmxResponse
     {
-        $template = 'demo/index.html.twig';
+        $template = 'index.html.twig';
         $form = $this->createForm(DemoType::class)->handleRequest($request);
         $builder = HtmxResponseBuilder::create(
             $htmx->isHtmx,
@@ -118,11 +123,9 @@ TBD
 
 ## Supported versions
 
-| PHP Version | Symfony Version |
-|-------------|-----------------|
-| 8.2         | 5.4, 6.4, 7.0   |
-| 8.3         | 5.4, 6.4, 7.0   |
-
+| PHP         | Symfony         | htmx   |
+|-------------|-----------------|--------|
+| 8.2, 8.3    | 5.4, 6.4, 7.0   | 1.9    |
 ## Credits
 
 - [Mateusz Dołęga](https://mdx.pl)
