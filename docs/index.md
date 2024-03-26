@@ -28,34 +28,38 @@ return [
 ];
 ```
 
-Usage
+Quick start
 ============
 
-1. Inject `HtmxRequest` parameter to the action method.
+1. Inject `HtmxRequest` parameter to the action method and return `HtmxResponse`
 ```php
+     // 1. Inject HtmxRequest parameter
     #[Route('/demo', name: 'demo_index')]
-    public function index(HtmxRequest $htmx): HtmxResponse {}
+    public function index(HtmxRequest $htmx): HtmxResponse
+    {
+        // 2. Return HtmxResponse, you can build it using HtmxResponseBuilder
+        return HtmxResponseBuilder::create($htmx->isHtmx)
+                ->success()
+                ->view('index.html.twig')
+                ->build();
+    }
 ```
 
-2. Return HtmxResponse, you can build it using `HtmxResponseBuilder`.
-```php
-    return HtmxResponseBuilder::create($htmx->isHtmx)
-        ->success()
-        ->view('_partial.html.twig')
-        ->build();
-```
-
-3. Include htmx library in your template [installing htmx documentation](https://htmx.org/docs/#installing)
-```html
-<head>
-    <script src="/path/to/htmx.min.js"></script>
-</head>
-```
-
-4. Use [htmx attributes](https://htmx.org/reference/#attributes).
+2. Include htmx library in your template [installing htmx documentation](https://htmx.org/docs/#installing)
 ```twig
-<button hx-get="{{ path('demo_index') }}" hx-swap="outerHTML">
+{# templates/index.html #}
+
+<html>
+    <head>
+        <script src="/path/to/htmx.min.js"></script>
+    </head>
+    <body>
+        <button hx-get="{{ path('demo_index') }}" hx-swap="outerHTML">
+    </body>
+</html>
 ```
+
+3. Check examples, demo site and [htmx documentation](https://htmx.org/docs/#installing).
 
 Examples
 ============
