@@ -16,19 +16,19 @@ Read the documentation at:
 
 ### Htmx request injection
 
-> [!TIP]
 > Render template depending on the request type.
 
 ```php
     public function index(HtmxRequest $request): Response
     {
-        return $this->render($request->isHtmx ? 'demo/_partial.html.twig' : 'demo/index.html.twig');
+        return $this->render($request->isHtmx
+            ? 'demo/_partial.html.twig'
+            : 'demo/index.html.twig');
     }
 ```
 
 ### Htmx response handling
 
-> [!TIP]
 > Build response using HtmxResponse or use HtmxResponseBuilder for more complex responses.
 
 ```php
@@ -38,7 +38,6 @@ Read the documentation at:
     }
 ```
 
-> [!TIP]
 > Return multiple views to fully utilize the capabilities of [xh-swap-ob](https://htmx.org/attributes/hx-swap-oob/).
 
 ```php
@@ -62,7 +61,6 @@ Read the documentation at:
     }
 ```
 
-> [!TIP]
 > Add one or more [response headers](https://htmx.org/reference/#response_headers) to control the behavior of the
 > client-side.
 > For simple responses, use one of defined response type.
@@ -76,7 +74,6 @@ Read the documentation at:
 
 ### Htmx form handling
 
-> [!TIP]
 > Do not refresh whole page after a form submission. Render form block instead the whole page.
 > It allows you to keep all the related templates in one place.
 
@@ -85,14 +82,17 @@ Read the documentation at:
     {
         $template = 'demo/index.html.twig';
         $form = $this->createForm(DemoType::class)->handleRequest($request);
-        $builder = HtmxResponseBuilder::create($htmx->isHtmx, ['form' => $form->createView()]);
+        $builder = HtmxResponseBuilder::create(
+            $htmx->isHtmx,
+            ['form' => $form->createView()],
+        );
 
         if ($form->isSubmitted()) {
-            $builder->viewBlock($template, 'formBlock');
             if ($form->isValid()) {
-                return $builder->success()->build();
+                return $builder->success()->viewBlock($template, 'success')->build();
             }
-            return $builder->failure()->build();
+
+            return $builder->failure()->viewBlock($template, 'formBlock')->build();
         }
 
         return $builder->view($template)->build();
@@ -101,7 +101,6 @@ Read the documentation at:
 
 ### Attributes
 
-> [!TIP]
 > Thanks to the [#HtmxOnly] attribute, you can limit the endpoint to requests coming from htmx.
 > When someone opens the link directly, they will receive a 404 response.
 
