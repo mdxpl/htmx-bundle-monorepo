@@ -33,7 +33,8 @@ Usage
 
 1. Inject `HtmxRequest` parameter to the action method.
 2. Build the request using `HtmxResponseBuilder`.
-3. Use [htmx attributes](https://htmx.org/reference/#attributes) in your templates.
+3. Include htmx library in your template
+4. Use [htmx attributes](https://htmx.org/reference/#attributes) in your templates.
 
 Examples
 ============
