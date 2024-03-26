@@ -34,7 +34,6 @@ Usage
 1. Inject `HtmxRequest` parameter to the action method.
 2. Build the request using `HtmxResponseBuilder`.
 3. Use [htmx attributes](https://htmx.org/reference/#attributes) in your templates.
-4. Check the following examples to see how to use it.
 
 Examples
 ============
