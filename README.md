@@ -1,4 +1,4 @@
-# Symfony Integration with htmx tools
+# Symfony integration with htmx tools
 
 This bundle enables full **htmx** integration and opens up new possibilities for **Symfony** applications using **Twig**. 
 Effortlessly enrich your projects with dynamic features like on-demand content loading and asynchronous form submissions, all within the familiar Symfony environment, without the need for additional JavaScript.
