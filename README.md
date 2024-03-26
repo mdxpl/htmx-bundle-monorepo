@@ -25,9 +25,7 @@ Read the documentation at:
 ```php
     public function index(HtmxRequest $request): Response
     {
-        return $this->render($request->isHtmx
-            ? '_partial.html.twig'
-            : 'index.html.twig');
+        return $this->render($request->isHtmx ? '_partial.html.twig' : 'index.html.twig');
     }
 ```
 
