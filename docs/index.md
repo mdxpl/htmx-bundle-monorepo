@@ -32,9 +32,30 @@ Usage
 ============
 
 1. Inject `HtmxRequest` parameter to the action method.
-2. Build the request using `HtmxResponseBuilder`.
-3. Include htmx library in your template
-4. Use [htmx attributes](https://htmx.org/reference/#attributes) in your templates.
+```php
+    #[Route('/demo', name: 'demo_index')]
+    public function index(HtmxRequest $htmx): HtmxResponse {}
+```
+
+2. Return HtmxResponse, you can build it using `HtmxResponseBuilder`.
+```php
+    return HtmxResponseBuilder::create($htmx->isHtmx)
+        ->success()
+        ->view('_partial.html.twig')
+        ->build();
+```
+
+3. Include htmx library in your template [installing htmx documentation](https://htmx.org/docs/#installing)
+```html
+<head>
+    <script src="/path/to/htmx.min.js"></script>
+</head>
+```
+
+4. Use [htmx attributes](https://htmx.org/reference/#attributes).
+```twig
+<button hx-get="{{ path('demo_index') }}" hx-swap="outerHTML">
+```
 
 Examples
 ============
