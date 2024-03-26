@@ -65,7 +65,7 @@ Read the documentation at:
 
 > Add one or more [response headers](https://htmx.org/reference/#response_headers) to control the behavior of the
 > client-side.
-> For simple responses, use one of defined response type.
+> For simple responses, use one of the defined response types.
 
 ```php
     public function refresh(): HtmxResponse
@@ -76,7 +76,7 @@ Read the documentation at:
 
 ### Htmx form handling
 
-> Do not refresh whole page after a form submission. Render form block instead the whole page.
+> Do not refresh the whole page after submitting a form. Instead, render the form block.
 > It allows you to keep all the related templates in one place.
 
 ```php
