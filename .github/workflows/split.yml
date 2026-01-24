@@ -6,6 +6,12 @@ on:
       - main
     tags:
       - 'v*'
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Tag to split'
+        required: true
+        type: string
 
 jobs:
   split:
@@ -23,11 +29,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Determine reference
+        id: ref
+        run: |
+          if [ -n "${{ inputs.tag }}" ]; then
+            echo "reference=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+            echo "as_tag=true" >> $GITHUB_OUTPUT
+          else
+            echo "reference=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "as_tag=${{ startsWith(github.ref, 'refs/tags/') }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Split ${{ matrix.package.prefix }}
         uses: claudiodekker/splitsh-action@v1.0.0
         with:
           prefix: ${{ matrix.package.prefix }}
           remote: 'https://x-access-token:${{ secrets.HTMX_BUNDLE_SPLIT_TOKEN }}@github.com/${{ matrix.package.repo }}.git'
-          reference: ${{ github.ref_name }}
-          as_tag: ${{ startsWith(github.ref, 'refs/tags/') }}
+          reference: ${{ steps.ref.outputs.reference }}
+          as_tag: ${{ steps.ref.outputs.as_tag }}
