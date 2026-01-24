@@ -1,43 +1,41 @@
 {
-  "name": "mdxpl/htmx-bundle",
-  "description": "HTMX support for Symfony",
-  "license": "MIT",
-  "type": "library",
-  "keywords": ["htmx"],
-  "authors": [
-    {
-      "name": "Mateusz Dołęga",
-      "homepage": "https://mdx.pl"
+    "name": "mdxpl/htmx-bundle-monorepo",
+    "description": "Monorepo for htmx-bundle and demo",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "phpunit/phpunit": "^10.0|^11.0",
+        "symplify/monorepo-builder": "^11.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mdxpl\\HtmxBundle\\": "packages/htmx-bundle/src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mdxpl\\HtmxBundle\\Tests\\": "packages/htmx-bundle/tests/"
+        }
+    },
+    "replace": {
+        "mdxpl/htmx-bundle": "self.version"
+    },
+    "scripts": {
+        "test": "cd packages/htmx-bundle && vendor/bin/phpunit",
+        "test:bundle": "cd packages/htmx-bundle && vendor/bin/phpunit",
+        "cs:check": "php-cs-fixer check",
+        "cs:fix": "php-cs-fixer fix"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
     }
-  ],
-  "require": {
-    "php": ">=8.2",
-    "symfony/framework-bundle": "^6.4|^7.0",
-    "symfony/twig-bundle": "^6.4|^7.0",
-    "twig/twig": "^3.0"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^11.0",
-    "friendsofphp/php-cs-fixer": "dev-master",
-    "symfony/security-csrf": "^6.4|^7.0"
-  },
-  "suggest": {
-    "symfony/security-csrf": "Required for CSRF protection (mdx_htmx.csrf.enabled: true)"
-  },
-  "minimum-stability": "dev",
-  "autoload": {
-    "psr-4": {
-      "Mdxpl\\HtmxBundle\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Mdxpl\\HtmxBundle\\Tests\\": "tests/"
-    }
-  },
-  "scripts": {
-    "test": "phpunit",
-    "cs": "php-cs-fixer fix --dry-run --diff",
-    "cs-fix": "php-cs-fixer fix"
-  }
 }

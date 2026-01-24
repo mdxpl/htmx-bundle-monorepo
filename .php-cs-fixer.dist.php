@@ -1,8 +1,9 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
-    ->in(__DIR__ . '/src')
-    ->in(__DIR__ . '/tests')
+    ->in(__DIR__ . '/packages/htmx-bundle/src')
+    ->in(__DIR__ . '/packages/htmx-bundle/tests')
+    ->in(__DIR__ . '/packages/demo/src')
 ;
 
 return (new PhpCsFixer\Config())

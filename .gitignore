@@ -1,9 +1,20 @@
+# IDE
 .idea/
-vendor/
-var/
-.phpunit.cache/
 
+# Dependencies
+/vendor/
+/packages/*/vendor/
+
+# Symfony
+/packages/demo/var/
+
+# Composer
 composer.lock
+
+# PHPUnit
 phpunit.xml
+.phpunit.cache/
 .phpunit.result.cache
+
+# PHP CS Fixer
 .php-cs-fixer.cache

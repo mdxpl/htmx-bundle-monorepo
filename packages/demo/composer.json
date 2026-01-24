@@ -21,7 +21,7 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../",
+            "url": "../htmx-bundle",
             "options": {
                 "symlink": true
             }
