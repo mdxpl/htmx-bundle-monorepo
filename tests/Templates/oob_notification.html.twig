@@ -1,0 +1,5 @@
+{% block notification %}
+<div id="notification" hx-swap-oob="true">
+    <p class="alert alert-{{ type|default('info') }}">{{ message }}</p>
+</div>
+{% endblock %}

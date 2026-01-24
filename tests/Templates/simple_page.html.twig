@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ page.name }}{% endblock %}
+
+{% block body %}
+<nav>
+    {% for slug, item in menu %}
+    <button hx-get="/simple-page/{{ slug }}"
+            hx-push-url="true"
+            hx-swap="outerHTML"
+            hx-target="#pageContent">{{ item.name }}</button>
+    {% endfor %}
+</nav>
+
+{{ block('pageContent') }}
+{% endblock %}
+
+{% block pageContent %}
+<section id="pageContent">
+    <h1>{{ page.name }}</h1>
+    <p>{{ page.description }}</p>
+</section>
+{% endblock %}
+
+{% block pageContentPartial %}
+<title>{{ page.name }}</title>
+{{ block('pageContent') }}
+{% endblock %}

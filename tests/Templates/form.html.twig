@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div id="formWrapper">
+    {{ block('formComponent') }}
+</div>
+{% endblock %}
+
+{% block failureComponent %}
+<p>Fix the errors in the form!</p>
+<hr>
+{{ block('formComponent') }}
+{% endblock %}
+
+{% block successComponent %}
+<p>Great success!</p>
+{% endblock %}
+
+{% block formComponent %}
+<form hx-post="/demo" hx-target="#formWrapper">
+    <input type="text" name="name" value="{{ formData.name|default('') }}">
+    {% if errors|default([]) %}
+    <ul class="errors">
+        {% for error in errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}
