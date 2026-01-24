@@ -11,46 +11,48 @@ We don't even need a single line of JavaScript!
 
 namespace App\Controller;
 
-use Mdxpl\HtmxBundle\Controller\HtmxControllerTrait;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
+use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-// 1. Extend AbstractController
 class DemoController extends AbstractController
 {
-    // 2. Use HtmxTrait form the bundle
-    use HtmxControllerTrait;
-
     private const PAGES = [
         'home' => ['name' => 'Home', 'description' => 'This is the home page'],
         'about' => ['name' => 'About', 'description' => 'This is the about page'],
         'contact' => ['name' => 'Contact', 'description' => 'This is the contact page'],
     ];
 
-    // 3. Inject HtmxRequest attribute
+    // 1. Inject HtmxRequest - it will be automatically resolved
     #[Route('/simple-page/{slug}', name: 'app_demo_simple_page')]
-    public function index(HtmxRequest $request, string $slug = 'home'): Response
+    public function index(HtmxRequest $request, string $slug = 'home'): HtmxResponse
     {
-        // Just for demonstration purposes, nothing to do with htmx
         $page = self::PAGES[$slug] ?? throw $this->createNotFoundException('The page does not exist');
 
-        //4. Create the response builder and set the template
-        $responseBuilder = HtmxResponseBuilder::create($request->isHtmx, 'demo/simple_page.html.twig')
-            // 5. Add view data, which will then be available in the template.
-            // In a real-world application, the menu would be added only for non-htmx requests.
-            ->withViewParam('menu', self::PAGES)
-            ->withViewParam('page', $page);
+        // 2. Create the response builder
+        $builder = HtmxResponseBuilder::create($request->isHtmx);
 
+        // 3. View data to be passed to the template
+        $viewData = [
+            'menu' => self::PAGES,
+            'page' => $page,
+        ];
+
+        // 4. For htmx requests, render only the page content block
         if ($request->isHtmx) {
-            // 6. Specify the block to render for htmx requests, by default it's 'successComponent'
-            $responseBuilder->withBlock('pageContentPartial');
+            return $builder
+                ->success()
+                ->viewBlock('demo/simple_page.html.twig', 'pageContentPartial', $viewData)
+                ->build();
         }
 
-        // 7. Render the response
-        return $this->renderHtmx($responseBuilder);
+        // 5. For regular requests, render the full page
+        return $builder
+            ->success()
+            ->view('demo/simple_page.html.twig', $viewData)
+            ->build();
     }
 }
 ```
@@ -98,7 +100,7 @@ When the request is htmx, it will automatically return certain block from the te
                 hx-target="#pageContent">{{ item.name }}</button>
         {% endfor %}
     </nav>
-    
+
     {# Render pageContent #}
     {{ block('pageContent') }}
 

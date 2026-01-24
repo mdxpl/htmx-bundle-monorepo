@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Tests\Response\View;
 
-use Mdxpl\HtmxBundle\Exception\BlockCannotBeSetWithoutTemplate;
+use Mdxpl\HtmxBundle\Exception\BlockCannotBeSetWithoutTemplateException;
 use Mdxpl\HtmxBundle\Response\View\View;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -70,7 +70,7 @@ class ViewTest extends TestCase
 
     public function testCreateBlockWithoutTemplate(): void
     {
-        $this->expectException(BlockCannotBeSetWithoutTemplate::class);
+        $this->expectException(BlockCannotBeSetWithoutTemplateException::class);
 
         View::block('', 'block');
     }

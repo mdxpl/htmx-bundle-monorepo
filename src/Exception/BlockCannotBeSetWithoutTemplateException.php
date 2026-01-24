@@ -6,7 +6,7 @@ namespace Mdxpl\HtmxBundle\Exception;
 
 use InvalidArgumentException;
 
-class BlockCannotBeSetWithoutTemplate extends InvalidArgumentException implements HtmxBundleException
+class BlockCannotBeSetWithoutTemplateException extends InvalidArgumentException implements HtmxBundleException
 {
     public static function withBlockName(string $blockName): self
     {

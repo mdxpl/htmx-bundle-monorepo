@@ -11,33 +11,41 @@ We don't even need a single line of JavaScript!
 
 namespace App\Controller;
 
-use Mdxpl\HtmxBundle\Controller\HtmxControllerTrait;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
+use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 
 class DemoController extends AbstractController
 {
-    use HtmxControllerTrait;
-
     #[Route('/infinite-scroll', name: 'app_demo_infinite_scroll')]
-    public function index(HtmxRequest $request, #[MapQueryParameter] int $pageNumber = 1): Response
+    public function index(HtmxRequest $request, #[MapQueryParameter] int $pageNumber = 1): HtmxResponse
     {
-        // 1. Create the response builder, set the template and add view data
-        $responseBuilder = HtmxResponseBuilder::create($request->isHtmx, 'demo/infinite_scroll.html.twig')
-            ->withViewParam('items', $this->generateItemsForPage($pageNumber))
-            ->withViewParam('nextPageNumber', $pageNumber + 1);
+        // 1. Prepare view data
+        $viewData = [
+            'items' => $this->generateItemsForPage($pageNumber),
+            'nextPageNumber' => $pageNumber + 1,
+        ];
 
-        // 2. If request is htmx, it will automatically return certain block from the template
+        // 2. Create the response builder
+        $builder = HtmxResponseBuilder::create($request->isHtmx);
+
+        // 3. For htmx requests, render only the items block
         if ($request->isHtmx) {
             sleep(1); // Simulate a slow response
-            $responseBuilder->withBlock('items');
+            return $builder
+                ->success()
+                ->viewBlock('demo/infinite_scroll.html.twig', 'items', $viewData)
+                ->build();
         }
 
-        return $this->renderHtmx($responseBuilder);
+        // 4. For regular requests, render the full page
+        return $builder
+            ->success()
+            ->view('demo/infinite_scroll.html.twig', $viewData)
+            ->build();
     }
 
     // Just for demo purposes, not related to the bundle itself
@@ -97,7 +105,7 @@ Add some basic styles for indicator. See: https://htmx.org/attributes/hx-indicat
 See infinite scroll in [htmx documentation](https://htmx.org/examples/infinite-scroll/).
 
 ```html
-{# templates/demo/index.html.twig #}
+{# templates/demo/infinite_scroll.html.twig #}
 
 {% extends 'base.html.twig' %}
 

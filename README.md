@@ -6,7 +6,7 @@ Effortlessly enrich your projects with dynamic features like on-demand content l
 This bundle is designed for developers who want to make their applications faster, more interactive, and user-friendly with minimal effort. 
 Unlock the power of [HTMX](https://htmx.com)  and [Twig](https://twig.symfony.com) in your [Symfony](https://symfony.com/doc/current/controller.html) applications for dynamic user interfaces.
 
-
+> **Note:** This is a hobby project created for personal use and learning purposes. It is not maintained as an open-source project with active support. If you want to use it, the best approach is to fork the repository and develop it further on your own.
 
 [![PHP](https://img.shields.io/badge/php-%23777BB4.svg?&logo=php&logoColor=white)](#) [![Symfony](https://img.shields.io/badge/Symfony-black?logo=symfony)](#) [![HTMX](https://img.shields.io/badge/%3C/%3E%20HTMX-3D72D7?logo=mysl&logoColor=white)](#) [![Tests](https://github.com/mdxpl/htmx-bundle/actions/workflows/ci.yml/badge.svg)](#) [![Static Badge](https://img.shields.io/badge/Tests%20coverage-100%25-success?logo=php)](#)
 

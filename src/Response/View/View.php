@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Response\View;
 
-use Mdxpl\HtmxBundle\Exception\BlockCannotBeSetWithoutTemplate;
+use Mdxpl\HtmxBundle\Exception\BlockCannotBeSetWithoutTemplateException;
 
 readonly class View
 {
@@ -22,7 +22,7 @@ readonly class View
     private function assertTemplate(): void
     {
         if (empty($this->template) && !empty($this->block)) {
-            throw BlockCannotBeSetWithoutTemplate::withBlockName($this->block);
+            throw BlockCannotBeSetWithoutTemplateException::withBlockName($this->block);
         }
     }
 
