@@ -120,9 +120,9 @@ TBD
 
 ## Supported versions
 
-| PHP  | Symfony       | htmx |
-|------|---------------|------|
-| 8.4+ | 5.4, 6.4, 7.x | 1.9+ |
+| PHP  | Symfony    | htmx |
+|------|------------|------|
+| 8.2+ | 6.4+, 7.4+ | 2.0+ |
 
 ## Important notes
 

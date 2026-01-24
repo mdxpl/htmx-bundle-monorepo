@@ -10,8 +10,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class MdxplHtmxBundle extends Bundle
 {
-    protected function createContainerExtension(): ?ExtensionInterface
+    public function getContainerExtension(): ?ExtensionInterface
     {
-        return new HtmxExtension();
+        return $this->extension ??= new HtmxExtension();
     }
 }
