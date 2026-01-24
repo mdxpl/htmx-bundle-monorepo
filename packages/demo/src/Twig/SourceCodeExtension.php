@@ -35,10 +35,10 @@ final class SourceCodeExtension extends AbstractExtension
 
     public function getGithubUrl(string $relativePath, string $repo = 'mdxpl/htmx-bundle-demo'): string
     {
-        return sprintf(
+        return \sprintf(
             'https://github.com/%s/blob/main/%s',
             $repo,
-            ltrim($relativePath, '/')
+            ltrim($relativePath, '/'),
         );
     }
 }

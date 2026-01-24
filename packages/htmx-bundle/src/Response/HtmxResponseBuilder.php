@@ -495,7 +495,7 @@ class HtmxResponseBuilder
      * @example
      *     ->triggerAfterSettle('initTooltips')
      *
-     * @see trigger() For event syntax examples
+     * @see Trigger() For event syntax examples
      */
     public function triggerAfterSettle(string|array $events): self
     {
@@ -517,7 +517,7 @@ class HtmxResponseBuilder
      * @example
      *     ->triggerAfterSwap('contentSwapped')
      *
-     * @see trigger() For event syntax examples
+     * @see Trigger() For event syntax examples
      */
     public function triggerAfterSwap(string|array $events): self
     {

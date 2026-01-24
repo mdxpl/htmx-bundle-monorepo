@@ -72,6 +72,8 @@
                 <li><a href="{{ path('app_polling') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_polling' ? 'btn-primary' : 'btn-ghost' }}">Live Polling</a></li>
                 <li><a href="{{ path('app_delete_demo') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_delete_demo' ? 'btn-primary' : 'btn-ghost' }}">Delete Confirm</a></li>
                 <li><a href="{{ path('app_cascading') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_cascading' ? 'btn-primary' : 'btn-ghost' }}">Cascading Selects</a></li>
+                <li><a href="{{ path('app_builder_showcase') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_builder_showcase' ? 'btn-primary' : 'btn-ghost' }}">Builder Showcase</a></li>
+                <li><a href="{{ path('app_request_showcase') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_request_showcase' ? 'btn-primary' : 'btn-ghost' }}">Request Showcase</a></li>
             </ul>
         </div>
     </div>
