@@ -70,5 +70,6 @@ jobs:
               --restart unless-stopped \
               -p ${{ secrets.DEPLOY_PORT_MAPPING || '127.0.0.1:8080:80' }} \
               -e APP_ENV=prod \
+              -e APP_SECRET=${{ secrets.DEMO_APP_SECRET }} \
               ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             docker image prune -f
