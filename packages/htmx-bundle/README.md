@@ -4,7 +4,7 @@ This bundle enables full **htmx** integration and opens up new possibilities for
 Effortlessly enrich your projects with dynamic features like on-demand content loading and asynchronous form submissions, all within the familiar Symfony environment, without the need for additional JavaScript.
 
 This bundle is designed for developers who want to make their applications faster, more interactive, and user-friendly with minimal effort.
-Unlock the power of [HTMX](https://htmx.org)  and [Twig](https://twig.symfony.com) in your [Symfony](https://symfony.com/doc/current/controller.html) applications for dynamic user interfaces.
+Unlock the power of [HTMX](https://htmx.org) and [Twig](https://twig.symfony.com) in your [Symfony](https://symfony.com/doc/current/controller.html) applications for dynamic user interfaces.
 
 > **Note:** This is a hobby project created for personal use and learning purposes. It is not maintained as an open-source project with active support. If you want to use it, the best approach is to fork the repository and develop it further on your own.
 
@@ -42,7 +42,7 @@ Read the documentation at:
     }
 ```
 
-> Return multiple views to fully utilize the capabilities of [xh-swap-ob](https://htmx.org/attributes/hx-swap-oob/).
+> Return multiple views to fully utilize the capabilities of [hx-swap-oob](https://htmx.org/attributes/hx-swap-oob/).
 
 ```php
     public function builder(HtmxRequest $request): HtmxResponse
@@ -105,7 +105,7 @@ Read the documentation at:
 
 ### Attributes
 
-> Thanks to the [#HtmxOnly] attribute, you can limit the endpoint to requests coming from htmx.
+> Thanks to the `#[HtmxOnly]` attribute, you can limit the endpoint to requests coming from htmx.
 > When someone opens the link directly, they will receive a 404 response.
 
 ```php
@@ -116,17 +116,24 @@ Read the documentation at:
     }
 ```
 
+### API Reference
+
+The source code is fully documented with PHPDoc including examples and links to htmx documentation:
+
+- **[HtmxRequest](src/Request/HtmxRequest.php)** - All htmx request headers (`isHtmx`, `isBoosted`, `currentUrl`, `target`, `trigger`, `prompt`, etc.)
+- **[HtmxResponseBuilder](src/Response/HtmxResponseBuilder.php)** - Fluent builder with all response methods (`success()`, `failure()`, `view()`, `trigger()`, `redirect()`, `pushUrl()`, `retarget()`, `withReswap()`, etc.)
+
 ### Demo project and code examples
 
-**[Live Demo](https://htmx-bundle.mdx.pl)** - See the bundle in action
+**[Live Demo](https://htmx-bundle.mdx.pl)** - See the bundle in action with source code preview
 
 **[Demo Source Code](https://github.com/mdxpl/htmx-bundle-demo)** - Browse the implementation
 
 ## Supported versions
 
-| PHP  | Symfony    | htmx |
-|------|------------|------|
-| 8.2+ | 6.4+, 7.4+ | 2.0+ |
+| PHP  | Symfony        | htmx |
+|------|----------------|------|
+| 8.2+ | 6.4+, 7.x, 8.x | 2.0+ |
 
 ## Important notes
 
