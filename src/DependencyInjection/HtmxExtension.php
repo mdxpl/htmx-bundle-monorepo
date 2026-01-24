@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\DependencyInjection;
 
+use LogicException;
+use Mdxpl\HtmxBundle\EventSubscriber\CsrfValidationSubscriber;
+use Mdxpl\HtmxBundle\Twig\HtmxCsrfExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class HtmxExtension extends Extension
 {
@@ -25,6 +30,43 @@ class HtmxExtension extends Extension
 
         $loader = new Loader\PhpFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.php');
+
+        $this->configureCsrf($config['csrf'], $container);
+    }
+
+    /**
+     * @param array{enabled: bool, token_id: string, header_name: string, safe_methods: list<string>} $config
+     */
+    private function configureCsrf(array $config, ContainerBuilder $container): void
+    {
+        if (!$config['enabled']) {
+            return;
+        }
+
+        if (!interface_exists(CsrfTokenManagerInterface::class)) {
+            throw new LogicException(
+                'CSRF protection requires the "symfony/security-csrf" package. '
+                . 'Install it with "composer require symfony/security-csrf" or disable CSRF with "mdx_htmx.csrf.enabled: false".',
+            );
+        }
+
+        $container->register(HtmxCsrfExtension::class)
+            ->setArguments([
+                new Reference('security.csrf.token_manager'),
+                $config['token_id'],
+                $config['header_name'],
+            ])
+            ->addTag('twig.extension');
+
+        $container->register(CsrfValidationSubscriber::class)
+            ->setArguments([
+                new Reference('security.csrf.token_manager'),
+                true,
+                $config['token_id'],
+                $config['header_name'],
+                $config['safe_methods'],
+            ])
+            ->addTag('kernel.event_subscriber');
     }
 
     public function getAlias(): string
