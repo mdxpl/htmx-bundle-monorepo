@@ -1,14 +1,16 @@
 # Symfony integration with htmx tools
 
-This bundle enables full **htmx** integration and opens up new possibilities for **Symfony** applications using **Twig**. 
+This bundle enables full **htmx** integration and opens up new possibilities for **Symfony** applications using **Twig**.
 Effortlessly enrich your projects with dynamic features like on-demand content loading and asynchronous form submissions, all within the familiar Symfony environment, without the need for additional JavaScript.
 
-This bundle is designed for developers who want to make their applications faster, more interactive, and user-friendly with minimal effort. 
+This bundle is designed for developers who want to make their applications faster, more interactive, and user-friendly with minimal effort.
 Unlock the power of [HTMX](https://htmx.org)  and [Twig](https://twig.symfony.com) in your [Symfony](https://symfony.com/doc/current/controller.html) applications for dynamic user interfaces.
 
 > **Note:** This is a hobby project created for personal use and learning purposes. It is not maintained as an open-source project with active support. If you want to use it, the best approach is to fork the repository and develop it further on your own.
 
-[![PHP](https://img.shields.io/badge/php-%23777BB4.svg?&logo=php&logoColor=white)](#) [![Symfony](https://img.shields.io/badge/Symfony-black?logo=symfony)](#) [![HTMX](https://img.shields.io/badge/%3C/%3E%20HTMX-3D72D7?logo=mysl&logoColor=white)](#) [![Tests](https://github.com/mdxpl/htmx-bundle/actions/workflows/ci.yml/badge.svg)](#)
+[![PHP](https://img.shields.io/badge/php-%23777BB4.svg?&logo=php&logoColor=white)](#) [![Symfony](https://img.shields.io/badge/Symfony-black?logo=symfony)](#) [![HTMX](https://img.shields.io/badge/%3C/%3E%20HTMX-3D72D7?logo=mysl&logoColor=white)](#) 
+
+**[Live Demo](https://htmx-bundle.mdx.pl)** | **[Demo Source Code](https://github.com/mdxpl/htmx-bundle-demo)**
 
 
 ## Documentation
@@ -116,7 +118,9 @@ Read the documentation at:
 
 ### Demo project and code examples
 
-TBD
+**[Live Demo](https://htmx-bundle.mdx.pl)** - See the bundle in action
+
+**[Demo Source Code](https://github.com/mdxpl/htmx-bundle-demo)** - Browse the implementation
 
 ## Supported versions
 

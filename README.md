@@ -1,9 +1,13 @@
 # htmx-bundle Monorepo
 
+**[Live Demo](https://htmx-bundle.mdx.pl)**
+
+> **Note:** This is a hobby project created for personal use and learning purposes. It is not maintained as an open-source project with active support.
+
 This is a monorepo containing:
 
-- **[htmx-bundle](packages/htmx-bundle)** - Symfony bundle for htmx integration
-- **[demo](packages/demo)** - Demo application showcasing bundle features
+- **[htmx-bundle](packages/htmx-bundle)** - Symfony bundle for htmx integration ([GitHub](https://github.com/mdxpl/htmx-bundle))
+- **[demo](packages/demo)** - Demo application showcasing bundle features ([GitHub](https://github.com/mdxpl/htmx-bundle-demo))
 
 ## Structure
 

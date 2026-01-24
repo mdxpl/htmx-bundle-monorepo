@@ -1,6 +1,10 @@
 # htmx-bundle Demo
 
-A minimal Symfony application demonstrating the htmx-bundle features.
+A minimal Symfony application demonstrating the [htmx-bundle](https://github.com/mdxpl/htmx-bundle) features.
+
+> **Note:** This is a hobby project created for personal use and learning purposes. It is not maintained as an open-source project with active support.
+
+**[Live Demo](https://htmx-bundle.mdx.pl)** | **[htmx-bundle Documentation](https://github.com/mdxpl/htmx-bundle)**
 
 ## Installation
 
