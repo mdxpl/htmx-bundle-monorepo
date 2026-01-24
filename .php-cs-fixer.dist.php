@@ -24,6 +24,7 @@ return (new PhpCsFixer\Config())
         'class_definition' => ['single_line' => true],
         'modernize_types_casting' => true,
         'native_function_invocation' => ['include' => ['@compiler_optimized'], 'scope' => 'namespaced'],
+        'single_blank_line_at_eof' => true,
     ])
     ->setFinder($finder)
     ->setRiskyAllowed(true)
