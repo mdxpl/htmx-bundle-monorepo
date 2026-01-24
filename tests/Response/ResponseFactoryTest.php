@@ -86,6 +86,25 @@ class ResponseFactoryTest extends TestCase
         self::assertSame('', $response->getContent());
     }
 
+    public function testVaryHeaderIsAddedByDefault(): void
+    {
+        $builder = HtmxResponseBuilder::create(true)->success();
+        $factory = new ResponseFactory($this->initTwig());
+        $response = $factory->create($builder->build());
+
+        self::assertTrue($response->headers->has('Vary'));
+        self::assertEquals('HX-Request', $response->headers->get('Vary'));
+    }
+
+    public function testVaryHeaderCanBeDisabled(): void
+    {
+        $builder = HtmxResponseBuilder::create(true)->success();
+        $factory = new ResponseFactory($this->initTwig(), addVaryHeader: false);
+        $response = $factory->create($builder->build());
+
+        self::assertFalse($response->headers->has('Vary'));
+    }
+
     /**
      * @return Environment
      */

@@ -3,6 +3,7 @@
 namespace Mdxpl\HtmxBundle\Tests\EventSubscriber;
 
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxResponseSubscriber;
+use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use Mdxpl\HtmxBundle\Response\ResponseFactory;
 use PHPUnit\Framework\Assert;
@@ -40,4 +41,43 @@ class HtmxResponseSubscriberTest extends TestCase
         Assert::assertInstanceOf(Response::class, $event->getResponse());
     }
 
+    public function testStrictModeThrowsExceptionForNonHtmxRequest(): void
+    {
+        $request = new Request();
+        $request->attributes->set(HtmxRequest::REQUEST_ATTRIBUTE_NAME, new HtmxRequest(isHtmx: false));
+
+        $event = new ViewEvent(
+            $this->createMock(KernelInterface::class),
+            $request,
+            1,
+            new HtmxResponse(200)
+        );
+
+        $twig = $this->createMock(Environment::class);
+        $subscriber = new HtmxResponseSubscriber(new ResponseFactory($twig), strictMode: true);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('HtmxResponse returned for non-htmx request');
+
+        $subscriber->onKernelView($event);
+    }
+
+    public function testStrictModeDoesNotThrowForHtmxRequest(): void
+    {
+        $request = new Request();
+        $request->attributes->set(HtmxRequest::REQUEST_ATTRIBUTE_NAME, new HtmxRequest(isHtmx: true));
+
+        $event = new ViewEvent(
+            $this->createMock(KernelInterface::class),
+            $request,
+            1,
+            new HtmxResponse(200)
+        );
+
+        $twig = $this->createMock(Environment::class);
+        $subscriber = new HtmxResponseSubscriber(new ResponseFactory($twig), strictMode: true);
+        $subscriber->onKernelView($event);
+
+        Assert::assertInstanceOf(Response::class, $event->getResponse());
+    }
 }

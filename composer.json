@@ -30,5 +30,10 @@
     "psr-4": {
       "Mdxpl\\HtmxBundle\\Tests\\": "tests/"
     }
+  },
+  "scripts": {
+    "test": "simple-phpunit",
+    "cs": "php-cs-fixer fix --dry-run --diff",
+    "cs-fix": "php-cs-fixer fix"
   }
 }

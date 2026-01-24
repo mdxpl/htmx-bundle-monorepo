@@ -61,6 +61,29 @@ Quick start
 
 3. Check examples, demo site and [htmx documentation](https://htmx.org/docs/#installing).
 
+Configuration
+============
+
+You can configure the bundle by creating a `config/packages/mdx_htmx.yaml` file:
+
+```yaml
+mdx_htmx:
+    # Configuration for #[HtmxOnly] attribute
+    htmx_only:
+        enabled: true              # Enable/disable the functionality
+        status_code: 404           # HTTP status for non-htmx requests (404, 403, 400)
+        message: 'Not Found'       # Error message
+
+    # Default view parameters (_htmx_result, _htmx_request)
+    default_view_data:
+        enabled: true              # Add default params to views
+
+    # Response configuration
+    response:
+        vary_header: true          # Add "Vary: HX-Request" (important for caching)
+        strict_mode: false         # Throw exception when HtmxResponse for non-htmx request
+```
+
 Examples
 ============
 

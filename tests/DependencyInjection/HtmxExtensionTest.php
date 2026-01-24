@@ -11,6 +11,6 @@ class HtmxExtensionTest extends TestCase
     {
         $extension = new HtmxExtension();
 
-        $this->assertEquals('mdxpl_htmx', $extension->getAlias());
+        $this->assertEquals('mdx_htmx', $extension->getAlias());
     }
 }

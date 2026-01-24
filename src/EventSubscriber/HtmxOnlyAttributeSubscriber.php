@@ -14,6 +14,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class HtmxOnlyAttributeSubscriber implements EventSubscriberInterface
 {
+    public function __construct(
+        private readonly bool $enabled = true,
+        private readonly int $statusCode = Response::HTTP_NOT_FOUND,
+        private readonly string $message = 'Not Found',
+    ) {
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -23,8 +30,12 @@ class HtmxOnlyAttributeSubscriber implements EventSubscriberInterface
 
     public function onKernelController(ControllerEvent $event): void
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         if ($this->hasAttribute($event) && !$this->isHtmxRequest($event)) {
-            throw new HttpException(Response::HTTP_NOT_FOUND, 'Not Found');
+            throw new HttpException($this->statusCode, $this->message);
         }
     }
 
@@ -37,6 +48,6 @@ class HtmxOnlyAttributeSubscriber implements EventSubscriberInterface
 
     private function isHtmxRequest(ControllerEvent $event): bool
     {
-        return (bool)$event->getRequest()->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME)?->isHtmx;
+        return (bool) $event->getRequest()->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME)?->isHtmx;
     }
 }

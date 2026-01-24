@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\EventSubscriber;
 
+use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use Mdxpl\HtmxBundle\Response\ResponseFactory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -12,8 +13,10 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 readonly class HtmxResponseSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private ResponseFactory $responseFactory)
-    {
+    public function __construct(
+        private ResponseFactory $responseFactory,
+        private bool $strictMode = false,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -27,6 +30,16 @@ readonly class HtmxResponseSubscriber implements EventSubscriberInterface
     {
         $result = $event->getControllerResult();
         if ($result instanceof HtmxResponse) {
+            if ($this->strictMode) {
+                $htmxRequest = $event->getRequest()->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME);
+                if ($htmxRequest && !$htmxRequest->isHtmx) {
+                    throw new \LogicException(
+                        'HtmxResponse returned for non-htmx request. '
+                        . 'This is likely a bug. Disable strict_mode in mdx_htmx config to suppress this error.'
+                    );
+                }
+            }
+
             $event->setResponse($this->responseFactory->create($result));
         }
     }

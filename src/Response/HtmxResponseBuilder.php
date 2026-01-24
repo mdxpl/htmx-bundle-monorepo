@@ -55,6 +55,15 @@ class HtmxResponseBuilder
         return new self($fromHtmxRequest, $viewData);
     }
 
+    /**
+     * Creates a builder with explicit configuration for default view data.
+     * Used internally by HtmxResponseBuilderFactory to respect bundle configuration.
+     */
+    public static function createWithConfig(bool $fromHtmxRequest, array $viewData, bool $setDefaultViewData): self
+    {
+        return new self($fromHtmxRequest, $viewData, $setDefaultViewData);
+    }
+
     public function responseCode(int $responseCode, Result $result): self
     {
         $this->withResponseCode($responseCode);

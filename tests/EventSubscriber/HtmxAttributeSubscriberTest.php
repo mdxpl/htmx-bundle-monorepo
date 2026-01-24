@@ -103,4 +103,35 @@ class HtmxAttributeSubscriberTest extends TestCase
             HtmxOnlyAttributeSubscriber::getSubscribedEvents(),
         );
     }
+
+    public function testDisabledSubscriberDoesNotThrowException(): void
+    {
+        $event = $this->createEvent(withHtmxRequest: false, withAnnotatedController: true);
+
+        $subscriber = new HtmxOnlyAttributeSubscriber(enabled: false);
+        $subscriber->onKernelController($event);
+
+        $this->assertTrue(true);
+    }
+
+    public function testCustomStatusCodeAndMessage(): void
+    {
+        $event = $this->createEvent(withHtmxRequest: false, withAnnotatedController: true);
+
+        $subscriber = new HtmxOnlyAttributeSubscriber(
+            enabled: true,
+            statusCode: 403,
+            message: 'Forbidden',
+        );
+
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('Forbidden');
+
+        try {
+            $subscriber->onKernelController($event);
+        } catch (HttpException $e) {
+            $this->assertEquals(403, $e->getStatusCode());
+            throw $e;
+        }
+    }
 }

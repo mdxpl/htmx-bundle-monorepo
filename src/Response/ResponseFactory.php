@@ -10,8 +10,10 @@ use Twig\Environment;
 
 class ResponseFactory
 {
-    public function __construct(private readonly Environment $twig)
-    {
+    public function __construct(
+        private readonly Environment $twig,
+        private readonly bool $addVaryHeader = true,
+    ) {
     }
 
     /**
@@ -21,6 +23,11 @@ class ResponseFactory
     {
         $response = new Response(null, $htmxResponse->responseCode);
         $this->setHeaders($htmxResponse, $response);
+
+        if ($this->addVaryHeader) {
+            $response->headers->set('Vary', 'HX-Request', false);
+        }
+
         if ($htmxResponse->views->isEmpty()) {
             return $response;
         }
