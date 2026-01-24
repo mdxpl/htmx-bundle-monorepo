@@ -14,33 +14,20 @@ jobs:
       fail-fast: false
       matrix:
         package:
-          - name: 'htmx-bundle'
-            local_path: 'packages/htmx-bundle'
-            split_repository: 'mdxpl/htmx-bundle'
-          - name: 'htmx-bundle-demo'
-            local_path: 'packages/demo'
-            split_repository: 'mdxpl/htmx-bundle-demo'
+          - prefix: 'packages/htmx-bundle'
+            repo: 'mdxpl/htmx-bundle'
+          - prefix: 'packages/demo'
+            repo: 'mdxpl/htmx-bundle-demo'
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Split ${{ matrix.package.name }}
+      - name: Split ${{ matrix.package.prefix }}
         uses: claudiodekker/splitsh-action@v1.0.0
         with:
-          local_path: ${{ matrix.package.local_path }}
-          split_repository: ${{ matrix.package.split_repository }}
-          split_branch: main
-        env:
-          GITHUB_TOKEN: ${{ secrets.HTMX_BUNDLE_SPLIT_TOKEN }}
-
-      - name: Push tag to ${{ matrix.package.name }}
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: claudiodekker/splitsh-action@v1.0.0
-        with:
-          local_path: ${{ matrix.package.local_path }}
-          split_repository: ${{ matrix.package.split_repository }}
-          split_branch: ${{ github.ref_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.HTMX_BUNDLE_SPLIT_TOKEN }}
+          prefix: ${{ matrix.package.prefix }}
+          remote: 'https://x-access-token:${{ secrets.HTMX_BUNDLE_SPLIT_TOKEN }}@github.com/${{ matrix.package.repo }}.git'
+          reference: ${{ github.ref_name }}
+          as_tag: ${{ startsWith(github.ref, 'refs/tags/') }}
