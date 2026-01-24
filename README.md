@@ -69,13 +69,6 @@ On push to `main` or tag creation, GitHub Actions automatically splits packages 
 - `mdxpl/htmx-bundle` - Read-only, installable via Packagist
 - `mdxpl/htmx-bundle-demo` - Read-only, deployable demo
 
-### Setup split
-
-1. Create empty repos `mdxpl/htmx-bundle` and `mdxpl/htmx-bundle-demo`
-2. Create Personal Access Token with `repo` scope
-3. Add as `SPLIT_TOKEN` secret in this repo
-4. Push to `main` - splits will happen automatically
-
 ## Releases
 
 ### Create a release
