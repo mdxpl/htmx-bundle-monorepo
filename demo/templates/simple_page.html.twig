@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ page.name }} - Simple Page Demo{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold">Simple Page Navigation</h1>
+    <p class="text-base-content/70">Click the buttons below to load different pages without a full page reload.</p>
+    <p class="text-base-content/70 text-sm mt-2">You can also navigate directly to the URL (e.g. <code class="badge badge-ghost badge-sm">/simple-page/about</code>) - the page will load as full HTML without htmx.</p>
+</div>
+
+<div id="page-nav" class="flex flex-wrap gap-2 mb-6">
+    {% for slug, item in menu %}
+    <button class="btn {{ currentSlug == slug ? 'btn-primary' : 'btn-outline' }}"
+            aria-current="{{ currentSlug == slug ? 'true' : 'false' }}"
+            data-slug="{{ slug }}"
+            hx-get="{{ path('app_simple_page', {'slug': slug}) }}"
+            hx-push-url="true"
+            hx-target="#pageContent"
+            hx-swap="innerHTML"
+            hx-indicator="#page-loading"
+            hx-on::after-request="updateActiveTab(this)">
+        {{ item.name }}
+    </button>
+    {% endfor %}
+    <span id="page-loading" class="htmx-indicator">
+        <span class="loading loading-spinner loading-sm"></span>
+    </span>
+</div>
+
+<script>
+function updateActiveTab(clicked) {
+    document.querySelectorAll('#page-nav button[data-slug]').forEach(btn => {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline');
+        btn.setAttribute('aria-current', 'false');
+    });
+    clicked.classList.remove('btn-outline');
+    clicked.classList.add('btn-primary');
+    clicked.setAttribute('aria-current', 'true');
+}
+</script>
+
+<div id="pageContent">
+    {{ block('pageContentInner') }}
+</div>
+{% endblock %}
+
+{% block pageContentInner %}
+<div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+        <h2 class="card-title">{{ page.name }}</h2>
+        <p>{{ page.description }}</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block pageContentPartial %}
+<title>{{ page.name }} - Simple Page Demo</title>
+{{ block('pageContentInner') }}
+{% endblock %}

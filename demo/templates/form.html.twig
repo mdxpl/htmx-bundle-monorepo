@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Form Demo - htmx-bundle{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold">Asynchronous Form Handling</h1>
+    <p class="text-base-content/70">Submit the form to see validation in action. Try submitting empty or with a single character.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Demo Form</h2>
+            <div id="formWrapper">
+                {{ block('formComponent') }}
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">How it works</h2>
+            <ul class="list-disc list-inside space-y-2">
+                <li>Form uses <code class="badge badge-ghost">hx-post</code> to submit asynchronously</li>
+                <li>Success returns HTTP 200 with success message</li>
+                <li>Validation errors return HTTP 422 with form errors</li>
+                <li>JavaScript handles 422 to allow htmx to swap content</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block formComponent %}
+{{ form_start(form, {
+    'attr': {
+        'hx-post': path('app_form'),
+        'hx-target': '#formWrapper',
+        'hx-swap': 'innerHTML',
+        'hx-indicator': '#form-loading'
+    }
+}) }}
+    <div class="form-control w-full mb-4">
+        <label class="label">
+            <span class="label-text">{{ form_label(form.name) }}</span>
+        </label>
+        {{ form_widget(form.name, {'attr': {'class': 'input input-bordered w-full'}}) }}
+        {% if form_errors(form.name)|length > 0 %}
+        <label class="label">
+            <span class="label-text-alt text-error">{{ form_errors(form.name) }}</span>
+        </label>
+        {% endif %}
+    </div>
+    <div class="flex items-center gap-2">
+        {{ form_widget(form.submit, {'attr': {'class': 'btn btn-primary'}}) }}
+        <span id="form-loading" class="htmx-indicator">
+            <span class="loading loading-spinner loading-sm"></span>
+        </span>
+    </div>
+{{ form_end(form) }}
+{% endblock %}
+
+{% block failureComponent %}
+<div class="alert alert-error mb-4">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <span>Please fix the errors below.</span>
+</div>
+{{ block('formComponent') }}
+{% endblock %}
+
+{% block successComponent %}
+<div class="alert alert-success mb-4">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <span><strong>Success!</strong> Hello, {{ name }}! Your form was submitted successfully.</span>
+</div>
+<button class="btn btn-outline"
+        hx-get="{{ path('app_form') }}"
+        hx-target="#formWrapper"
+        hx-swap="innerHTML">
+    Submit Another
+</button>
+{% endblock %}

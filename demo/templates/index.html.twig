@@ -1,0 +1,113 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home - htmx-bundle Demo{% endblock %}
+
+{% block body %}
+<div class="hero bg-base-100 rounded-box mb-6">
+    <div class="hero-content text-center">
+        <div class="max-w-md">
+            <h1 class="text-5xl font-bold">htmx-bundle Demo</h1>
+            <p class="py-6">This demo application showcases the features of the htmx-bundle for Symfony.</p>
+        </div>
+    </div>
+</div>
+
+<h2 class="text-2xl font-bold mb-4">Available Demos</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h3 class="card-title text-lg">Simple Page</h3>
+            <p class="text-sm">Navigate between pages without full reloads using partial HTML.</p>
+            <div class="card-actions justify-end">
+                <a href="{{ path('app_simple_page') }}" class="btn btn-primary btn-sm">Try it</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h3 class="card-title text-lg">Form Handling</h3>
+            <p class="text-sm">Async form submission with validation and proper HTTP status codes.</p>
+            <div class="card-actions justify-end">
+                <a href="{{ path('app_form') }}" class="btn btn-primary btn-sm">Try it</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h3 class="card-title text-lg">Infinite Scroll</h3>
+            <p class="text-sm">Load more content as you scroll with <code class="badge badge-ghost badge-xs">hx-trigger="revealed"</code>.</p>
+            <div class="card-actions justify-end">
+                <a href="{{ path('app_infinite_scroll') }}" class="btn btn-primary btn-sm">Try it</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h3 class="card-title text-lg">Active Search</h3>
+            <p class="text-sm">Real-time search with debouncing using <code class="badge badge-ghost badge-xs">delay:300ms</code>.</p>
+            <div class="card-actions justify-end">
+                <a href="{{ path('app_search') }}" class="btn btn-primary btn-sm">Try it</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h3 class="card-title text-lg">Click to Edit</h3>
+            <p class="text-sm">Inline editing of fields without page reload.</p>
+            <div class="card-actions justify-end">
+                <a href="{{ path('app_click_to_edit') }}" class="btn btn-primary btn-sm">Try it</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h3 class="card-title text-lg">Live Polling</h3>
+            <p class="text-sm">Auto-refresh stats every 2s with <code class="badge badge-ghost badge-xs">hx-trigger="every 2s"</code>.</p>
+            <div class="card-actions justify-end">
+                <a href="{{ path('app_polling') }}" class="btn btn-primary btn-sm">Try it</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h3 class="card-title text-lg">Delete Confirm</h3>
+            <p class="text-sm">Delete with confirmation dialog and toast notifications via <code class="badge badge-ghost badge-xs">HX-Trigger</code>.</p>
+            <div class="card-actions justify-end">
+                <a href="{{ path('app_delete_demo') }}" class="btn btn-primary btn-sm">Try it</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h3 class="card-title text-lg">Cascading Selects</h3>
+            <p class="text-sm">Dependent dropdowns - select country to load cities dynamically.</p>
+            <div class="card-actions justify-end">
+                <a href="{{ path('app_cascading') }}" class="btn btn-primary btn-sm">Try it</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="text-2xl font-bold mb-4">Features Demonstrated</h2>
+
+<div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+        <ul class="list-disc list-inside space-y-2">
+            <li><code class="badge badge-primary">HtmxRequest</code> injection for detecting htmx requests</li>
+            <li><code class="badge badge-primary">HtmxResponse</code> and <code class="badge badge-primary">HtmxResponseBuilder</code> for building responses</li>
+            <li><code class="badge badge-secondary">#[HtmxOnly]</code> attribute for htmx-only endpoints</li>
+            <li><code class="badge badge-accent">htmx_csrf_meta()</code> and <code class="badge badge-accent">htmx_csrf_headers()</code> for CSRF protection</li>
+            <li>Block rendering for partial updates</li>
+            <li>Trigger events for client-side notifications</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

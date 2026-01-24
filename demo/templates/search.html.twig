@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Active Search - htmx-bundle Demo{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold">Active Search</h1>
+    <p class="text-base-content/70">Search for users in real-time. Start typing to see results (minimum 2 characters).</p>
+    <p class="text-base-content/70 text-sm mt-2">Uses <code class="badge badge-ghost badge-sm">hx-trigger="keyup changed delay:300ms"</code> for debounced search.</p>
+    <p class="text-base-content/70 text-sm mt-1">Try searching for: <kbd class="kbd kbd-sm">john</kbd>, <kbd class="kbd kbd-sm">alice</kbd>, <kbd class="kbd kbd-sm">@example</kbd></p>
+</div>
+
+<div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+        <div class="form-control w-full max-w-md">
+            <label class="label">
+                <span class="label-text">Search users</span>
+            </label>
+            <input type="text"
+                   name="q"
+                   placeholder="Type a name or email..."
+                   class="input input-bordered w-full"
+                   hx-get="{{ path('app_search') }}"
+                   hx-trigger="keyup changed delay:300ms, search"
+                   hx-target="#search-results"
+                   hx-indicator="#search-spinner"
+                   value="{{ query }}" />
+        </div>
+
+        <div class="mt-4">
+            <span id="search-spinner" class="htmx-indicator">
+                <span class="loading loading-spinner loading-sm"></span> Searching...
+            </span>
+        </div>
+
+        <div id="search-results" class="mt-4">
+            {{ block('results') }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block results %}
+{% if query|length >= 2 %}
+    {% if results|length > 0 %}
+    <div class="overflow-x-auto">
+        <table class="table table-zebra">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in results %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="text-sm text-base-content/50 mt-2">Found {{ results|length }} result(s) for "{{ query }}"</p>
+    {% else %}
+    <div class="alert alert-warning">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+        <span>No results found for "{{ query }}"</span>
+    </div>
+    {% endif %}
+{% else %}
+<p class="text-base-content/50">Type at least 2 characters to search...</p>
+{% endif %}
+{% endblock %}

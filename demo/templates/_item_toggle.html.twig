@@ -1,0 +1,6 @@
+<button id="toggle-btn-{{ id }}"
+        hx-post="{{ path('app_item_toggle', {'id': id}) }}"
+        hx-swap="outerHTML"
+        class="btn {{ active ? 'btn-success' : 'btn-danger' }}">
+    {{ active ? 'Active' : 'Inactive' }}
+</button>
