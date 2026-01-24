@@ -71,6 +71,14 @@ jobs:
           draft: false
           prerelease: false
 
+  split-packages:
+    name: Split to Package Repos
+    needs: release
+    uses: ./.github/workflows/split.yml
+    with:
+      tag: v${{ inputs.version }}
+    secrets: inherit
+
   deploy-demo:
     name: Deploy Demo
     needs: release
