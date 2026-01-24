@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mdxpl\HtmxBundle\Tests\Response\Headers;
 
 use Mdxpl\HtmxBundle\Response\Headers\AbstractTrigger;

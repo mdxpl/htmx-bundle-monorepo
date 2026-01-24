@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mdxpl\HtmxBundle\Tests\Response\Headers;
 
 use Mdxpl\HtmxBundle\Response\Headers\HtmxResponseHeaderType;
@@ -16,7 +18,7 @@ class ReswapTest extends TestCase
         $reswap = new Reswap(
             SwapStyle::OUTER_HTML,
             new TimingSwap(1000),
-            new IgnoreTitle()
+            new IgnoreTitle(),
         );
 
         $this->assertEquals('outerHTML swap:1000ms ignoreTitle:true', $reswap->getValue());
@@ -43,7 +45,7 @@ class ReswapTest extends TestCase
         $reswap = new Reswap(
             SwapStyle::AFTER_BEGIN,
             new TimingSwap(1000),
-            new IgnoreTitle()
+            new IgnoreTitle(),
         );
 
         $this->assertEquals('afterbegin swap:1000ms ignoreTitle:true', $reswap->getValue());

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mdxpl\HtmxBundle\Tests\EventSubscriber;
 
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxResponseSubscriber;
@@ -31,7 +33,7 @@ class HtmxResponseSubscriberTest extends TestCase
             $this->createMock(KernelInterface::class),
             new Request(),
             1,
-            new HtmxResponse(200)
+            new HtmxResponse(200),
         );
 
         $twig = $this->createMock(Environment::class);
@@ -50,7 +52,7 @@ class HtmxResponseSubscriberTest extends TestCase
             $this->createMock(KernelInterface::class),
             $request,
             1,
-            new HtmxResponse(200)
+            new HtmxResponse(200),
         );
 
         $twig = $this->createMock(Environment::class);
@@ -71,7 +73,7 @@ class HtmxResponseSubscriberTest extends TestCase
             $this->createMock(KernelInterface::class),
             $request,
             1,
-            new HtmxResponse(200)
+            new HtmxResponse(200),
         );
 
         $twig = $this->createMock(Environment::class);

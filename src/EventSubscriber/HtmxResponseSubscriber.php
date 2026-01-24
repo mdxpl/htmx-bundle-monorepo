@@ -35,7 +35,7 @@ readonly class HtmxResponseSubscriber implements EventSubscriberInterface
                 if ($htmxRequest && !$htmxRequest->isHtmx) {
                     throw new \LogicException(
                         'HtmxResponse returned for non-htmx request. '
-                        . 'This is likely a bug. Disable strict_mode in mdx_htmx config to suppress this error.'
+                        . 'This is likely a bug. Disable strict_mode in mdx_htmx config to suppress this error.',
                     );
                 }
             }
