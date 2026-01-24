@@ -37,10 +37,20 @@
 
     <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
-            <h3 class="card-title text-lg">Form Handling</h3>
+            <h3 class="card-title text-lg">Simple Form</h3>
             <p class="text-sm">Async form submission with validation and proper HTTP status codes.</p>
             <div class="card-actions justify-end">
                 <a href="{{ path('app_form') }}" class="btn btn-primary btn-sm">Try it</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h3 class="card-title text-lg">Advanced Form</h3>
+            <p class="text-sm">Demo of <code class="badge badge-ghost badge-xs">HtmxTypeExtension</code> - htmx attributes on form fields.</p>
+            <div class="card-actions justify-end">
+                <a href="{{ path('app_advanced_form') }}" class="btn btn-primary btn-sm">Try it</a>
             </div>
         </div>
     </div>
@@ -105,7 +115,7 @@
         </div>
     </div>
 
-    <div class="card bg-base-100 shadow-xl border-2 border-primary">
+    <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
             <h3 class="card-title text-lg">Builder Showcase</h3>
             <p class="text-sm">Interactive demo of all <code class="badge badge-ghost badge-xs">HtmxResponseBuilder</code> methods.</p>
@@ -115,7 +125,7 @@
         </div>
     </div>
 
-    <div class="card bg-base-100 shadow-xl border-2 border-secondary">
+    <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
             <h3 class="card-title text-lg">Request Showcase</h3>
             <p class="text-sm">Interactive demo of all <code class="badge badge-ghost badge-xs">HtmxRequest</code> properties.</p>
@@ -124,6 +134,7 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <h2 class="text-2xl font-bold mb-4">Features Demonstrated</h2>

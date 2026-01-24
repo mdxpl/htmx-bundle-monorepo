@@ -33,8 +33,36 @@ Asynchronous form submission with validation:
 - Success: HTTP 200 with success message
 - Validation errors: HTTP 422 with form errors
 
+### Advanced Form (HtmxTypeExtension)
+Demonstrates the `htmx` option on Symfony form fields:
+- Live search / autocomplete with debouncing
+- Cascading selects (country → city)
+- Inline field validation on blur
+- Conditional fields based on selection
+
 ### Infinite Scroll
 Load more content automatically as you scroll using `hx-trigger="revealed"`.
+
+### Active Search
+Real-time search with debouncing using `delay:300ms`.
+
+### Click to Edit
+Inline editing of fields without page reload.
+
+### Live Polling
+Auto-refresh content with `hx-trigger="every 2s"`.
+
+### Delete Confirm
+Delete with confirmation dialog and toast notifications via `HX-Trigger`.
+
+### Cascading Selects
+Dependent dropdowns - select country to load cities dynamically.
+
+### Builder Showcase
+Interactive demo of all `HtmxResponseBuilder` methods.
+
+### Request Showcase
+Interactive demo of all `HtmxRequest` properties.
 
 ### CSRF Protection
 Global CSRF token injection using `htmx_csrf_meta()` and JavaScript event listener.

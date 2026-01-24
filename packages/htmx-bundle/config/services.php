@@ -4,6 +4,7 @@ use Mdxpl\HtmxBundle\Controller\ArgumentResolver\HtmxResponseValueResolver;
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxOnlyAttributeSubscriber;
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxRequestSubscriber;
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxResponseSubscriber;
+use Mdxpl\HtmxBundle\Form\Extension\HtmxTypeExtension;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilderFactory;
 use Mdxpl\HtmxBundle\Response\ResponseFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -12,6 +13,9 @@ use Symfony\Component\DependencyInjection\Reference;
 return static function (ContainerConfigurator $container): void {
     $container
         ->services()
+        ->set(HtmxTypeExtension::class)
+            ->tag('form.type_extension')
+
         ->set(HtmxResponseValueResolver::class)
         ->tag('controller.argument_value_resolver', ['priority' => 100])
 
