@@ -222,7 +222,7 @@ class HtmxResponseBuilder
 
     /**
      * Trigger events as soon as the response is received.
-     * @see \Mdxpl\HtmxBundle\Response\Headers\AbstractTrigger
+     * @see Headers\AbstractTrigger
      */
     public function trigger(string|array $events): self
     {
@@ -233,7 +233,7 @@ class HtmxResponseBuilder
 
     /**
      * Trigger events after the settling step.
-     * @see \Mdxpl\HtmxBundle\Response\Headers\AbstractTrigger
+     * @see Headers\AbstractTrigger
      */
     public function triggerAfterSettle(string|array $events): self
     {
@@ -244,7 +244,7 @@ class HtmxResponseBuilder
 
     /**
      * Allows you to trigger client-side events after the swap step.
-     * @see \Mdxpl\HtmxBundle\Response\Headers\AbstractTrigger
+     * @see Headers\AbstractTrigger
      */
     public function triggerAfterSwap(string|array $events): self
     {

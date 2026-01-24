@@ -23,7 +23,7 @@ class SimpleCollectionTraitTest extends TestCase
 
     public function createCollection(...$items): object
     {
-        return new class (...$items) implements Countable, IteratorAggregate {
+        return new class(...$items) implements Countable, IteratorAggregate {
             use ImmutableCollectionTrait;
 
             public function __construct(...$items)

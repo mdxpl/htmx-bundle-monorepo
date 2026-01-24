@@ -8,6 +8,7 @@ use Mdxpl\HtmxBundle\Attribute\HtmxOnly;
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxOnlyAttributeSubscriber;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -17,10 +18,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class HtmxAttributeSubscriberTest extends TestCase
 {
-    /**
-     * @doesNotPerformAssertions
-     */
-    public function testCases(): array
+    public static function htmxOnlyCasesProvider(): array
     {
         return [
             'Not htmx request and annotated controller throws not found exception' => [false, true, true],
@@ -30,9 +28,7 @@ class HtmxAttributeSubscriberTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider testCases
-     */
+    #[DataProvider('htmxOnlyCasesProvider')]
     public function testRequestWithHtmxWhenAttributeIsPresent(
         bool $htmxRequest,
         bool $annotatedController,
@@ -77,7 +73,7 @@ class HtmxAttributeSubscriberTest extends TestCase
 
     private function createControllerWithAnnotation(): object
     {
-        return new class () {
+        return new class() {
             #[HtmxOnly]
             public function __invoke(): HtmxResponse
             {
@@ -88,7 +84,7 @@ class HtmxAttributeSubscriberTest extends TestCase
 
     private function createControllerWithoutAnnotation(): object
     {
-        return new class () {
+        return new class() {
             public function __invoke(): HtmxResponse
             {
                 return new HtmxResponse();

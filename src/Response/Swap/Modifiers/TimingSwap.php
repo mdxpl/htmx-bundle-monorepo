@@ -18,6 +18,6 @@ readonly class TimingSwap implements SwapModifier
 
     public function __toString(): string
     {
-        return sprintf('swap:%dms', $this->delayInMilliseconds);
+        return \sprintf('swap:%dms', $this->delayInMilliseconds);
     }
 }

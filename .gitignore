@@ -1,6 +1,7 @@
 .idea/
 vendor/
 var/
+.phpunit.cache/
 
 composer.lock
 phpunit.xml

@@ -28,7 +28,7 @@ trait HasDefaultViewDataTrait
     private function assertNotOverridesReservedViewParams(mixed $viewData): void
     {
         foreach (self::BUILD_IN_VIEW_PARAMS as $reservedViewParam) {
-            if (array_key_exists($reservedViewParam, $viewData)) {
+            if (\array_key_exists($reservedViewParam, $viewData)) {
                 throw ReservedViewParamCannotBeOverriddenException::withViewParamName($reservedViewParam);
             }
         }

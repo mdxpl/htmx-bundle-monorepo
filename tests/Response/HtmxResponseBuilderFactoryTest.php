@@ -11,7 +11,7 @@ class HtmxResponseBuilderFactoryTest extends TestCase
 {
     public function testCreate(): void
     {
-        $builder = (new HtmxResponseBuilderFactory())->create(true);
+        $builder = new HtmxResponseBuilderFactory()->create(true);
         $htmxResponse = $builder->build();
 
         $this->assertCount(0, $htmxResponse->views);
@@ -21,7 +21,7 @@ class HtmxResponseBuilderFactoryTest extends TestCase
 
     public function testCreateWithView(): void
     {
-        $builder = (new HtmxResponseBuilderFactory())->create(true)->view('view');
+        $builder = new HtmxResponseBuilderFactory()->create(true)->view('view');
         $htmxResponse = $builder->build();
 
         $this->assertCount(1, $htmxResponse->views);
@@ -31,7 +31,7 @@ class HtmxResponseBuilderFactoryTest extends TestCase
 
     public function testSuccess(): void
     {
-        $builder = (new HtmxResponseBuilderFactory())->success(true);
+        $builder = new HtmxResponseBuilderFactory()->success(true);
         $htmxResponse = $builder->build();
 
         $this->assertCount(0, $htmxResponse->views);
@@ -41,7 +41,7 @@ class HtmxResponseBuilderFactoryTest extends TestCase
 
     public function testFailure(): void
     {
-        $builder = (new HtmxResponseBuilderFactory())->failure(true);
+        $builder = new HtmxResponseBuilderFactory()->failure(true);
         $htmxResponse = $builder->build();
 
         $this->assertCount(0, $htmxResponse->views);

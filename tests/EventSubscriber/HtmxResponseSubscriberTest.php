@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Tests\EventSubscriber;
 
+use LogicException;
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxResponseSubscriber;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
@@ -58,7 +59,7 @@ class HtmxResponseSubscriberTest extends TestCase
         $twig = $this->createMock(Environment::class);
         $subscriber = new HtmxResponseSubscriber(new ResponseFactory($twig), strictMode: true);
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('HtmxResponse returned for non-htmx request');
 
         $subscriber->onKernelView($event);

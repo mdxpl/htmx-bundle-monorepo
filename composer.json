@@ -11,13 +11,13 @@
     }
   ],
   "require": {
-    "php": ">=8.2",
+    "php": ">=8.4",
     "symfony/framework-bundle": "^5.4",
     "symfony/twig-bundle": "^5.4",
     "twig/twig": "^2.12|^3.0"
   },
   "require-dev": {
-    "symfony/phpunit-bridge": "^5.4",
+    "phpunit/phpunit": "^11.0",
     "friendsofphp/php-cs-fixer": "dev-master"
   },
   "minimum-stability": "dev",
@@ -32,7 +32,7 @@
     }
   },
   "scripts": {
-    "test": "simple-phpunit",
+    "test": "phpunit",
     "cs": "php-cs-fixer fix --dry-run --diff",
     "cs-fix": "php-cs-fixer fix"
   }

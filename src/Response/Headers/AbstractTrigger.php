@@ -21,7 +21,7 @@ abstract class AbstractTrigger implements HtmxResponseHeader
 
     public function getValue(): string
     {
-        if (is_string($this->events)) {
+        if (\is_string($this->events)) {
             return $this->events;
         }
 

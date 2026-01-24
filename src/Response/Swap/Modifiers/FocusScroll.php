@@ -18,6 +18,6 @@ readonly class FocusScroll implements SwapModifier
     {
         $boolAsString = $this->boolValue ? 'true' : 'false';
 
-        return sprintf('focus-scroll:%s', $boolAsString);
+        return \sprintf('focus-scroll:%s', $boolAsString);
     }
 }

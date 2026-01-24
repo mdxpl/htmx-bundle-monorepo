@@ -11,7 +11,7 @@ class ReservedViewParamCannotBeOverriddenException extends LogicException implem
     public static function withViewParamName(string $viewParamName): self
     {
         return new self(
-            sprintf('The view param "%s" is reserved and cannot be overridden.', $viewParamName),
+            \sprintf('The view param "%s" is reserved and cannot be overridden.', $viewParamName),
         );
     }
 }

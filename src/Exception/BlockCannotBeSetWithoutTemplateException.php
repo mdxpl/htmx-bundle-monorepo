@@ -11,7 +11,7 @@ class BlockCannotBeSetWithoutTemplateException extends InvalidArgumentException 
     public static function withBlockName(string $blockName): self
     {
         return new self(
-            sprintf('The block "%s" cannot be set without a template.', $blockName),
+            \sprintf('The block "%s" cannot be set without a template.', $blockName),
         );
     }
 }

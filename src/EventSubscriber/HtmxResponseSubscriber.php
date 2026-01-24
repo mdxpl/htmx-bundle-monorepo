@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\EventSubscriber;
 
+use LogicException;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use Mdxpl\HtmxBundle\Response\ResponseFactory;
@@ -33,7 +34,7 @@ readonly class HtmxResponseSubscriber implements EventSubscriberInterface
             if ($this->strictMode) {
                 $htmxRequest = $event->getRequest()->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME);
                 if ($htmxRequest && !$htmxRequest->isHtmx) {
-                    throw new \LogicException(
+                    throw new LogicException(
                         'HtmxResponse returned for non-htmx request. '
                         . 'This is likely a bug. Disable strict_mode in mdx_htmx config to suppress this error.',
                     );

@@ -18,6 +18,6 @@ readonly class TimingSettle implements SwapModifier
 
     public function __toString(): string
     {
-        return sprintf('settle:%dms', $this->delayInMilliseconds);
+        return \sprintf('settle:%dms', $this->delayInMilliseconds);
     }
 }

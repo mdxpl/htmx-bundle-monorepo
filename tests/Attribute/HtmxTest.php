@@ -13,7 +13,7 @@ class HtmxTest extends TestCase
 {
     public function testHtmxAttribute(): void
     {
-        $class = new class () {
+        $class = new class() {
             #[HtmxOnly]
             public function test(): true
             {
