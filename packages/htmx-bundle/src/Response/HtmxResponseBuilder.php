@@ -34,11 +34,11 @@ class HtmxResponseBuilder
 
     /**
      * @param bool $fromHtmxRequest Whether the request is from htmx or not.
-     * @param array $commonViewData View data that will be added to each view.
+     * @param array<string, mixed> $commonViewData View data that will be added to each view.
      * @param bool $setDefaultViewData Whether build-in view params should be added to each view.
      */
     private function __construct(
-        private readonly bool $fromHtmxRequest,
+        bool $fromHtmxRequest,
         private readonly array $commonViewData = [],
         private readonly bool $setDefaultViewData = true,
     ) {
@@ -49,6 +49,7 @@ class HtmxResponseBuilder
 
     /**
      * @param bool $fromHtmxRequest Whether the request is from htmx or not.
+     * @param array<string, mixed> $viewData
      */
     public static function create(bool $fromHtmxRequest, array $viewData = []): self
     {
@@ -58,6 +59,8 @@ class HtmxResponseBuilder
     /**
      * Creates a builder with explicit configuration for default view data.
      * Used internally by HtmxResponseBuilderFactory to respect bundle configuration.
+     *
+     * @param array<string, mixed> $viewData
      */
     public static function createWithConfig(bool $fromHtmxRequest, array $viewData, bool $setDefaultViewData): self
     {
@@ -109,6 +112,8 @@ class HtmxResponseBuilder
 
     /**
      * Adds a single view param.
+     *
+     * @param array<string, mixed> $viewData
      */
     public function view(string $template, array $viewData = [], ?string $block = null): self
     {
@@ -123,6 +128,9 @@ class HtmxResponseBuilder
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $viewData
+     */
     public function viewBlock(string $template, string $block, array $viewData = []): self
     {
         return $this->view($template, $viewData, $block);
@@ -222,6 +230,9 @@ class HtmxResponseBuilder
 
     /**
      * Trigger events as soon as the response is received.
+     *
+     * @param array<string, mixed>|string $events
+     *
      * @see Headers\AbstractTrigger
      */
     public function trigger(string|array $events): self
@@ -233,6 +244,9 @@ class HtmxResponseBuilder
 
     /**
      * Trigger events after the settling step.
+     *
+     * @param array<string, mixed>|string $events
+     *
      * @see Headers\AbstractTrigger
      */
     public function triggerAfterSettle(string|array $events): self
@@ -244,6 +258,9 @@ class HtmxResponseBuilder
 
     /**
      * Allows you to trigger client-side events after the swap step.
+     *
+     * @param array<string, mixed>|string $events
+     *
      * @see Headers\AbstractTrigger
      */
     public function triggerAfterSwap(string|array $events): self

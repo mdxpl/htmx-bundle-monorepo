@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\DependencyInjection;
 
-use LogicException;
 use Mdxpl\HtmxBundle\EventSubscriber\CsrfValidationSubscriber;
+use Mdxpl\HtmxBundle\Exception\MissingDependencyException;
 use Mdxpl\HtmxBundle\Twig\HtmxCsrfExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -44,10 +44,7 @@ class HtmxExtension extends Extension
         }
 
         if (!interface_exists(CsrfTokenManagerInterface::class)) {
-            throw new LogicException(
-                'CSRF protection requires the "symfony/security-csrf" package. '
-                . 'Install it with "composer require symfony/security-csrf" or disable CSRF with "mdx_htmx.csrf.enabled: false".',
-            );
+            throw MissingDependencyException::csrfPackageRequired();
         }
 
         $container->register(HtmxCsrfExtension::class)

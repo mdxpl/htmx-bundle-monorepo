@@ -40,13 +40,13 @@ class ResponseFactory
 
     private function renderView(View $view): string
     {
-        if (!$view->hasContent()) {
+        if ($view->template === null) {
             return '';
         }
 
         $templateWrapper = $this->twig->load($view->template);
 
-        return $view->block
+        return $view->block !== null
             ? $templateWrapper->renderBlock($view->block, $view->data)
             : $templateWrapper->render($view->data);
     }

@@ -18,6 +18,6 @@ readonly class ScrollingScroll implements SwapModifier
 
     public function __toString(): string
     {
-        return implode(':', array_filter(['scroll', $this->element, $this->direction->value]));
+        return implode(':', array_filter(['scroll', $this->element, $this->direction->value], static fn (?string $v): bool => $v !== null && $v !== ''));
     }
 }

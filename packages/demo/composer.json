@@ -5,12 +5,12 @@
     "license": "MIT",
     "require": {
         "php": ">=8.4",
-        "symfony/framework-bundle": "^7.0",
-        "symfony/twig-bundle": "^7.0",
-        "symfony/form": "^7.0",
-        "symfony/validator": "^7.0",
-        "symfony/security-csrf": "^7.0",
-        "symfony/runtime": "^7.0",
+        "symfony/framework-bundle": "^7.4",
+        "symfony/twig-bundle": "^7.4",
+        "symfony/form": "^7.4",
+        "symfony/validator": "^7.4",
+        "symfony/security-csrf": "^7.4",
+        "symfony/runtime": "^7.4",
         "mdxpl/htmx-bundle": "@dev"
     },
     "autoload": {

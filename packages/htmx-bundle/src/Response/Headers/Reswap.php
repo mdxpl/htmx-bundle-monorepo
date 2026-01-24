@@ -29,6 +29,6 @@ class Reswap implements HtmxResponseHeader
         $modifiers = array_map(fn (SwapModifier $modifier) => (string)$modifier, $this->modifiers);
         $modifiersAsString = implode(' ', $modifiers);
 
-        return implode(' ', array_filter([$this->style->value, $modifiersAsString]));
+        return implode(' ', array_filter([$this->style->value, $modifiersAsString], static fn (string $v): bool => $v !== ''));
     }
 }

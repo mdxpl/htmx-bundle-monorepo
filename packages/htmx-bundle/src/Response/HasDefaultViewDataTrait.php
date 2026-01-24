@@ -17,6 +17,7 @@ trait HasDefaultViewDataTrait
         View::IS_HTMX_REQUEST_VIEW_PARAM_NAME,
     ];
 
+    /** @var array<string, mixed> */
     private array $defaultViewData = [];
 
     private function setDefaultViewData(Result $result, bool $isHtmxRequest): void

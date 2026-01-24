@@ -17,16 +17,25 @@ class HtmxResponseBuilderFactory
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $viewData
+     */
     public function create(bool $fromHtmxRequest, array $viewData = []): HtmxResponseBuilder
     {
         return HtmxResponseBuilder::createWithConfig($fromHtmxRequest, $viewData, $this->setDefaultViewData);
     }
 
+    /**
+     * @param array<string, mixed> $viewData
+     */
     public function success(bool $fromHtmxRequest, array $viewData = []): HtmxResponseBuilder
     {
         return $this->create($fromHtmxRequest, $viewData)->success();
     }
 
+    /**
+     * @param array<string, mixed> $viewData
+     */
     public function failure(bool $fromHtmxRequest, array $viewData = []): HtmxResponseBuilder
     {
         return $this->create($fromHtmxRequest, $viewData)->failure();

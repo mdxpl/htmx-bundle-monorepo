@@ -4,10 +4,13 @@
     "type": "project",
     "license": "MIT",
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.4"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^10.0|^11.0",
         "symplify/monorepo-builder": "^11.2"
     },
@@ -28,7 +31,12 @@
         "test": "cd packages/htmx-bundle && vendor/bin/phpunit",
         "test:bundle": "cd packages/htmx-bundle && vendor/bin/phpunit",
         "cs:check": "php-cs-fixer check",
-        "cs:fix": "php-cs-fixer fix"
+        "cs:fix": "php-cs-fixer fix",
+        "phpstan": "phpstan analyse",
+        "analyse": "phpstan analyse",
+        "demo": "cd packages/demo && symfony serve",
+        "demo:docker": "docker compose up --build",
+        "demo:docker:stop": "docker compose down"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,

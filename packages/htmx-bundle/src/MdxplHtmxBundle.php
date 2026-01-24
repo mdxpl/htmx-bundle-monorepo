@@ -12,6 +12,10 @@ class MdxplHtmxBundle extends Bundle
 {
     public function getContainerExtension(): ?ExtensionInterface
     {
+        if ($this->extension === false) {
+            return null;
+        }
+
         return $this->extension ??= new HtmxExtension();
     }
 }

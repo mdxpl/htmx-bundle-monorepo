@@ -11,6 +11,9 @@ readonly class View
     public const RESULT_VIEW_PARAM_NAME = 'mdx_htmx_result';
     public const IS_HTMX_REQUEST_VIEW_PARAM_NAME = 'mdx_is_htmx_request';
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function __construct(
         public ?string $template = null,
         public ?string $block = null,
@@ -21,18 +24,21 @@ readonly class View
 
     private function assertTemplate(): void
     {
-        if (empty($this->template) && !empty($this->block)) {
+        if (($this->template === null || $this->template === '') && $this->block !== null) {
             throw BlockCannotBeSetWithoutTemplateException::withBlockName($this->block);
         }
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function create(string $template, ?string $block = null, array $data = []): self
     {
-        if (empty($template)) {
+        if ($template === '') {
             return self::empty();
         }
 
-        if (empty($block)) {
+        if ($block === null) {
             return self::template($template, $data);
         }
 
@@ -44,11 +50,17 @@ readonly class View
         return new self();
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function template(string $template, array $data = []): self
     {
         return new self($template, null, $data);
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public static function block(string $template, string $block, array $data = []): self
     {
         return new self($template, $block, $data);
@@ -56,6 +68,6 @@ readonly class View
 
     public function hasContent(): bool
     {
-        return !empty($this->template);
+        return $this->template !== null;
     }
 }

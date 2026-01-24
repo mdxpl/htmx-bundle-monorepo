@@ -15,6 +15,9 @@ namespace Mdxpl\HtmxBundle\Response\Headers;
  */
 abstract class AbstractTrigger implements HtmxResponseHeader
 {
+    /**
+     * @param array<string, mixed>|string $events
+     */
     public function __construct(private readonly array|string $events)
     {
     }

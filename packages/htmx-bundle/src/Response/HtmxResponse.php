@@ -19,41 +19,33 @@ readonly class HtmxResponse
         ViewsCollection|View|null $view = null,
         HtmxResponseHeaderCollection|HtmxResponseHeader|null $header = null,
     ) {
-        $this->resolveHeaders($header);
-        $this->resolveViewsCollection($view);
+        $this->views = self::resolveViewsCollection($view);
+        $this->headers = self::resolveHeaders($header);
     }
 
-    private function resolveViewsCollection(View|ViewsCollection|null $view): void
+    private static function resolveViewsCollection(View|ViewsCollection|null $view): ViewsCollection
     {
         if ($view instanceof View) {
-            $this->views = new ViewsCollection($view);
-
-            return;
+            return new ViewsCollection($view);
         }
 
         if ($view instanceof ViewsCollection) {
-            $this->views = $view;
-
-            return;
+            return $view;
         }
 
-        $this->views = new ViewsCollection();
+        return new ViewsCollection();
     }
 
-    private function resolveHeaders(HtmxResponseHeader|HtmxResponseHeaderCollection|null $header): void
+    private static function resolveHeaders(HtmxResponseHeader|HtmxResponseHeaderCollection|null $header): HtmxResponseHeaderCollection
     {
         if ($header instanceof HtmxResponseHeader) {
-            $this->headers = new HtmxResponseHeaderCollection($header);
-
-            return;
+            return new HtmxResponseHeaderCollection($header);
         }
 
         if ($header instanceof HtmxResponseHeaderCollection) {
-            $this->headers = $header;
-
-            return;
+            return $header;
         }
 
-        $this->headers = new HtmxResponseHeaderCollection();
+        return new HtmxResponseHeaderCollection();
     }
 }

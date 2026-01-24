@@ -57,7 +57,7 @@ final class CascadingController extends AbstractController
     #[Route('', name: 'app_cascading')]
     public function index(HtmxRequest $htmx): HtmxResponse
     {
-        $countries = array_map(static fn($data) => $data['name'], self::LOCATIONS);
+        $countries = array_map(static fn ($data) => $data['name'], self::LOCATIONS);
 
         return HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
@@ -81,8 +81,8 @@ final class CascadingController extends AbstractController
     #[HtmxOnly]
     public function submit(HtmxRequest $htmx, Request $request): HtmxResponse
     {
-        $country = $request->request->get('country');
-        $city = $request->request->get('city');
+        $country = (string) $request->request->get('country', '');
+        $city = (string) $request->request->get('city', '');
 
         $countryName = self::LOCATIONS[$country]['name'] ?? $country;
         $cityName = self::LOCATIONS[$country]['cities'][$city] ?? $city;

@@ -1,0 +1,22 @@
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+    level: 8
+    paths:
+        - packages/htmx-bundle/src
+        - packages/demo/src
+
+    scanDirectories:
+        - packages/htmx-bundle/vendor
+        - packages/demo/vendor
+
+    excludePaths:
+        - packages/*/vendor
+
+    treatPhpDocTypesAsCertain: false
+
+    symfony:
+        consoleApplicationLoader: null
+

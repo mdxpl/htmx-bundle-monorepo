@@ -11,14 +11,16 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 /**
  * It automatically resolves htmx request.
- * Just use "HtmxRequest $htmx" as an argument in your controller.
+ * Use "HtmxRequest $htmx" as an argument in your controller.
  */
 class HtmxResponseValueResolver implements ValueResolverInterface
 {
+    /**
+     * @return HtmxRequest[]
+     */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        $argumentType = $argument->getType();
-        if (!$argumentType || $argumentType !== HtmxRequest::class) {
+        if ($argument->getType() !== HtmxRequest::class) {
             return [];
         }
 

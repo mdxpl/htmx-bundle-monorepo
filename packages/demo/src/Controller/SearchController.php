@@ -28,9 +28,11 @@ final class SearchController extends AbstractController
     public function __invoke(HtmxRequest $htmx, #[MapQueryParameter] string $q = ''): HtmxResponse
     {
         $results = [];
-        if (strlen($q) >= 2) {
-            $results = array_filter(self::USERS, static fn($user) =>
-                stripos($user['name'], $q) !== false || stripos($user['email'], $q) !== false
+        if (\strlen($q) >= 2) {
+            $results = array_filter(
+                self::USERS,
+                static fn ($user) =>
+                stripos($user['name'], $q) !== false || stripos($user['email'], $q) !== false,
             );
             usleep(200000);
         }

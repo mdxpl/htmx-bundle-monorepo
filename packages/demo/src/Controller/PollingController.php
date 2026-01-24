@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use DateTime;
 use Mdxpl\HtmxBundle\Attribute\HtmxOnly;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
@@ -33,6 +34,9 @@ final class PollingController extends AbstractController
             ->build();
     }
 
+    /**
+     * @return array{visitors: int, orders: int, revenue: int, cpu: int, memory: int, updated_at: string}
+     */
     private function generateStats(): array
     {
         return [
@@ -41,7 +45,7 @@ final class PollingController extends AbstractController
             'revenue' => rand(1000, 9999),
             'cpu' => rand(20, 95),
             'memory' => rand(40, 85),
-            'updated_at' => (new \DateTime())->format('H:i:s'),
+            'updated_at' => new DateTime()->format('H:i:s'),
         ];
     }
 }

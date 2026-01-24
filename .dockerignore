@@ -1,0 +1,14 @@
+.git
+.gitignore
+.github
+vendor
+packages/demo/var
+packages/demo/vendor
+packages/htmx-bundle/vendor
+packages/htmx-bundle/tests
+*.md
+.php-cs-fixer.cache
+phpstan.neon
+.env.local
+.env.*.local
+docker-compose.yml

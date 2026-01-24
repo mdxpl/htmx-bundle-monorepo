@@ -43,7 +43,7 @@ class HtmxOnlyAttributeSubscriber implements EventSubscriberInterface
     {
         $attributes = $event->getAttributes(HtmxOnly::class);
 
-        return !empty($attributes);
+        return $attributes !== [];
     }
 
     private function isHtmxRequest(ControllerEvent $event): bool
