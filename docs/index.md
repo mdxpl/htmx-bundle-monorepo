@@ -84,6 +84,13 @@ mdx_htmx:
         strict_mode: false         # Throw exception when HtmxResponse for non-htmx request
 ```
 
+Main request only
+============
+
+This bundle only processes **main requests**. Sub-requests (ESI, `{{ render() }}` in Twig, `forward()`) are skipped.
+
+This is intentional - sub-requests are internal Symfony requests that may inherit HTTP headers from the parent request, which would lead to incorrect htmx detection.
+
 Examples
 ============
 

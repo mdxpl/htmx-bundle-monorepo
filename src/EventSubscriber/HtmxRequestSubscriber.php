@@ -20,6 +20,10 @@ class HtmxRequestSubscriber implements EventSubscriberInterface
 
     public function onKernelRequest(RequestEvent $event): void
     {
+        if (!$event->isMainRequest()) {
+            return;
+        }
+
         $request = $event->getRequest();
 
         $request->attributes->set(

@@ -20,6 +20,7 @@ class HtmxRequestSubscriberTest extends TestCase
         $request->headers->set(HtmxRequestHeaderType::REQUEST->value, 'true');
 
         $event = $this->createMock(RequestEvent::class);
+        $event->method('isMainRequest')->willReturn(true);
         $event->expects($this->once())
             ->method('getRequest')
             ->willReturn($request);
@@ -37,6 +38,7 @@ class HtmxRequestSubscriberTest extends TestCase
     {
         $request = new Request();
         $event = $this->createMock(RequestEvent::class);
+        $event->method('isMainRequest')->willReturn(true);
         $event->expects($this->once())
             ->method('getRequest')
             ->willReturn($request);
@@ -46,6 +48,21 @@ class HtmxRequestSubscriberTest extends TestCase
 
         $this->assertTrue($request->attributes->has(HtmxRequest::REQUEST_ATTRIBUTE_NAME));
         $this->assertFalse($request->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME)->isHtmx);
+    }
+
+    public function testOnKernelRequestSkipsSubRequest(): void
+    {
+        $request = new Request();
+        $request->headers->set(HtmxRequestHeaderType::REQUEST->value, 'true');
+
+        $event = $this->createMock(RequestEvent::class);
+        $event->method('isMainRequest')->willReturn(false);
+        $event->expects($this->never())->method('getRequest');
+
+        $subscriber = new HtmxRequestSubscriber();
+        $subscriber->onKernelRequest($event);
+
+        $this->assertFalse($request->attributes->has(HtmxRequest::REQUEST_ATTRIBUTE_NAME));
     }
 
     public function testGetSubscribedEvents(): void
