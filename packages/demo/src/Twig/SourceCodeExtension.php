@@ -30,7 +30,9 @@ final class SourceCodeExtension extends AbstractExtension
             return "// File not found: {$relativePath}";
         }
 
-        return file_get_contents($fullPath) ?: '';
+        $content = file_get_contents($fullPath);
+
+        return $content !== false ? $content : '';
     }
 
     public function getGithubUrl(string $relativePath, string $repo = 'mdxpl/htmx-bundle-demo'): string
