@@ -1,0 +1,5 @@
+{% block token %}{{ htmx_csrf_token() }}{% endblock %}
+
+{% block meta %}{{ htmx_csrf_meta() }}{% endblock %}
+
+{% block headers %}{{ htmx_csrf_headers() }}{% endblock %}
