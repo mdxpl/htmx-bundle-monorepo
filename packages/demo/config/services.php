@@ -1,5 +1,6 @@
 <?php
 
+use App\Twig\SourceCodeExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return static function (ContainerConfigurator $container): void {
@@ -13,4 +14,7 @@ return static function (ContainerConfigurator $container): void {
 
     $services->load('App\\Controller\\', '../src/Controller/')
         ->tag('controller.service_arguments');
+
+    $services->set(SourceCodeExtension::class)
+        ->arg('$projectDir', '%kernel.project_dir%');
 };

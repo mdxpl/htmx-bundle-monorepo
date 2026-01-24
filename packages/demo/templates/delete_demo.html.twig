@@ -148,3 +148,7 @@ document.body.addEventListener('htmx:afterSwap', function(evt) {
 });
 </script>
 {% endblock %}
+
+{% block sourceCode %}
+{% include '_source_code.html.twig' with {controller: 'DeleteDemoController.php', template: 'delete_demo.html.twig'} %}
+{% endblock %}

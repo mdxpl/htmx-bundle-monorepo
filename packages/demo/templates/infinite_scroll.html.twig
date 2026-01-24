@@ -45,3 +45,7 @@
 </div>
 {% endif %}
 {% endblock %}
+
+{% block sourceCode %}
+{% include '_source_code.html.twig' with {controller: 'InfiniteScrollController.php', template: 'infinite_scroll.html.twig'} %}
+{% endblock %}

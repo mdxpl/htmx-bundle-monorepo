@@ -59,3 +59,7 @@ function updateActiveTab(clicked) {
 <title>{{ page.name }} - Simple Page Demo</title>
 {{ block('pageContentInner') }}
 {% endblock %}
+
+{% block sourceCode %}
+{% include '_source_code.html.twig' with {controller: 'SimplePageController.php', template: 'simple_page.html.twig'} %}
+{% endblock %}

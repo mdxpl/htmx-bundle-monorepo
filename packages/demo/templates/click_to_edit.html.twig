@@ -92,3 +92,7 @@
     </div>
 </form>
 {% endblock %}
+
+{% block sourceCode %}
+{% include '_source_code.html.twig' with {controller: 'ClickToEditController.php', template: 'click_to_edit.html.twig'} %}
+{% endblock %}
