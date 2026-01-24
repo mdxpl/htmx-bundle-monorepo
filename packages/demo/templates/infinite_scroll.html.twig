@@ -5,7 +5,7 @@
 {% block body %}
 <div class="mb-6">
     <h1 class="text-3xl font-bold">Infinite Scroll</h1>
-    <p class="text-base-content/70">Scroll down to load more items automatically. No JavaScript required!</p>
+    <p class="text-base-content/70">Scroll down to load more items automatically. No custom JavaScript code needed!</p>
 </div>
 
 <div id="items-container" hx-indicator="#loading-indicator" class="space-y-4">
@@ -44,4 +44,8 @@
     <span>You've reached the end! No more items to load.</span>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block sourceCode %}
+{% include '_source_code.html.twig' with {controller: 'InfiniteScrollController.php', template: 'infinite_scroll.html.twig'} %}
 {% endblock %}

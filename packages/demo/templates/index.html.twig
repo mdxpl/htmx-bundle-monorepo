@@ -4,9 +4,9 @@
 
 {% block body %}
 <div class="hero bg-base-100 rounded-box mb-6">
-    <div class="hero-content text-center">
+    <div class="hero-content text-center py-12">
         <div class="max-w-md">
-            <h1 class="text-5xl font-bold">htmx-bundle Demo</h1>
+            <h1 class="text-5xl font-bold">MDX htmx-bundle Demo</h1>
             <p class="py-6">This demo application showcases the features of the htmx-bundle for Symfony.</p>
             <div class="flex justify-center gap-2">
                 <a href="https://github.com/mdxpl/htmx-bundle" target="_blank" class="btn btn-outline btn-sm">
@@ -101,6 +101,26 @@
             <p class="text-sm">Dependent dropdowns - select country to load cities dynamically.</p>
             <div class="card-actions justify-end">
                 <a href="{{ path('app_cascading') }}" class="btn btn-primary btn-sm">Try it</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl border-2 border-primary">
+        <div class="card-body">
+            <h3 class="card-title text-lg">Builder Showcase</h3>
+            <p class="text-sm">Interactive demo of all <code class="badge badge-ghost badge-xs">HtmxResponseBuilder</code> methods.</p>
+            <div class="card-actions justify-end">
+                <a href="{{ path('app_builder_showcase') }}" class="btn btn-primary btn-sm">Try it</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl border-2 border-secondary">
+        <div class="card-body">
+            <h3 class="card-title text-lg">Request Showcase</h3>
+            <p class="text-sm">Interactive demo of all <code class="badge badge-ghost badge-xs">HtmxRequest</code> properties.</p>
+            <div class="card-actions justify-end">
+                <a href="{{ path('app_request_showcase') }}" class="btn btn-primary btn-sm">Try it</a>
             </div>
         </div>
     </div>

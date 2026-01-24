@@ -1,8 +1,8 @@
-Infinite scroll without a single line of JavaScript, let's go!
+Infinite scroll without writing custom JavaScript code
 =========================
 
 Implementing infinite scroll has never been easier.
-We don't even need a single line of JavaScript!
+We don't need to write any custom JavaScript code!
 
 ### Step 1: Create a controller
 

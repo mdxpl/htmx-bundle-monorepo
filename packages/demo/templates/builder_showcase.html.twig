@@ -1,0 +1,353 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Builder Showcase - htmx-bundle Demo{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold">HtmxResponseBuilder Showcase</h1>
+    <p class="text-base-content/70">Interactive demo of all <code class="badge badge-ghost badge-sm">HtmxResponseBuilder</code> methods. Click buttons to see each method in action.</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    {# Left column - Buttons #}
+    <div class="lg:col-span-2 space-y-4">
+        {# Triggers #}
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Trigger Events</h2>
+                <p class="text-sm text-base-content/70 mb-3">Fire JavaScript events from server response (result shown via OOB)</p>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <button class="btn btn-primary btn-sm"
+                            hx-post="{{ path('app_builder_showcase_trigger') }}"
+                            hx-swap="none">
+                        trigger()
+                    </button>
+                    <button class="btn btn-primary btn-sm"
+                            hx-post="{{ path('app_builder_showcase_trigger_after_swap') }}"
+                            hx-swap="none">
+                        triggerAfterSwap()
+                    </button>
+                    <button class="btn btn-primary btn-sm"
+                            hx-post="{{ path('app_builder_showcase_trigger_after_settle') }}"
+                            hx-swap="none">
+                        triggerAfterSettle()
+                    </button>
+                </div>
+                <div id="trigger-result" class="p-2 bg-base-200 rounded text-sm min-h-[40px]">
+                    <span class="text-base-content/50">Click button to see trigger event result</span>
+                </div>
+            </div>
+        </div>
+
+        {# URL Manipulation #}
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-lg">URL Manipulation</h2>
+                <p class="text-sm text-base-content/70 mb-3">Change browser URL from server (watch address bar)</p>
+                <div class="flex flex-wrap gap-2">
+                    <button class="btn btn-secondary btn-sm"
+                            hx-post="{{ path('app_builder_showcase_push_url') }}"
+                            hx-swap="none">
+                        pushUrl()
+                    </button>
+                    <button class="btn btn-secondary btn-sm"
+                            hx-post="{{ path('app_builder_showcase_replace_url') }}"
+                            hx-swap="none">
+                        replaceUrl()
+                    </button>
+                    <button class="btn btn-secondary btn-sm"
+                            hx-post="{{ path('app_builder_showcase_location') }}"
+                            hx-swap="none">
+                        location()
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {# Retarget & Reselect #}
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Retarget & Reselect</h2>
+                <p class="text-sm text-base-content/70 mb-3">Server controls where content goes</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button class="btn btn-accent btn-sm"
+                            hx-post="{{ path('app_builder_showcase_retarget') }}"
+                            hx-target="#original-target"
+                            hx-swap="innerHTML">
+                        retarget()
+                    </button>
+                    <button class="btn btn-accent btn-sm"
+                            hx-post="{{ path('app_builder_showcase_reselect') }}"
+                            hx-target="#reselect-area"
+                            hx-swap="innerHTML">
+                        reselect()
+                    </button>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div id="original-target" class="p-3 bg-base-200 rounded text-sm min-h-[60px]">
+                        <span class="text-base-content/50">Original target (hx-target)</span>
+                    </div>
+                    <div id="retarget-area" class="p-3 bg-base-200 rounded text-sm min-h-[60px]">
+                        <span class="text-base-content/50">Retarget area (server redirects here)</span>
+                    </div>
+                    <div id="reselect-area" class="p-3 bg-base-200 rounded text-sm min-h-[60px]">
+                        <span class="text-base-content/50">reselect() target area</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Reswap #}
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Reswap & Modifiers</h2>
+                <p class="text-sm text-base-content/70 mb-3">Control how content is swapped</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button class="btn btn-warning btn-sm"
+                            hx-post="{{ path('app_builder_showcase_reswap_append') }}"
+                            hx-target="#items-list"
+                            hx-swap="innerHTML">
+                        withReswap(BEFORE_END)
+                    </button>
+                    <button class="btn btn-warning btn-sm"
+                            hx-post="{{ path('app_builder_showcase_reswap_transition') }}"
+                            hx-swap="none">
+                        + Transition
+                    </button>
+                    <button class="btn btn-warning btn-sm"
+                            hx-post="{{ path('app_builder_showcase_reswap_timing') }}"
+                            hx-swap="none">
+                        + TimingSwap(1s)
+                    </button>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <div class="text-xs text-base-content/50 mb-1">Appended items:</div>
+                        <div id="items-list" class="p-2 bg-base-200 rounded min-h-[60px] space-y-1"></div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-base-content/50 mb-1">Transition area:</div>
+                        <div id="transition-area" class="p-2 bg-base-200 rounded min-h-[60px] text-sm">
+                            <span class="text-base-content/50">Click to animate</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-base-content/50 mb-1">Timing area:</div>
+                        <div id="timing-area" class="p-2 bg-base-200 rounded min-h-[60px] text-sm">
+                            <span class="text-base-content/50">1s delay swap</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Success & Failure #}
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Success & Failure Status</h2>
+                <p class="text-sm text-base-content/70 mb-3">HTTP status codes: 200 vs 422 (form validation)</p>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <button class="btn btn-success btn-sm"
+                            hx-post="{{ path('app_builder_showcase_success') }}"
+                            hx-target="#status-result"
+                            hx-swap="innerHTML">
+                        success() → 200
+                    </button>
+                    <button class="btn btn-error btn-sm"
+                            hx-post="{{ path('app_builder_showcase_failure') }}"
+                            hx-target="#status-result"
+                            hx-swap="innerHTML">
+                        failure() → 422
+                    </button>
+                </div>
+                <div id="status-result" class="p-3 bg-base-200 rounded min-h-[60px]">
+                    <span class="text-base-content/50">Click to see HTTP status difference</span>
+                </div>
+            </div>
+        </div>
+
+        {# Multiple OOB & No Content #}
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Multiple OOB & No Content</h2>
+                <p class="text-sm text-base-content/70 mb-3">Advanced response patterns</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button class="btn btn-info btn-sm"
+                            hx-post="{{ path('app_builder_showcase_multiple_oob') }}"
+                            hx-swap="none">
+                        Multiple viewBlock()
+                    </button>
+                    <button class="btn btn-info btn-sm"
+                            hx-post="{{ path('app_builder_showcase_no_content') }}"
+                            hx-swap="none">
+                        noContent() + trigger
+                    </button>
+                </div>
+                <div class="grid grid-cols-4 gap-2">
+                    <div id="oob-area-1" class="p-2 bg-base-200 rounded text-sm text-center">Area 1</div>
+                    <div id="oob-area-2" class="p-2 bg-base-200 rounded text-sm text-center">Area 2</div>
+                    <div id="oob-area-3" class="p-2 bg-base-200 rounded text-sm text-center">Area 3</div>
+                    <div id="no-content-result" class="p-2 bg-base-200 rounded text-sm text-center">
+                        <span class="text-base-content/50">204 result</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Right column - Log #}
+    <div>
+        <div class="card bg-base-100 shadow-xl sticky top-4">
+            <div class="card-body">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="card-title text-lg">Activity Log</h2>
+                    <button class="btn btn-ghost btn-xs"
+                            hx-post="{{ path('app_builder_showcase_clear_log') }}"
+                            hx-swap="none">
+                        Clear
+                    </button>
+                </div>
+                <div id="log-list" class="space-y-2 max-h-[500px] overflow-y-auto">
+                    <div class="text-sm text-base-content/50 text-center py-4">
+                        Click buttons to see methods in action
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{# Log entry OOB - prepends new log entry #}
+{% block logEntryOob %}
+<div id="log-list" hx-swap-oob="afterbegin">
+    <div class="alert alert-sm py-2">
+        <div>
+            <div class="font-mono text-xs text-primary">{{ log.method }}</div>
+            <div class="text-xs">{{ log.description }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{# Log list OOB - replaces entire log #}
+{% block logListOob %}
+<div id="log-list" hx-swap-oob="true" class="space-y-2 max-h-[500px] overflow-y-auto">
+    {% if logs|length > 0 %}
+        {% for log in logs %}
+        <div class="alert alert-sm py-2">
+            <div>
+                <div class="font-mono text-xs text-primary">{{ log.method }}</div>
+                <div class="text-xs">{{ log.description }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-sm text-base-content/50 text-center py-4">
+            Log cleared
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{# Retarget content #}
+{% block retargetContent %}
+<div class="text-success font-bold animate-pulse">
+    ✓ Content arrived here via retarget()!
+</div>
+{% endblock %}
+
+{# New item for append demo #}
+{% block newItem %}
+<div class="badge badge-primary badge-sm">Item #{{ itemId }}</div>
+{% endblock %}
+
+{# Transition content #}
+{% block transitionContent %}
+<div class="text-warning font-bold">
+    ✨ Transitioned! ({{ "now"|date("H:i:s") }})
+</div>
+{% endblock %}
+
+{# Timing content #}
+{% block timingContent %}
+<div class="text-error font-bold">
+    ⏱️ Delayed 1s! ({{ "now"|date("H:i:s") }})
+</div>
+{% endblock %}
+
+{# Reselect full response - only #selected-part will be used #}
+{% block reselectFullResponse %}
+<div id="ignored-part" class="text-error">This part is ignored</div>
+<div id="selected-part" class="text-success font-bold">✓ Only this part was selected!</div>
+<div id="also-ignored" class="text-error">This is also ignored</div>
+{% endblock %}
+
+{# Multiple OOB areas #}
+{% block oobArea1 %}
+<div id="oob-area-1" hx-swap-oob="true" class="p-2 bg-success/20 rounded text-sm text-center font-bold">
+    Updated 1! ✓
+</div>
+{% endblock %}
+
+{% block oobArea2 %}
+<div id="oob-area-2" hx-swap-oob="true" class="p-2 bg-warning/20 rounded text-sm text-center font-bold">
+    Updated 2! ✓
+</div>
+{% endblock %}
+
+{% block oobArea3 %}
+<div id="oob-area-3" hx-swap-oob="true" class="p-2 bg-info/20 rounded text-sm text-center font-bold">
+    Updated 3! ✓
+</div>
+{% endblock %}
+
+{% block successResult %}
+<div class="alert alert-success">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <div>
+        <div class="font-bold">HTTP 200 OK</div>
+        <div class="text-sm">success() - standard successful response</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block failureResult %}
+<div class="alert alert-error">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+    <div>
+        <div class="font-bold">HTTP 422 Unprocessable Entity</div>
+        <div class="text-sm">failure() - validation errors (htmx still swaps with special handler)</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block triggerResultOob %}
+<div id="trigger-result" hx-swap-oob="true" class="p-2 bg-success/20 rounded text-sm min-h-[40px]">
+    <span class="font-bold text-success">{{ triggerType }}:</span> {{ message }} <span class="text-base-content/50">({{ "now"|date("H:i:s") }})</span>
+</div>
+{% endblock %}
+
+{% block sourceCode %}
+{% include '_source_code.html.twig' with {controller: 'BuilderShowcaseController.php', template: 'builder_showcase.html.twig'} %}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// Only for noContent() demo - shows that triggers work even with HTTP 204 (no body)
+// Since 204 has no body, we can't use OOB - but trigger header still works!
+document.body.addEventListener('noContentDemo', function(evt) {
+    // Update result box
+    const el = document.getElementById('no-content-result');
+    el.className = 'p-2 bg-warning/20 rounded text-sm text-center font-bold';
+    el.innerHTML = '204 + trigger ✓';
+
+    // Add log entry via JS (can't use OOB with 204)
+    const log = document.getElementById('log-list');
+    const entry = document.createElement('div');
+    entry.className = 'alert alert-sm py-2';
+    entry.innerHTML = '<div><div class="font-mono text-xs text-primary">noContent()</div><div class="text-xs">HTTP 204 sent (no body), but trigger header reached JS!</div></div>';
+    log.insertBefore(entry, log.firstChild);
+});
+</script>
+{% endblock %}

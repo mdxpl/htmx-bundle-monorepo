@@ -114,6 +114,7 @@ Demo is automatically deployed on each release.
 | `DEPLOY_PORT` | SSH port (optional, default: 22) |
 | `DEPLOY_CONTAINER_NAME` | Container name (optional, default: `htmx-demo`) |
 | `DEPLOY_PORT_MAPPING` | Port mapping (optional, default: `127.0.0.1:8080:80`) |
+| `APP_SECRET` | Symfony application secret for session/CSRF security |
 
 ### Required GitHub Environment
 

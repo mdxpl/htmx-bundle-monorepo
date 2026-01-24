@@ -13,6 +13,7 @@
         }
     </script>
     {{ htmx_csrf_meta() }}
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <style>
         .htmx-indicator {
             display: none;
@@ -20,6 +21,18 @@
         .htmx-request .htmx-indicator,
         .htmx-request.htmx-indicator {
             display: inline-flex;
+        }
+        pre[class*="language-"] {
+            margin: 0;
+            border-radius: 0 0 0.5rem 0.5rem;
+            max-height: 500px;
+            font-size: 0.85rem;
+        }
+        .code-tabs .tab-content {
+            display: none;
+        }
+        .code-tabs .tab-content.active {
+            display: block;
         }
     </style>
     {% block stylesheets %}{% endblock %}
@@ -59,12 +72,15 @@
                 <li><a href="{{ path('app_polling') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_polling' ? 'btn-primary' : 'btn-ghost' }}">Live Polling</a></li>
                 <li><a href="{{ path('app_delete_demo') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_delete_demo' ? 'btn-primary' : 'btn-ghost' }}">Delete Confirm</a></li>
                 <li><a href="{{ path('app_cascading') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_cascading' ? 'btn-primary' : 'btn-ghost' }}">Cascading Selects</a></li>
+                <li><a href="{{ path('app_builder_showcase') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_builder_showcase' ? 'btn-primary' : 'btn-ghost' }}">Builder Showcase</a></li>
+                <li><a href="{{ path('app_request_showcase') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_request_showcase' ? 'btn-primary' : 'btn-ghost' }}">Request Showcase</a></li>
             </ul>
         </div>
     </div>
 
     <main class="container mx-auto p-6">
         {% block body %}{% endblock %}
+        {% block sourceCode %}{% endblock %}
     </main>
 
     <script>
@@ -107,6 +123,23 @@
         debugToggle.addEventListener('change', function() {
             localStorage.setItem('htmx-debug', this.checked);
             location.reload();
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup-templating.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-php.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-twig.min.js"></script>
+    <script>
+        // Code tabs functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('.code-tab-btn')) {
+                const container = e.target.closest('.code-tabs');
+                container.querySelectorAll('.code-tab-btn').forEach(btn => btn.classList.remove('tab-active'));
+                container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                e.target.classList.add('tab-active');
+                const target = container.querySelector(e.target.dataset.target);
+                if (target) target.classList.add('active');
+            }
         });
     </script>
     {% block javascripts %}{% endblock %}

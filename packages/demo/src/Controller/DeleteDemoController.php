@@ -53,26 +53,30 @@ final class DeleteDemoController extends AbstractController
             }
         }
 
-        $request->getSession()->set('delete_demo_items', array_values($items));
-        usleep(300000);
+        $items = array_values($items);
+        $request->getSession()->set('delete_demo_items', $items);
 
-        return HtmxResponseBuilder::create($htmx->isHtmx)
+        $builder = HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
-            ->trigger(['showToast' => ['message' => "'{$deletedItem['name']}' has been deleted", 'type' => 'success']])
             ->viewBlock('delete_demo.html.twig', 'empty')
-            ->build();
+            ->viewBlock('delete_demo.html.twig', 'notificationOob', ['deletedName' => $deletedItem['name']]);
+
+        if (\count($items) === 0) {
+            $builder->viewBlock('delete_demo.html.twig', 'itemsListOob', ['items' => []]);
+        }
+
+        return $builder->build();
     }
 
     #[Route('/reset', name: 'app_delete_demo_reset', methods: ['POST'])]
     #[HtmxOnly]
     public function reset(HtmxRequest $htmx, Request $request): HtmxResponse
     {
-        $request->getSession()->remove('delete_demo_items');
+        $request->getSession()->set('delete_demo_items', self::DEFAULT_ITEMS);
 
         return HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
-            ->redirect($this->generateUrl('app_delete_demo'))
-            ->viewBlock('delete_demo.html.twig', 'empty')
+            ->viewBlock('delete_demo.html.twig', 'itemsList', ['items' => self::DEFAULT_ITEMS])
             ->build();
     }
 }

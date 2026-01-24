@@ -74,3 +74,7 @@
 <p class="text-base-content/50">Type at least 2 characters to search...</p>
 {% endif %}
 {% endblock %}
+
+{% block sourceCode %}
+{% include '_source_code.html.twig' with {controller: 'SearchController.php', template: 'search.html.twig'} %}
+{% endblock %}

@@ -36,6 +36,7 @@ final class SimplePageController extends AbstractController
             return $builder
                 ->success()
                 ->viewBlock('simple_page.html.twig', 'pageContentPartial', $viewData)
+                ->viewBlock('simple_page.html.twig', 'pageNavOob', $viewData)
                 ->build();
         }
 
