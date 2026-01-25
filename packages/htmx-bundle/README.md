@@ -108,12 +108,14 @@ Read the documentation at:
 > Add htmx attributes to any form field using the `htmx` option via HtmxTypeExtension.
 
 ```php
+use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
+use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
+
 $builder->add('search', TextType::class, [
-    'htmx' => [
-        'get' => '/search',
-        'trigger' => 'keyup changed delay:300ms',
-        'target' => '#results',
-    ],
+    'htmx' => HtmxOptions::create()
+        ->get('/search')
+        ->trigger(Trigger::keyup()->changed()->delay(300))
+        ->target('#results'),
 ]);
 ```
 

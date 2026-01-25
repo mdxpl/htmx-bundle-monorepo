@@ -6,6 +6,9 @@ namespace App\Controller;
 
 use App\Form\BusinessFieldsType;
 use Mdxpl\HtmxBundle\Attribute\HtmxOnly;
+use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
+use Mdxpl\HtmxBundle\Form\Htmx\SwapStyle;
+use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
@@ -299,13 +302,12 @@ final class AdvancedFormController extends AbstractController
                         message: 'Please select a valid user from the list',
                     ),
                 ],
-                'htmx' => [
-                    'get' => '/advanced-form/search/users',
-                    'trigger' => 'keyup changed delay:300ms[target.value.length >= 2]',
-                    'target' => '#user-results',
-                    'indicator' => '#search-spinner',
-                    'on::before-request' => 'document.querySelector("#user-results").innerHTML = ""',
-                ],
+                'htmx' => HtmxOptions::create()
+                    ->get('/advanced-form/search/users')
+                    ->trigger(Trigger::keyup()->changed()->delay(300)->condition('target.value.length >= 2'))
+                    ->target('#user-results')
+                    ->indicator('#search-spinner')
+                    ->onBeforeRequest('document.querySelector("#user-results").innerHTML = ""'),
             ])
             // Cascading Selects - uses CascadingTypeExtension
             ->add('country', ChoiceType::class, [
@@ -360,12 +362,11 @@ final class AdvancedFormController extends AbstractController
                     new NotBlank(message: 'Email is required'),
                     new Email(message: 'Please enter a valid email address'),
                 ],
-                'htmx' => [
-                    'post' => '/advanced-form/validate/email',
-                    'trigger' => 'blur changed delay:500ms',
-                    'target' => '#form_email-validation',
-                    'swap' => 'innerHTML',
-                ],
+                'htmx' => HtmxOptions::create()
+                    ->post('/advanced-form/validate/email')
+                    ->trigger(Trigger::blur()->changed()->delay(500))
+                    ->target('#form_email-validation')
+                    ->swap(SwapStyle::InnerHTML),
             ])
             // Username with inline validation
             ->add('username', TextType::class, [
@@ -377,12 +378,11 @@ final class AdvancedFormController extends AbstractController
                     new Length(min: 3, max: 20, minMessage: 'Username must be at least {{ limit }} characters', maxMessage: 'Username cannot exceed {{ limit }} characters'),
                     new Regex(pattern: '/^[a-zA-Z0-9_]+$/', message: 'Username can only contain letters, numbers and underscores'),
                 ],
-                'htmx' => [
-                    'post' => '/advanced-form/validate/username',
-                    'trigger' => 'blur changed delay:500ms',
-                    'target' => '#form_username-validation',
-                    'swap' => 'innerHTML',
-                ],
+                'htmx' => HtmxOptions::create()
+                    ->post('/advanced-form/validate/username')
+                    ->trigger(Trigger::blur()->changed()->delay(500))
+                    ->target('#form_username-validation')
+                    ->swap(SwapStyle::InnerHTML),
             ])
             // Account Type with conditional fields
             ->add('accountType', ChoiceType::class, [

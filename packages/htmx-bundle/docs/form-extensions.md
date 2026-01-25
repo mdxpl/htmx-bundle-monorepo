@@ -7,7 +7,7 @@ This bundle provides several Symfony Form Type Extensions that simplify adding h
 
 Adds htmx attributes to any form field using the `htmx` option.
 
-### Basic Usage
+### Basic Usage (Array)
 
 ```php
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -20,6 +20,113 @@ $builder->add('search', TextType::class, [
         'indicator' => '#spinner',
     ],
 ]);
+```
+
+### Builder Usage (Recommended)
+
+For better IDE autocompletion and type safety, use the `HtmxOptions` builder:
+
+```php
+use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
+use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
+use Mdxpl\HtmxBundle\Form\Htmx\SwapStyle;
+
+$builder->add('search', TextType::class, [
+    'htmx' => HtmxOptions::create()
+        ->get('/search')
+        ->trigger(Trigger::keyup()->changed()->delay(300))
+        ->target('#results')
+        ->indicator('#spinner'),
+]);
+```
+
+### Trigger Builder
+
+The `Trigger` class provides a fluent API for building trigger specifications:
+
+```php
+use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
+
+// Simple triggers
+Trigger::click()                              // 'click'
+Trigger::change()                             // 'change'
+Trigger::submit()                             // 'submit'
+
+// With modifiers
+Trigger::keyup()->changed()->delay(300)       // 'keyup changed delay:300ms'
+Trigger::blur()->changed()->delay(500)        // 'blur changed delay:500ms'
+Trigger::click()->once()                      // 'click once'
+Trigger::keyup()->throttle(500)               // 'keyup throttle:500ms'
+
+// With conditions
+Trigger::keyup()->condition('target.value.length >= 2')
+// 'keyup[target.value.length >= 2]'
+
+Trigger::keyup()->changed()->delay(300)->condition('target.value.length >= 2')
+// 'keyup changed delay:300ms[target.value.length >= 2]'
+
+// Special triggers
+Trigger::load()->delay(1000)                  // 'load delay:1000ms'
+Trigger::revealed()                           // 'revealed'
+Trigger::intersect()->threshold(0.5)          // 'intersect threshold:0.5'
+Trigger::every(5000)                          // 'every 5000ms'
+
+// Custom events
+Trigger::event('custom-event')->once()        // 'custom-event once'
+```
+
+### HtmxOptions Methods
+
+```php
+HtmxOptions::create()
+    // HTTP Methods
+    ->get('/url')
+    ->post('/url')
+    ->put('/url')
+    ->patch('/url')
+    ->delete('/url')
+
+    // Core attributes
+    ->trigger('click')                // or Trigger object
+    ->target('#element')
+    ->swap(SwapStyle::InnerHTML)      // or string
+    ->indicator('#spinner')
+
+    // Request modifiers
+    ->include('[name^="filter"]')
+    ->vals(['key' => 'value'])
+    ->params('*')
+    ->headers(['X-Custom' => 'value'])
+
+    // Response handling
+    ->select('.content')
+    ->selectOob('#sidebar')
+
+    // User interaction
+    ->confirm('Are you sure?')
+    ->prompt('Enter value:')
+
+    // URL/History
+    ->pushUrl()
+    ->replaceUrl('/new-url')
+
+    // Synchronization
+    ->sync('closest form:abort')
+    ->disabledElt('button')
+
+    // Event handlers
+    ->on('config-request', 'console.log(event)')
+    ->onBeforeRequest('...')
+    ->onAfterRequest('...')
+    ->onConfigRequest('...')
+    ->onBeforeSwap('...')
+    ->onAfterSwap('...')
+    ->onAfterSettle('...')
+
+    // Miscellaneous
+    ->boost()
+    ->ext('json-enc')
+    ->set('custom-attr', 'value');   // Raw option
 ```
 
 ### Supported Options

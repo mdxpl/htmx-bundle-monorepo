@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
+use Mdxpl\HtmxBundle\Form\Htmx\SwapStyle;
+use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -28,12 +31,13 @@ final class BusinessFieldsType extends AbstractType
                     new NotBlank(message: 'Company name is required'),
                     new Length(min: 2, max: 100, minMessage: 'Company name must be at least {{ limit }} characters'),
                 ] : [],
-                'htmx' => $isRequired ? [
-                    'post' => '/advanced-form/validate/business/companyName',
-                    'trigger' => 'blur changed delay:500ms',
-                    'target' => '#companyName-validation',
-                    'swap' => 'innerHTML',
-                ] : null,
+                'htmx' => $isRequired
+                    ? HtmxOptions::create()
+                        ->post('/advanced-form/validate/business/companyName')
+                        ->trigger(Trigger::blur()->changed()->delay(500))
+                        ->target('#companyName-validation')
+                        ->swap(SwapStyle::InnerHTML)
+                    : null,
             ])
             ->add('taxId', TextType::class, [
                 'label' => 'Tax ID / VAT Number',
@@ -46,12 +50,13 @@ final class BusinessFieldsType extends AbstractType
                         message: 'Tax ID must be in format: 2 letters followed by 8-12 alphanumeric characters (e.g., PL1234567890)',
                     ),
                 ] : [],
-                'htmx' => $isRequired ? [
-                    'post' => '/advanced-form/validate/business/taxId',
-                    'trigger' => 'blur changed delay:500ms',
-                    'target' => '#taxId-validation',
-                    'swap' => 'innerHTML',
-                ] : null,
+                'htmx' => $isRequired
+                    ? HtmxOptions::create()
+                        ->post('/advanced-form/validate/business/taxId')
+                        ->trigger(Trigger::blur()->changed()->delay(500))
+                        ->target('#taxId-validation')
+                        ->swap(SwapStyle::InnerHTML)
+                    : null,
             ])
             ->add('companyAddress', TextareaType::class, [
                 'label' => 'Company Address',

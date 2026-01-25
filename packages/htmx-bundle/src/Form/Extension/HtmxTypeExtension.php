@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Form\Extension;
 
+use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormInterface;
@@ -13,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Form extension that adds HTMX attributes support to all form fields.
  *
- * Usage:
+ * Usage with array:
  * ```php
  * $builder->add('search', TextType::class, [
  *     'htmx' => [
@@ -22,6 +23,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *         'target' => '#results',
  *         'indicator' => '#spinner',
  *     ],
+ * ]);
+ * ```
+ *
+ * Usage with HtmxOptions builder:
+ * ```php
+ * use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
+ * use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
+ *
+ * $builder->add('search', TextType::class, [
+ *     'htmx' => HtmxOptions::create()
+ *         ->get('/search')
+ *         ->trigger(Trigger::keyup()->changed()->delay(300))
+ *         ->target('#results')
+ *         ->indicator('#spinner'),
  * ]);
  * ```
  */
@@ -70,7 +85,7 @@ final class HtmxTypeExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefined('htmx');
-        $resolver->setAllowedTypes('htmx', ['null', 'array']);
+        $resolver->setAllowedTypes('htmx', ['null', 'array', HtmxOptions::class]);
         $resolver->setDefault('htmx', null);
     }
 
@@ -80,8 +95,11 @@ final class HtmxTypeExtension extends AbstractTypeExtension
             return;
         }
 
+        /** @var array<string, mixed>|HtmxOptions $htmx */
+        $htmx = $options['htmx'];
+
         /** @var array<string, mixed> $htmxOptions */
-        $htmxOptions = $options['htmx'];
+        $htmxOptions = $htmx instanceof HtmxOptions ? $htmx->toArray() : $htmx;
 
         /** @var array<string, string> $attrs */
         $attrs = $view->vars['attr'] ?? [];
