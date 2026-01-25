@@ -157,42 +157,37 @@
             </div>
         </div>
 
-        {# Section 4: Conditional Fields #}
+        {# Section 4: Conditional Fields with BusinessFieldsType #}
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
                 <h2 class="card-title">
                     <span class="badge badge-primary">4</span>
                     Conditional Fields
                 </h2>
-                <p class="text-sm text-base-content/70 mb-4">Select account type to show/hide additional fields.</p>
+                <p class="text-sm text-base-content/70 mb-4">Select account type to show/hide additional fields. Uses <code class="badge badge-ghost badge-sm">conditional</code> option from <code class="badge badge-ghost badge-sm">ConditionalTypeExtension</code>.</p>
 
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">{{ form_label(form.accountType) }}</span>
                     </label>
-                    {# Note: For expanded ChoiceType (radio/checkbox), htmx attrs must be on each input
-                       because the change event fires on the individual input, not the container. #}
-                    <div class="flex gap-4">
+                    {# ConditionalTypeExtension adds htmx directly to each radio input #}
+                    <div class="flex gap-4" id="{{ form.accountType.vars.id }}">
                         {% for child in form.accountType %}
                             <label class="label cursor-pointer gap-2">
-                                {{ form_widget(child, {'attr': {
-                                    'class': 'radio radio-primary',
-                                    'hx-get': path('app_advanced_form_conditional') ~ '?type=' ~ child.vars.value,
-                                    'hx-trigger': 'change',
-                                    'hx-target': '#conditional-fields',
-                                }}) }}
+                                {{ form_widget(child, {'attr': {'class': 'radio radio-primary'}}) }}
                                 <span class="label-text">{{ child.vars.label }}</span>
                             </label>
                         {% endfor %}
                     </div>
                 </div>
 
-                <div id="conditional-fields" class="mt-4">
-                    {{ block('conditionalFields') }}
+                {# Conditional field wrapper - ID set by ConditionalTypeExtension #}
+                <div id="{{ form.business.vars.conditional.wrapper_id|default('business-fields') }}" class="mt-4">
+                    {{ block('businessFields') }}
                 </div>
 
                 <div class="mt-2 text-xs text-base-content/50">
-                    <strong>Note:</strong> For expanded ChoiceType (radio/checkbox), htmx attrs must be applied directly to each input in template.
+                    <strong>conditional:</strong> trigger, endpoint (auto-configures htmx)
                 </div>
             </div>
         </div>
@@ -276,6 +271,27 @@
                 </div>
             </div>
         </div>
+
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Conditional Fields</h2>
+                <p class="text-sm text-base-content/70 mb-4">Use <code class="badge badge-ghost badge-sm">conditional</code> to show/hide fields based on another field's value:</p>
+
+                <div class="mockup-code text-xs">
+                    <pre><code class="language-php">$builder
+    ->add('accountType', ChoiceType::class, [
+        'choices' => ['Personal' => 'personal', 'Business' => 'business'],
+        'expanded' => true,
+    ])
+    ->add('business', BusinessFieldsType::class, [
+        'conditional' => [
+            'trigger' => 'accountType',
+            'endpoint' => '/form/business-fields',
+        ],
+    ]);</code></pre>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -340,79 +356,67 @@
 {% endif %}
 {% endblock %}
 
-{% block conditionalFields %}
-{% set type = accountType is defined ? accountType : (form is defined and form.accountType is defined ? form.accountType.vars.value : 'personal') %}
-{% if type == 'business' %}
+{% block businessFields %}
+{# Determine if we should show business fields #}
+{% set showBusiness = isBusiness is defined ? isBusiness : (form is defined and form.accountType is defined and form.accountType.vars.value == 'business') %}
+{% set businessForm = businessForm is defined ? businessForm : (form is defined and form.business is defined ? form.business : null) %}
+
+{% if showBusiness and businessForm %}
 <div class="space-y-4 p-4 bg-base-200 rounded-lg">
     <div class="text-sm font-semibold text-primary">Business Account Fields</div>
 
-    {% if form is defined and form.companyName is defined %}
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">{{ form_label(form.companyName) }}</span>
-            </label>
-            {{ form_widget(form.companyName, {'attr': {'class': 'input input-bordered w-full' ~ (form_errors(form.companyName)|length > 0 ? ' input-error' : '')}}) }}
-            {% if form_errors(form.companyName)|length > 0 %}
+    <div class="form-control w-full">
+        <label class="label">
+            <span class="label-text">{{ form_label(businessForm.companyName) }}</span>
+        </label>
+        {{ form_widget(businessForm.companyName, {'attr': {'class': 'input input-bordered w-full' ~ (form_errors(businessForm.companyName)|length > 0 ? ' input-error' : '')}}) }}
+        <div id="companyName-validation" class="min-h-[24px]">
+            {% if form_errors(businessForm.companyName)|length > 0 %}
             <label class="label py-1">
-                <span class="label-text-alt text-error">{{ form_errors(form.companyName) }}</span>
+                <span class="label-text-alt text-error">{{ form_errors(businessForm.companyName) }}</span>
             </label>
             {% endif %}
         </div>
+    </div>
 
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">{{ form_label(form.taxId) }}</span>
-            </label>
-            {{ form_widget(form.taxId, {'attr': {'class': 'input input-bordered w-full' ~ (form_errors(form.taxId)|length > 0 ? ' input-error' : '')}}) }}
-            {% if form_errors(form.taxId)|length > 0 %}
+    <div class="form-control w-full">
+        <label class="label">
+            <span class="label-text">{{ form_label(businessForm.taxId) }}</span>
+        </label>
+        {{ form_widget(businessForm.taxId, {'attr': {'class': 'input input-bordered w-full' ~ (form_errors(businessForm.taxId)|length > 0 ? ' input-error' : '')}}) }}
+        <div id="taxId-validation" class="min-h-[24px]">
+            {% if form_errors(businessForm.taxId)|length > 0 %}
             <label class="label py-1">
-                <span class="label-text-alt text-error">{{ form_errors(form.taxId) }}</span>
+                <span class="label-text-alt text-error">{{ form_errors(businessForm.taxId) }}</span>
             </label>
             {% endif %}
         </div>
+    </div>
 
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">{{ form_label(form.companyAddress) }}</span>
-            </label>
-            {{ form_widget(form.companyAddress, {'attr': {'class': 'textarea textarea-bordered w-full' ~ (form_errors(form.companyAddress)|length > 0 ? ' textarea-error' : '')}}) }}
-            {% if form_errors(form.companyAddress)|length > 0 %}
-            <label class="label py-1">
-                <span class="label-text-alt text-error">{{ form_errors(form.companyAddress) }}</span>
-            </label>
-            {% endif %}
-        </div>
-    {% else %}
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">Company Name</span>
-            </label>
-            <input type="text" name="form[companyName]" class="input input-bordered w-full" placeholder="Enter company name...">
-        </div>
-
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">Tax ID / VAT Number</span>
-            </label>
-            <input type="text" name="form[taxId]" class="input input-bordered w-full" placeholder="Enter tax ID...">
-        </div>
-
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">Company Address</span>
-            </label>
-            <textarea name="form[companyAddress]" class="textarea textarea-bordered w-full" rows="2" placeholder="Enter company address..."></textarea>
-        </div>
-    {% endif %}
+    <div class="form-control w-full">
+        <label class="label">
+            <span class="label-text">{{ form_label(businessForm.companyAddress) }}</span>
+        </label>
+        {{ form_widget(businessForm.companyAddress, {'attr': {'class': 'textarea textarea-bordered w-full' ~ (form_errors(businessForm.companyAddress)|length > 0 ? ' textarea-error' : '')}}) }}
+        {% if form_errors(businessForm.companyAddress)|length > 0 %}
+        <label class="label py-1">
+            <span class="label-text-alt text-error">{{ form_errors(businessForm.companyAddress) }}</span>
+        </label>
+        {% endif %}
+    </div>
+</div>
+{% elseif showBusiness %}
+{# Fallback for htmx partial when businessForm comes from standalone form #}
+<div class="space-y-4 p-4 bg-base-200 rounded-lg">
+    <div class="text-sm font-semibold text-primary">Business Account Fields</div>
+    <p class="text-sm text-base-content/70">Loading...</p>
 </div>
 {% else %}
 <div class="p-4 bg-base-200 rounded-lg text-sm text-base-content/70">
     <span class="badge badge-ghost">Personal</span> account selected - no additional fields required.
 </div>
-{% if form is defined %}
-    {% do form.companyName.setRendered() %}
-    {% do form.taxId.setRendered() %}
-    {% do form.companyAddress.setRendered() %}
+{% if form is defined and form.business is defined %}
+    {% do form.business.setRendered() %}
 {% endif %}
 {% endif %}
 {% endblock %}

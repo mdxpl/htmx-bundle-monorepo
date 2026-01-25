@@ -80,7 +80,11 @@ final class HtmxTypeExtension extends AbstractTypeExtension
             return;
         }
 
+        /** @var array<string, mixed> $htmxOptions */
         $htmxOptions = $options['htmx'];
+
+        /** @var array<string, string> $attrs */
+        $attrs = $view->vars['attr'] ?? [];
 
         foreach ($htmxOptions as $key => $value) {
             if (null === $value) {
@@ -88,8 +92,10 @@ final class HtmxTypeExtension extends AbstractTypeExtension
             }
 
             $attributeName = $this->resolveAttributeName($key);
-            $view->vars['attr'][$attributeName] = $this->formatAttributeValue($value);
+            $attrs[$attributeName] = $this->formatAttributeValue($value);
         }
+
+        $view->vars['attr'] = $attrs;
     }
 
     private function resolveAttributeName(string $key): string
@@ -113,7 +119,10 @@ final class HtmxTypeExtension extends AbstractTypeExtension
         return 'hx-' . $key;
     }
 
-    private function formatAttributeValue(mixed $value): string
+    /**
+     * @param mixed $value
+     */
+    private function formatAttributeValue($value): string
     {
         if (\is_bool($value)) {
             return $value ? 'true' : 'false';
@@ -123,6 +132,14 @@ final class HtmxTypeExtension extends AbstractTypeExtension
             return json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
         }
 
-        return (string) $value;
+        if (\is_string($value) || \is_int($value) || \is_float($value)) {
+            return (string) $value;
+        }
+
+        if (\is_object($value) && method_exists($value, '__toString')) {
+            return (string) $value;
+        }
+
+        return '';
     }
 }

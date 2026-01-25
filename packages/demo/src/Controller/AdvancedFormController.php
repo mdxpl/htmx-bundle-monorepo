@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Form\BusinessFieldsType;
 use Mdxpl\HtmxBundle\Attribute\HtmxOnly;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
@@ -12,9 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -82,7 +81,12 @@ final class AdvancedFormController extends AbstractController
     public function index(HtmxRequest $htmx, Request $request): HtmxResponse
     {
         $template = 'advanced_form.html.twig';
-        $form = $this->createAdvancedForm();
+
+        // Check if this is a POST with business account type to enable business validation
+        $formData = $request->request->all('form');
+        $isBusiness = ($formData['accountType'] ?? 'personal') === 'business';
+
+        $form = $this->createAdvancedForm($isBusiness);
         $form->handleRequest($request);
 
         $countries = array_combine(
@@ -97,31 +101,21 @@ final class AdvancedFormController extends AbstractController
             'form' => $form->createView(),
             'countries' => $countries,
             'cities' => $cities,
+            'isBusiness' => $isBusiness,
         ];
 
         $builder = HtmxResponseBuilder::create($htmx->isHtmx);
 
         if ($form->isSubmitted()) {
-            // Additional validation for business account fields
-            $data = $form->getData();
-            if (($data['accountType'] ?? '') === 'business') {
-                if (($data['companyName'] ?? '') === '') {
-                    $form->get('companyName')->addError(new FormError('Company name is required for business accounts'));
-                }
-                if (($data['taxId'] ?? '') === '') {
-                    $form->get('taxId')->addError(new FormError('Tax ID is required for business accounts'));
-                }
-            }
-
-            // Recreate view data after adding errors
-            $viewData['form'] = $form->createView();
-
-            if ($form->isValid() && $form->getErrors(true)->count() === 0) {
+            if ($form->isValid()) {
                 return $builder
                     ->success()
                     ->viewBlock($template, 'submitSuccess', ['data' => $form->getData()])
                     ->build();
             }
+
+            // Recreate view data after validation errors
+            $viewData['form'] = $form->createView();
 
             return $builder
                 ->failure()
@@ -206,22 +200,65 @@ final class AdvancedFormController extends AbstractController
             ->build();
     }
 
-    #[Route('/conditional', name: 'app_advanced_form_conditional', methods: ['GET'])]
+    #[Route('/business-fields', name: 'app_advanced_form_business_fields', methods: ['GET'])]
     #[HtmxOnly]
-    public function conditionalFields(HtmxRequest $htmx, Request $request): HtmxResponse
+    public function businessFields(HtmxRequest $htmx, Request $request): HtmxResponse
     {
-        $accountType = $request->query->getString('type', 'personal');
+        /** @var array<string, string> $formData */
+        $formData = $request->query->all('form');
+        $isBusiness = ($formData['accountType'] ?? 'personal') === 'business';
+
+        // Create a minimal form with just the business fields, using same structure as main form
+        $form = $this->createFormBuilder(options: ['csrf_protection' => false])
+            ->add('business', BusinessFieldsType::class, [
+                'is_required' => $isBusiness,
+            ])
+            ->getForm();
 
         return HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
-            ->viewBlock('advanced_form.html.twig', 'conditionalFields', ['accountType' => $accountType])
+            ->viewBlock('advanced_form.html.twig', 'businessFields', [
+                'businessForm' => $form->get('business')->createView(),
+                'isBusiness' => $isBusiness,
+            ])
+            ->build();
+    }
+
+    #[Route('/validate/business/{field}', name: 'app_advanced_form_validate_business', methods: ['POST'])]
+    #[HtmxOnly]
+    public function validateBusinessField(
+        HtmxRequest $htmx,
+        Request $request,
+        ValidatorInterface $validator,
+        string $field,
+    ): HtmxResponse {
+        /** @var array<string, array<string, string>> $formData */
+        $formData = $request->request->all('form');
+        $businessData = $formData['business'] ?? [];
+        $value = $businessData[$field] ?? '';
+
+        $constraints = $this->getBusinessFieldConstraints($field);
+        $violations = $validator->validate($value, $constraints);
+
+        $errors = [];
+        foreach ($violations as $violation) {
+            $errors[] = $violation->getMessage();
+        }
+
+        return HtmxResponseBuilder::create($htmx->isHtmx)
+            ->success()
+            ->viewBlock('advanced_form.html.twig', 'fieldValidation', [
+                'errors' => $errors,
+                'field' => $field,
+                'isValid' => \count($errors) === 0 && $value !== '',
+            ])
             ->build();
     }
 
     /**
      * @return FormInterface<array<string, mixed>>
      */
-    private function createAdvancedForm(): FormInterface
+    private function createAdvancedForm(bool $requireBusinessFields = false): FormInterface
     {
         $countries = array_combine(
             array_map(static fn ($data) => $data['name'], self::LOCATIONS),
@@ -309,9 +346,6 @@ final class AdvancedFormController extends AbstractController
                 ],
             ])
             // Account Type with conditional fields
-            // Note: For expanded ChoiceType (radio/checkbox), htmx attributes are applied
-            // to the container div, not individual inputs. The change event fires on inputs,
-            // so we handle this in the template using hx-trigger="change from:find input".
             ->add('accountType', ChoiceType::class, [
                 'label' => 'Account Type',
                 'choices' => [
@@ -321,21 +355,14 @@ final class AdvancedFormController extends AbstractController
                 'expanded' => true,
                 'data' => 'personal',
             ])
-            // Business fields (shown conditionally)
-            ->add('companyName', TextType::class, [
-                'label' => 'Company Name',
+            // Business fields (embedded form type) - conditionally shown via htmx
+            ->add('business', BusinessFieldsType::class, [
                 'required' => false,
-                'attr' => ['placeholder' => 'Enter company name...'],
-            ])
-            ->add('taxId', TextType::class, [
-                'label' => 'Tax ID / VAT Number',
-                'required' => false,
-                'attr' => ['placeholder' => 'Enter tax ID...'],
-            ])
-            ->add('companyAddress', TextareaType::class, [
-                'label' => 'Company Address',
-                'required' => false,
-                'attr' => ['placeholder' => 'Enter company address...', 'rows' => 2],
+                'is_required' => $requireBusinessFields,
+                'conditional' => [
+                    'trigger' => 'accountType',
+                    'endpoint' => '/advanced-form/business-fields',
+                ],
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Submit Form',
@@ -362,6 +389,28 @@ final class AdvancedFormController extends AbstractController
             default => [],
         };
     }
+
+    /**
+     * @return array<\Symfony\Component\Validator\Constraint>
+     */
+    private function getBusinessFieldConstraints(string $field): array
+    {
+        return match ($field) {
+            'companyName' => [
+                new NotBlank(message: 'Company name is required'),
+                new Length(min: 2, max: 100, minMessage: 'Company name must be at least {{ limit }} characters'),
+            ],
+            'taxId' => [
+                new NotBlank(message: 'Tax ID is required'),
+                new Regex(
+                    pattern: '/^[A-Z]{2}[0-9A-Z]{8,12}$/',
+                    message: 'Tax ID must be in format: 2 letters followed by 8-12 alphanumeric characters (e.g., PL1234567890)',
+                ),
+            ],
+            default => [],
+        };
+    }
+
 
     /**
      * @return array<string, string>

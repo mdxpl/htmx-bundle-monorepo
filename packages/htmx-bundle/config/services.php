@@ -4,6 +4,7 @@ use Mdxpl\HtmxBundle\Controller\ArgumentResolver\HtmxResponseValueResolver;
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxOnlyAttributeSubscriber;
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxRequestSubscriber;
 use Mdxpl\HtmxBundle\EventSubscriber\HtmxResponseSubscriber;
+use Mdxpl\HtmxBundle\Form\Extension\ConditionalTypeExtension;
 use Mdxpl\HtmxBundle\Form\Extension\HtmxTypeExtension;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilderFactory;
 use Mdxpl\HtmxBundle\Response\ResponseFactory;
@@ -14,6 +15,9 @@ return static function (ContainerConfigurator $container): void {
     $container
         ->services()
         ->set(HtmxTypeExtension::class)
+            ->tag('form.type_extension')
+
+        ->set(ConditionalTypeExtension::class)
             ->tag('form.type_extension')
 
         ->set(HtmxResponseValueResolver::class)
