@@ -46,7 +46,7 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
+        self::assertTrue($htmxRequest->isHtmx);
     }
 
     /**
@@ -58,7 +58,7 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertFalse($htmxRequest->isHtmx);
+        self::assertFalse($htmxRequest->isHtmx);
     }
 
     /**
@@ -73,8 +73,8 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertTrue($htmxRequest->isBoosted);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertTrue($htmxRequest->isBoosted);
     }
 
     /**
@@ -89,8 +89,8 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertTrue($htmxRequest->isForHistoryRestoration);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertTrue($htmxRequest->isForHistoryRestoration);
     }
 
     /**
@@ -105,8 +105,8 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertSame('https://example.com/page?foo=bar', $htmxRequest->currentUrl);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertSame('https://example.com/page?foo=bar', $htmxRequest->currentUrl);
     }
 
     /**
@@ -121,8 +121,8 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertSame('User confirmed deletion', $htmxRequest->prompt);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertSame('User confirmed deletion', $htmxRequest->prompt);
     }
 
     /**
@@ -137,8 +137,8 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertSame('main-content', $htmxRequest->target);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertSame('main-content', $htmxRequest->target);
     }
 
     /**
@@ -153,8 +153,8 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertSame('submit-button', $htmxRequest->triggerName);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertSame('submit-button', $htmxRequest->triggerName);
     }
 
     /**
@@ -169,8 +169,8 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertSame('btn-save', $htmxRequest->trigger);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertSame('btn-save', $htmxRequest->trigger);
     }
 
     /**
@@ -190,14 +190,14 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertTrue($htmxRequest->isBoosted);
-        $this->assertTrue($htmxRequest->isForHistoryRestoration);
-        $this->assertSame('https://example.com/current', $htmxRequest->currentUrl);
-        $this->assertSame('User input', $htmxRequest->prompt);
-        $this->assertSame('content-area', $htmxRequest->target);
-        $this->assertSame('action-btn', $htmxRequest->triggerName);
-        $this->assertSame('trigger-id', $htmxRequest->trigger);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertTrue($htmxRequest->isBoosted);
+        self::assertTrue($htmxRequest->isForHistoryRestoration);
+        self::assertSame('https://example.com/current', $htmxRequest->currentUrl);
+        self::assertSame('User input', $htmxRequest->prompt);
+        self::assertSame('content-area', $htmxRequest->target);
+        self::assertSame('action-btn', $htmxRequest->triggerName);
+        self::assertSame('trigger-id', $htmxRequest->trigger);
     }
 
     /**
@@ -210,14 +210,14 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertFalse($htmxRequest->isBoosted);
-        $this->assertFalse($htmxRequest->isForHistoryRestoration);
-        $this->assertNull($htmxRequest->currentUrl);
-        $this->assertNull($htmxRequest->prompt);
-        $this->assertNull($htmxRequest->target);
-        $this->assertNull($htmxRequest->triggerName);
-        $this->assertNull($htmxRequest->trigger);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertFalse($htmxRequest->isBoosted);
+        self::assertFalse($htmxRequest->isForHistoryRestoration);
+        self::assertNull($htmxRequest->currentUrl);
+        self::assertNull($htmxRequest->prompt);
+        self::assertNull($htmxRequest->target);
+        self::assertNull($htmxRequest->triggerName);
+        self::assertNull($htmxRequest->trigger);
     }
 
     /**
@@ -233,9 +233,9 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertSame('https://example.com/search?q=test&page=1#section', $htmxRequest->currentUrl);
-        $this->assertSame('User said: "Yes, delete it!"', $htmxRequest->prompt);
-        $this->assertSame('my-element-123', $htmxRequest->target);
+        self::assertSame('https://example.com/search?q=test&page=1#section', $htmxRequest->currentUrl);
+        self::assertSame('User said: "Yes, delete it!"', $htmxRequest->prompt);
+        self::assertSame('my-element-123', $htmxRequest->target);
     }
 
     /**
@@ -258,7 +258,7 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertNull($request->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME));
+        self::assertNull($request->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME));
     }
 
     /**
@@ -275,11 +275,11 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertSame('item-row-123', $htmxRequest->target);
-        $this->assertSame('delete-btn-123', $htmxRequest->trigger);
-        $this->assertSame('DELETE', $htmxRequest->prompt);
-        $this->assertSame('https://example.com/items', $htmxRequest->currentUrl);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertSame('item-row-123', $htmxRequest->target);
+        self::assertSame('delete-btn-123', $htmxRequest->trigger);
+        self::assertSame('DELETE', $htmxRequest->prompt);
+        self::assertSame('https://example.com/items', $htmxRequest->currentUrl);
     }
 
     /**
@@ -295,9 +295,9 @@ class HtmxRequestIntegrationTest extends TestCase
 
         $htmxRequest = $this->processRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertTrue($htmxRequest->isBoosted);
-        $this->assertSame('body', $htmxRequest->target);
-        $this->assertSame('https://example.com/home', $htmxRequest->currentUrl);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertTrue($htmxRequest->isBoosted);
+        self::assertSame('body', $htmxRequest->target);
+        self::assertSame('https://example.com/home', $htmxRequest->currentUrl);
     }
 }

@@ -38,7 +38,7 @@ class HtmxCsrfExtensionIntegrationTest extends TestCase
 
         $result = $twig->render('csrf.html.twig');
 
-        $this->assertStringContainsString('my-secret-token', $result);
+        self::assertStringContainsString('my-secret-token', $result);
     }
 
     public function testCsrfMetaRendersMetaTag(): void
@@ -48,7 +48,7 @@ class HtmxCsrfExtensionIntegrationTest extends TestCase
         $template = $twig->load('csrf.html.twig');
         $result = $template->renderBlock('meta');
 
-        $this->assertSame('<meta name="csrf-token" content="meta-token-value">', $result);
+        self::assertSame('<meta name="csrf-token" content="meta-token-value">', $result);
     }
 
     public function testCsrfHeadersRendersHxHeadersAttribute(): void
@@ -58,7 +58,7 @@ class HtmxCsrfExtensionIntegrationTest extends TestCase
         $template = $twig->load('csrf.html.twig');
         $result = $template->renderBlock('headers');
 
-        $this->assertSame('hx-headers=\'{"X-CSRF-Token":"header-token-value"}\'', $result);
+        self::assertSame('hx-headers=\'{"X-CSRF-Token":"header-token-value"}\'', $result);
     }
 
     public function testCsrfMetaEscapesSpecialCharacters(): void
@@ -68,7 +68,7 @@ class HtmxCsrfExtensionIntegrationTest extends TestCase
         $template = $twig->load('csrf.html.twig');
         $result = $template->renderBlock('meta');
 
-        $this->assertSame(
+        self::assertSame(
             '<meta name="csrf-token" content="token&quot;with&lt;special&gt;chars">',
             $result,
         );
@@ -81,9 +81,9 @@ class HtmxCsrfExtensionIntegrationTest extends TestCase
         $template = $twig->load('csrf.html.twig');
         $result = $template->renderBlock('headers');
 
-        $this->assertStringContainsString('&#039;', $result);
-        $this->assertStringStartsWith("hx-headers='", $result);
-        $this->assertStringEndsWith("'", $result);
+        self::assertStringContainsString('&#039;', $result);
+        self::assertStringStartsWith("hx-headers='", $result);
+        self::assertStringEndsWith("'", $result);
     }
 
     public function testCsrfHeadersWithCustomHeaderName(): void
@@ -99,7 +99,7 @@ class HtmxCsrfExtensionIntegrationTest extends TestCase
         $template = $twig->load('csrf.html.twig');
         $result = $template->renderBlock('headers');
 
-        $this->assertSame('hx-headers=\'{"X-My-CSRF":"token-value"}\'', $result);
+        self::assertSame('hx-headers=\'{"X-My-CSRF":"token-value"}\'', $result);
     }
 
     public function testFullPageRenderWithCsrfFunctions(): void
@@ -108,8 +108,8 @@ class HtmxCsrfExtensionIntegrationTest extends TestCase
 
         $result = $twig->render('csrf.html.twig');
 
-        $this->assertStringContainsString('full-page-token', $result);
-        $this->assertStringContainsString('<meta name="csrf-token"', $result);
-        $this->assertStringContainsString('hx-headers=', $result);
+        self::assertStringContainsString('full-page-token', $result);
+        self::assertStringContainsString('<meta name="csrf-token"', $result);
+        self::assertStringContainsString('hx-headers=', $result);
     }
 }

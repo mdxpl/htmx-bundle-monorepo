@@ -13,6 +13,6 @@ class TimingSwapTest extends TestCase
     {
         $timingSwap = new TimingSwap(100);
 
-        $this->assertEquals('swap:100ms', $timingSwap->__toString());
+        self::assertEquals('swap:100ms', $timingSwap->__toString());
     }
 }

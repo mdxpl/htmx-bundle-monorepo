@@ -13,6 +13,6 @@ class FocusScrollTest extends TestCase
     {
         $focusScroll = new FocusScroll(true);
 
-        $this->assertEquals('focus-scroll:true', $focusScroll->__toString());
+        self::assertEquals('focus-scroll:true', $focusScroll->__toString());
     }
 }

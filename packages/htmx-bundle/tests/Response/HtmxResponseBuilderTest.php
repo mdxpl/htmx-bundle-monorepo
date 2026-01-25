@@ -202,7 +202,7 @@ class HtmxResponseBuilderTest extends TestCase
                 ->withReswap(SwapStyle::OUTER_HTML, new Transition(), new TimingSwap(500))
                 ->build();
 
-            $this->assertTrue(true, 'Chaining all methods did not result in a crash or exception.');
+            self::assertTrue(true, 'Chaining all methods did not result in a crash or exception.');
         } catch (Exception $e) {
             $this->fail('Chaining all methods resulted in an exception: ' . $e->getMessage());
         }

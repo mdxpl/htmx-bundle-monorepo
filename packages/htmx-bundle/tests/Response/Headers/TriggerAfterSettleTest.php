@@ -13,6 +13,6 @@ class TriggerAfterSettleTest extends TestCase
     public function testGetType(): void
     {
         $trigger = new TriggerAfterSettle('demo-event');
-        $this->assertSame(HtmxResponseHeaderType::TRIGGER_AFTER_SETTLE, $trigger->getType());
+        self::assertSame(HtmxResponseHeaderType::TRIGGER_AFTER_SETTLE, $trigger->getType());
     }
 }

@@ -23,8 +23,8 @@ class HtmxResponseTest extends TestCase
             ),
         );
 
-        $this->assertEquals('template.html.twig', $htmxResponse->views->first()->template);
-        $this->assertCount(2, $htmxResponse->views);
+        self::assertEquals('template.html.twig', $htmxResponse->views->first()->template);
+        self::assertCount(2, $htmxResponse->views);
     }
 
     public function testCreateWithView(): void
@@ -34,8 +34,8 @@ class HtmxResponseTest extends TestCase
             View::template('template.html.twig'),
         );
 
-        $this->assertEquals('template.html.twig', $htmxResponse->views->first()->template);
-        $this->assertCount(1, $htmxResponse->views);
+        self::assertEquals('template.html.twig', $htmxResponse->views->first()->template);
+        self::assertCount(1, $htmxResponse->views);
     }
 
 
@@ -43,16 +43,16 @@ class HtmxResponseTest extends TestCase
     {
         $htmxResponse = new HtmxResponse();
 
-        $this->assertEquals(204, $htmxResponse->responseCode);
-        $this->assertCount(0, $htmxResponse->views);
-        $this->assertCount(0, $htmxResponse->headers);
+        self::assertEquals(204, $htmxResponse->responseCode);
+        self::assertCount(0, $htmxResponse->views);
+        self::assertCount(0, $htmxResponse->headers);
     }
 
     public function testCreateWithResponseCode(): void
     {
         $htmxResponse = new HtmxResponse(201);
 
-        $this->assertEquals(201, $htmxResponse->responseCode);
+        self::assertEquals(201, $htmxResponse->responseCode);
     }
 
     public function testCreateWithHeader(): void
@@ -65,8 +65,8 @@ class HtmxResponseTest extends TestCase
             ),
         );
 
-        $this->assertCount(1, $htmxResponse->headers);
-        $this->assertInstanceOf(Trigger::class, $htmxResponse->headers->first());
+        self::assertCount(1, $htmxResponse->headers);
+        self::assertInstanceOf(Trigger::class, $htmxResponse->headers->first());
     }
 
     public function testCreateWithHeaders(): void
@@ -80,8 +80,8 @@ class HtmxResponseTest extends TestCase
             ),
         );
 
-        $this->assertCount(2, $htmxResponse->headers);
-        $this->assertInstanceOf(Trigger::class, $htmxResponse->headers->first());
+        self::assertCount(2, $htmxResponse->headers);
+        self::assertInstanceOf(Trigger::class, $htmxResponse->headers->first());
     }
 
     public function testCreateWithNoContentAndHeaders(): void
@@ -95,8 +95,8 @@ class HtmxResponseTest extends TestCase
             ),
         );
 
-        $this->assertEquals(204, $htmxResponse->responseCode);
-        $this->assertCount(2, $htmxResponse->headers);
-        $this->assertInstanceOf(Trigger::class, $htmxResponse->headers->first());
+        self::assertEquals(204, $htmxResponse->responseCode);
+        self::assertCount(2, $htmxResponse->headers);
+        self::assertInstanceOf(Trigger::class, $htmxResponse->headers->first());
     }
 }

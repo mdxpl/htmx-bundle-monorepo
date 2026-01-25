@@ -13,6 +13,6 @@ class IgnoreTitleTest extends TestCase
     {
         $ignoreTitle = new IgnoreTitle();
 
-        $this->assertEquals('ignoreTitle:true', $ignoreTitle->__toString());
+        self::assertEquals('ignoreTitle:true', $ignoreTitle->__toString());
     }
 }

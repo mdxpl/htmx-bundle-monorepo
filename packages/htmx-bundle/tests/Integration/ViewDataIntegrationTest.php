@@ -35,8 +35,8 @@ class ViewDataIntegrationTest extends TestCase
         $response = $this->responseFactory->create($htmxResponse);
         $content = $response->getContent();
 
-        $this->assertStringContainsString('Custom block text value1', $content);
-        $this->assertStringContainsString('Body text value2', $content);
+        self::assertStringContainsString('Custom block text value1', $content);
+        self::assertStringContainsString('Body text value2', $content);
     }
 
     /**
@@ -55,7 +55,7 @@ class ViewDataIntegrationTest extends TestCase
         $response = $this->responseFactory->create($htmxResponse);
         $content = $response->getContent();
 
-        $this->assertSame(2, substr_count($content, 'shared-value'));
+        self::assertSame(2, substr_count($content, 'shared-value'));
     }
 
     /**
@@ -74,8 +74,8 @@ class ViewDataIntegrationTest extends TestCase
         $response = $this->responseFactory->create($htmxResponse);
         $content = $response->getContent();
 
-        $this->assertStringContainsString('Custom block text specific-value', $content);
-        $this->assertStringContainsString('Body text common-value', $content);
+        self::assertStringContainsString('Custom block text specific-value', $content);
+        self::assertStringContainsString('Body text common-value', $content);
     }
 
     /**
@@ -92,7 +92,7 @@ class ViewDataIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('Success block', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('Success block', $response->getContent());
     }
 }

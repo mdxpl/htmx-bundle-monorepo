@@ -24,13 +24,13 @@ class HtmxResponseValueResolverTest extends TestCase
 
         $resolved = iterator_to_array($resolver->resolve($request, $argument));
 
-        $this->assertCount(
+        self::assertCount(
             1,
             $resolved,
             'Expected exactly one resolved argument.',
         );
 
-        $this->assertInstanceOf(
+        self::assertInstanceOf(
             HtmxRequest::class,
             $resolved[0],
             'The resolved argument should be an instance of HtmxRequest.',
@@ -46,6 +46,6 @@ class HtmxResponseValueResolverTest extends TestCase
 
         $resolved = iterator_to_array($resolver->resolve($request, $argument));
 
-        $this->assertEmpty($resolved, 'Expected no resolved arguments for non-HtmxRequest types.');
+        self::assertEmpty($resolved, 'Expected no resolved arguments for non-HtmxRequest types.');
     }
 }

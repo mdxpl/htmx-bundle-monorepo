@@ -19,7 +19,7 @@ class AbstractTriggerTest extends TestCase
             }
         };
 
-        $this->assertEquals('HX-Trigger', $abstractTrigger->getType()->value);
-        $this->assertEquals('event1, event2', $abstractTrigger->getValue());
+        self::assertEquals('HX-Trigger', $abstractTrigger->getType()->value);
+        self::assertEquals('event1, event2', $abstractTrigger->getValue());
     }
 }

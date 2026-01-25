@@ -62,7 +62,7 @@ class HtmxOnlyAttributeIntegrationTest extends TestCase
 
         $subscriber->onKernelController($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -91,7 +91,7 @@ class HtmxOnlyAttributeIntegrationTest extends TestCase
 
         $subscriber->onKernelController($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -105,7 +105,7 @@ class HtmxOnlyAttributeIntegrationTest extends TestCase
 
         $subscriber->onKernelController($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -121,7 +121,7 @@ class HtmxOnlyAttributeIntegrationTest extends TestCase
             $subscriber->onKernelController($event);
             $this->fail('Expected HttpException');
         } catch (HttpException $e) {
-            $this->assertSame(Response::HTTP_NOT_FOUND, $e->getStatusCode());
+            self::assertSame(Response::HTTP_NOT_FOUND, $e->getStatusCode());
         }
     }
 
@@ -141,8 +141,8 @@ class HtmxOnlyAttributeIntegrationTest extends TestCase
             $subscriber->onKernelController($event);
             $this->fail('Expected HttpException');
         } catch (HttpException $e) {
-            $this->assertSame(Response::HTTP_FORBIDDEN, $e->getStatusCode());
-            $this->assertSame('Access Denied', $e->getMessage());
+            self::assertSame(Response::HTTP_FORBIDDEN, $e->getStatusCode());
+            self::assertSame('Access Denied', $e->getMessage());
         }
     }
 
@@ -162,8 +162,8 @@ class HtmxOnlyAttributeIntegrationTest extends TestCase
             $subscriber->onKernelController($event);
             $this->fail('Expected HttpException');
         } catch (HttpException $e) {
-            $this->assertSame(Response::HTTP_BAD_REQUEST, $e->getStatusCode());
-            $this->assertSame('Bad Request - HTMX required', $e->getMessage());
+            self::assertSame(Response::HTTP_BAD_REQUEST, $e->getStatusCode());
+            self::assertSame('Bad Request - HTMX required', $e->getMessage());
         }
     }
 
@@ -178,7 +178,7 @@ class HtmxOnlyAttributeIntegrationTest extends TestCase
 
         $subscriber->onKernelController($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**

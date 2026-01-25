@@ -18,12 +18,12 @@ class HtmxCsrfExtensionTest extends TestCase
 
         $functions = $extension->getFunctions();
 
-        $this->assertCount(3, $functions);
+        self::assertCount(3, $functions);
 
         $functionNames = array_map(fn ($f) => $f->getName(), $functions);
-        $this->assertContains('htmx_csrf_token', $functionNames);
-        $this->assertContains('htmx_csrf_meta', $functionNames);
-        $this->assertContains('htmx_csrf_headers', $functionNames);
+        self::assertContains('htmx_csrf_token', $functionNames);
+        self::assertContains('htmx_csrf_meta', $functionNames);
+        self::assertContains('htmx_csrf_headers', $functionNames);
     }
 
     public function testGetCsrfTokenReturnsTokenValue(): void
@@ -36,7 +36,7 @@ class HtmxCsrfExtensionTest extends TestCase
 
         $extension = new HtmxCsrfExtension($tokenManager);
 
-        $this->assertSame('test-token-value', $extension->getCsrfToken());
+        self::assertSame('test-token-value', $extension->getCsrfToken());
     }
 
     public function testGetCsrfMetaReturnsMetaTag(): void
@@ -49,7 +49,7 @@ class HtmxCsrfExtensionTest extends TestCase
 
         $extension = new HtmxCsrfExtension($tokenManager);
 
-        $this->assertSame(
+        self::assertSame(
             '<meta name="csrf-token" content="meta-token-value">',
             $extension->getCsrfMeta(),
         );
@@ -65,7 +65,7 @@ class HtmxCsrfExtensionTest extends TestCase
 
         $extension = new HtmxCsrfExtension($tokenManager);
 
-        $this->assertSame(
+        self::assertSame(
             '<meta name="csrf-token" content="token&quot;with&lt;special&gt;chars">',
             $extension->getCsrfMeta(),
         );
@@ -81,7 +81,7 @@ class HtmxCsrfExtensionTest extends TestCase
 
         $extension = new HtmxCsrfExtension($tokenManager);
 
-        $this->assertSame(
+        self::assertSame(
             'hx-headers=\'{"X-CSRF-Token":"header-token-value"}\'',
             $extension->getCsrfHeaders(),
         );
@@ -97,7 +97,7 @@ class HtmxCsrfExtensionTest extends TestCase
 
         $extension = new HtmxCsrfExtension($tokenManager, 'mdx-htmx', 'X-Custom-Token');
 
-        $this->assertSame(
+        self::assertSame(
             'hx-headers=\'{"X-Custom-Token":"custom-header-token"}\'',
             $extension->getCsrfHeaders(),
         );
@@ -115,8 +115,8 @@ class HtmxCsrfExtensionTest extends TestCase
 
         $result = $extension->getCsrfHeaders();
 
-        $this->assertStringContainsString('hx-headers=', $result);
-        $this->assertStringNotContainsString("'token'", $result);
+        self::assertStringContainsString('hx-headers=', $result);
+        self::assertStringNotContainsString("'token'", $result);
     }
 
     public function testDefaultTokenIdIsUsed(): void

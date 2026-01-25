@@ -19,7 +19,7 @@ class CsrfValidationSubscriberTest extends TestCase
 {
     public function testGetSubscribedEvents(): void
     {
-        $this->assertSame(
+        self::assertSame(
             [KernelEvents::REQUEST => ['onKernelRequest', 8]],
             CsrfValidationSubscriber::getSubscribedEvents(),
         );
@@ -130,7 +130,7 @@ class CsrfValidationSubscriberTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     public function testUsesCustomTokenId(): void

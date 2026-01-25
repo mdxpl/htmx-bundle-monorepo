@@ -13,8 +13,8 @@ class HtmxRefreshResponseTest extends TestCase
     public function testResponse(): void
     {
         $response = new HtmxRefreshResponse();
-        $this->assertSame(204, $response->responseCode);
-        $this->assertSame(HtmxResponseHeaderType::REFRESH, $response->headers->first()->getType());
-        $this->assertEquals('true', $response->headers->first()->getValue());
+        self::assertSame(204, $response->responseCode);
+        self::assertSame(HtmxResponseHeaderType::REFRESH, $response->headers->first()->getType());
+        self::assertEquals('true', $response->headers->first()->getValue());
     }
 }

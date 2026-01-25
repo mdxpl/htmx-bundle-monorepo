@@ -28,7 +28,7 @@ class HtmxRequestSubscriberTest extends TestCase
         $subscriber = new HtmxRequestSubscriber();
         $subscriber->onKernelRequest($event);
 
-        $this->assertInstanceOf(
+        self::assertInstanceOf(
             HtmxRequest::class,
             $request->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME),
         );
@@ -46,8 +46,8 @@ class HtmxRequestSubscriberTest extends TestCase
         $subscriber = new HtmxRequestSubscriber();
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue($request->attributes->has(HtmxRequest::REQUEST_ATTRIBUTE_NAME));
-        $this->assertFalse($request->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME)->isHtmx);
+        self::assertTrue($request->attributes->has(HtmxRequest::REQUEST_ATTRIBUTE_NAME));
+        self::assertFalse($request->attributes->get(HtmxRequest::REQUEST_ATTRIBUTE_NAME)->isHtmx);
     }
 
     public function testOnKernelRequestSkipsSubRequest(): void
@@ -62,12 +62,12 @@ class HtmxRequestSubscriberTest extends TestCase
         $subscriber = new HtmxRequestSubscriber();
         $subscriber->onKernelRequest($event);
 
-        $this->assertFalse($request->attributes->has(HtmxRequest::REQUEST_ATTRIBUTE_NAME));
+        self::assertFalse($request->attributes->has(HtmxRequest::REQUEST_ATTRIBUTE_NAME));
     }
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertSame(
+        self::assertSame(
             [KernelEvents::REQUEST => ['onKernelRequest']],
             HtmxRequestSubscriber::getSubscribedEvents(),
         );

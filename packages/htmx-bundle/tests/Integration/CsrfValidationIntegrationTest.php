@@ -83,7 +83,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -98,7 +98,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -112,7 +112,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -126,7 +126,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -185,7 +185,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -199,7 +199,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -213,7 +213,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -227,7 +227,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -244,7 +244,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -270,7 +270,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -291,7 +291,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -309,7 +309,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -328,7 +328,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -342,7 +342,7 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     /**
@@ -356,6 +356,6 @@ class CsrfValidationIntegrationTest extends TestCase
 
         $subscriber->onKernelRequest($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 }

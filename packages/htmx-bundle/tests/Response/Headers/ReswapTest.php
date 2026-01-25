@@ -21,14 +21,14 @@ class ReswapTest extends TestCase
             new IgnoreTitle(),
         );
 
-        $this->assertEquals('outerHTML swap:1000ms ignoreTitle:true', $reswap->getValue());
+        self::assertEquals('outerHTML swap:1000ms ignoreTitle:true', $reswap->getValue());
     }
 
     public function testType(): void
     {
         $reswap = new Reswap(SwapStyle::AFTER_BEGIN);
 
-        $this->assertEquals(HtmxResponseHeaderType::RESWAP, $reswap->getType());
+        self::assertEquals(HtmxResponseHeaderType::RESWAP, $reswap->getType());
     }
 
     public function testReswapWithoutModifiers(): void
@@ -37,7 +37,7 @@ class ReswapTest extends TestCase
             SwapStyle::AFTER_BEGIN,
         );
 
-        $this->assertEquals('afterbegin', $reswap->getValue());
+        self::assertEquals('afterbegin', $reswap->getValue());
     }
 
     public function testTypeWithModifiers(): void
@@ -48,6 +48,6 @@ class ReswapTest extends TestCase
             new IgnoreTitle(),
         );
 
-        $this->assertEquals('afterbegin swap:1000ms ignoreTitle:true', $reswap->getValue());
+        self::assertEquals('afterbegin swap:1000ms ignoreTitle:true', $reswap->getValue());
     }
 }

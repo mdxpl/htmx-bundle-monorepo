@@ -13,6 +13,6 @@ class TimingSettleTest extends TestCase
     {
         $timingSettle = new TimingSettle(100);
 
-        $this->assertEquals('settle:100ms', $timingSettle->__toString());
+        self::assertEquals('settle:100ms', $timingSettle->__toString());
     }
 }
