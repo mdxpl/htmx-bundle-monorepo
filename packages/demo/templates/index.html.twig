@@ -77,10 +77,10 @@
 
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
-                <h3 class="card-title text-lg">Click to Edit</h3>
-                <p class="text-sm">Inline editing of fields without page reload.</p>
+                <h3 class="card-title text-lg">Item List</h3>
+                <p class="text-sm">Inline editing, delete with confirmation, and OOB notifications.</p>
                 <div class="card-actions justify-end">
-                    <a href="{{ path('app_click_to_edit') }}" class="btn btn-primary btn-sm">Try it</a>
+                    <a href="{{ path('app_items') }}" class="btn btn-primary btn-sm">Try it</a>
                 </div>
             </div>
         </div>
@@ -91,16 +91,6 @@
                 <p class="text-sm">Auto-refresh stats every 2s with <code class="badge badge-ghost badge-xs">hx-trigger="every 2s"</code>.</p>
                 <div class="card-actions justify-end">
                     <a href="{{ path('app_polling') }}" class="btn btn-primary btn-sm">Try it</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h3 class="card-title text-lg">Delete Confirm</h3>
-                <p class="text-sm">Delete with confirmation dialog and toast notifications via <code class="badge badge-ghost badge-xs">HX-Trigger</code>.</p>
-                <div class="card-actions justify-end">
-                    <a href="{{ path('app_delete_demo') }}" class="btn btn-primary btn-sm">Try it</a>
                 </div>
             </div>
         </div>

@@ -1,0 +1,191 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Item List - htmx-bundle Demo{% endblock %}
+
+{% block body %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold">Item List</h1>
+    <p class="text-base-content/70">Click to edit names, change status via dropdown, delete with confirmation. Uses <code class="badge badge-ghost badge-sm">hx-swap-oob</code> for notifications.</p>
+</div>
+
+<div id="notification" class="mb-4">{{ block('notificationContent') }}</div>
+
+<div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title">Projects</h2>
+            <button class="btn btn-outline btn-sm"
+                    hx-post="{{ path('app_items_reset') }}"
+                    hx-target="#items-list"
+                    hx-swap="innerHTML">
+                Reset List
+            </button>
+        </div>
+
+        <div id="items-list">
+            {{ block('itemsList') }}
+        </div>
+    </div>
+</div>
+
+<div class="mt-6">
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">How it works</h2>
+            <ul class="list-disc list-inside space-y-2">
+                <li><strong>Edit name:</strong> Click name to edit inline (min 3 chars, try empty to see error)</li>
+                <li><strong>Change status:</strong> Click badge to open dropdown</li>
+                <li><strong>Delete:</strong> <code class="badge badge-ghost">hx-confirm</code> shows native confirmation</li>
+                <li><strong>Notifications:</strong> <code class="badge badge-ghost">hx-swap-oob</code> with CSS animation</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    tr.htmx-swapping { opacity: 0; transition: opacity 0.3s ease-out; }
+    @keyframes slide-in {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    #notification .alert { animation: slide-in 0.3s ease-out; }
+</style>
+{% endblock %}
+
+{% block notificationContent %}{% endblock %}
+
+{% block notificationOob %}
+<div id="notification" hx-swap-oob="true" class="mb-4">
+    <div class="alert {{ type == 'error' ? 'alert-error' : 'alert-success' }}">
+        {% if type == 'error' %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        {% else %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        {% endif %}
+        <span>{{ message }}</span>
+        <button type="button" class="btn btn-sm btn-ghost btn-square" onclick="this.closest('.alert').parentElement.innerHTML = ''">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block itemsList %}
+{% if items|length > 0 %}
+<div class="overflow-x-auto">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr id="item-row-{{ item.id }}">
+                <td>{{ item.id }}</td>
+                <td id="item-name-{{ item.id }}">
+                    {{ block('viewName') }}
+                </td>
+                <td id="item-status-{{ item.id }}">
+                    {{ block('viewStatus') }}
+                </td>
+                <td>
+                    <button class="btn btn-ghost btn-sm btn-square text-error"
+                            hx-delete="{{ path('app_items_delete', {id: item.id}) }}"
+                            hx-target="#item-row-{{ item.id }}"
+                            hx-swap="outerHTML swap:300ms"
+                            hx-confirm="Are you sure you want to delete '{{ item.name }}'?">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <span>No items left. Click "Reset List" to restore.</span>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block viewName %}
+<div class="flex items-center gap-2 cursor-pointer hover:bg-base-200 -mx-2 px-2 py-1 rounded transition-colors"
+     hx-get="{{ path('app_items_edit', {id: item.id}) }}"
+     hx-target="#item-name-{{ item.id }}"
+     hx-swap="innerHTML">
+    <span>{{ item.name }}</span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+    </svg>
+</div>
+{% endblock %}
+
+{% block editName %}
+<form class="flex items-center gap-2"
+      hx-put="{{ path('app_items_update', {id: item.id}) }}"
+      hx-target="#item-name-{{ item.id }}"
+      hx-swap="innerHTML">
+    <input type="text"
+           name="name"
+           value="{{ item.name }}"
+           class="input input-bordered input-sm w-40"
+           autocomplete="off"
+           data-1p-ignore
+           data-lpignore="true"
+           autofocus />
+    <button type="submit" class="btn btn-primary btn-sm btn-square">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+    </button>
+    <button type="button" class="btn btn-ghost btn-sm btn-square"
+            hx-get="{{ path('app_items') }}"
+            hx-target="#item-name-{{ item.id }}"
+            hx-select="#item-name-{{ item.id }} > *">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+</form>
+{% endblock %}
+
+{% block viewStatus %}
+<div class="dropdown dropdown-end">
+    <div tabindex="0" role="button" class="badge badge-sm cursor-pointer text-white uppercase text-xs font-bold py-2 {{ item.status == 'active' ? 'badge-success' : (item.status == 'pending' ? 'badge-warning' : 'badge-info') }}">
+        {{ item.status }}
+    </div>
+    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-10 w-32 p-2 shadow-lg">
+        {% for status in ['active', 'pending', 'completed'] %}
+        <li>
+            <button hx-put="{{ path('app_items_status', {id: item.id}) }}"
+                    hx-vals='{"status": "{{ status }}"}'
+                    hx-target="#item-status-{{ item.id }}"
+                    hx-swap="innerHTML"
+                    class="{{ item.status == status ? 'active' : '' }}">
+                {{ status|capitalize }}
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+{% block itemsListOob %}
+<div id="items-list" hx-swap-oob="true">
+    {{ block('itemsList') }}
+</div>
+{% endblock %}
+
+{% block empty %}{% endblock %}
+
+{% block sourceCode %}
+{% include '_source_code.html.twig' with {controller: 'ItemListController.php', template: 'item_list.html.twig'} %}
+{% endblock %}
