@@ -37,7 +37,7 @@ final class HtmxOptions
     }
 
     // ==========================================
-    // HTTP Methods
+    // HTTP Methods (URL)
     // ==========================================
 
     /**
@@ -96,6 +96,88 @@ final class HtmxOptions
     public function delete(string $url): self
     {
         $this->options['delete'] = $url;
+
+        return $this;
+    }
+
+    // ==========================================
+    // HTTP Methods (Route)
+    // ==========================================
+
+    /**
+     * Issues a GET request to the given Symfony route.
+     *
+     * @param string $route Route name
+     * @param array<string, mixed> $params Route parameters
+     *
+     * @link https://htmx.org/attributes/hx-get/
+     *
+     * @example ->getRoute('app_search')
+     * @example ->getRoute('app_search', ['query' => 'foo'])
+     */
+    public function getRoute(string $route, array $params = []): self
+    {
+        $this->options['get'] = new Route($route, $params);
+
+        return $this;
+    }
+
+    /**
+     * Issues a POST request to the given Symfony route.
+     *
+     * @param string $route Route name
+     * @param array<string, mixed> $params Route parameters
+     *
+     * @link https://htmx.org/attributes/hx-post/
+     */
+    public function postRoute(string $route, array $params = []): self
+    {
+        $this->options['post'] = new Route($route, $params);
+
+        return $this;
+    }
+
+    /**
+     * Issues a PUT request to the given Symfony route.
+     *
+     * @param string $route Route name
+     * @param array<string, mixed> $params Route parameters
+     *
+     * @link https://htmx.org/attributes/hx-put/
+     */
+    public function putRoute(string $route, array $params = []): self
+    {
+        $this->options['put'] = new Route($route, $params);
+
+        return $this;
+    }
+
+    /**
+     * Issues a PATCH request to the given Symfony route.
+     *
+     * @param string $route Route name
+     * @param array<string, mixed> $params Route parameters
+     *
+     * @link https://htmx.org/attributes/hx-patch/
+     */
+    public function patchRoute(string $route, array $params = []): self
+    {
+        $this->options['patch'] = new Route($route, $params);
+
+        return $this;
+    }
+
+    /**
+     * Issues a DELETE request to the given Symfony route.
+     *
+     * @param string $route Route name
+     * @param array<string, mixed> $params Route parameters
+     *
+     * @link https://htmx.org/attributes/hx-delete/
+     */
+    public function deleteRoute(string $route, array $params = []): self
+    {
+        $this->options['delete'] = new Route($route, $params);
 
         return $this;
     }

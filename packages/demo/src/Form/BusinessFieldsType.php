@@ -33,9 +33,9 @@ final class BusinessFieldsType extends AbstractType
                 ] : [],
                 'htmx' => $isRequired
                     ? HtmxOptions::create()
-                        ->post('/advanced-form/validate/business/companyName')
+                        ->postRoute('app_advanced_form_validate_business', ['field' => '{name}'])
                         ->trigger(Trigger::blur()->changed()->delay(500))
-                        ->target('#companyName-validation')
+                        ->target('#{name}-validation')
                         ->swap(SwapStyle::InnerHTML)
                     : null,
             ])
@@ -52,9 +52,9 @@ final class BusinessFieldsType extends AbstractType
                 ] : [],
                 'htmx' => $isRequired
                     ? HtmxOptions::create()
-                        ->post('/advanced-form/validate/business/taxId')
+                        ->postRoute('app_advanced_form_validate_business', ['field' => '{name}'])
                         ->trigger(Trigger::blur()->changed()->delay(500))
-                        ->target('#taxId-validation')
+                        ->target('#{name}-validation')
                         ->swap(SwapStyle::InnerHTML)
                     : null,
             ])

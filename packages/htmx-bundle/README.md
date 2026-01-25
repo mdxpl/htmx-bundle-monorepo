@@ -113,7 +113,7 @@ use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
 
 $builder->add('search', TextType::class, [
     'htmx' => HtmxOptions::create()
-        ->get('/search')
+        ->getRoute('app_search')  // or ->get('/search')
         ->trigger(Trigger::keyup()->changed()->delay(300))
         ->target('#results'),
 ]);

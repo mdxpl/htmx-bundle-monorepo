@@ -16,6 +16,7 @@ return static function (ContainerConfigurator $container): void {
     $container
         ->services()
         ->set(HtmxTypeExtension::class)
+            ->args([new Reference('router')])
             ->tag('form.type_extension')
 
         ->set(ConditionalTypeExtension::class)

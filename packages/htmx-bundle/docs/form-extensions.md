@@ -75,16 +75,73 @@ Trigger::every(5000)                          // 'every 5000ms'
 Trigger::event('custom-event')->once()        // 'custom-event once'
 ```
 
+### Placeholders
+
+Use placeholders to dynamically insert field information into URLs, route parameters, and other string values:
+
+| Placeholder | Description | Resolved | Example |
+|-------------|-------------|----------|---------|
+| `{name}` | Field name | Server-side (PHP) | `email` |
+| `{id}` | Field ID | Server-side (PHP) | `form_email` |
+| `{full_name}` | Full field name | Server-side (PHP) | `form[email]` |
+| `{value}` | Field value | Client-side (JS) | User input |
+
+**Server-side placeholders** (`{name}`, `{id}`, `{full_name}`) are resolved when the form is rendered.
+
+**Client-side placeholder** (`{value}`) is resolved via JavaScript when the request is made. The extension automatically adds `hx-on::config-request` handler.
+
+```php
+// Reusable validation configuration - works for any field!
+$builder
+    ->add('email', EmailType::class, [
+        'htmx' => HtmxOptions::create()
+            ->postRoute('app_validate', ['field' => '{name}'])
+            ->target('#form_{name}-validation'),
+    ])
+    ->add('username', TextType::class, [
+        'htmx' => HtmxOptions::create()
+            ->postRoute('app_validate', ['field' => '{name}'])
+            ->target('#form_{name}-validation'),
+    ]);
+
+// Both fields use the same configuration but resolve to different URLs:
+// email    -> POST /validate/email,    target: #form_email-validation
+// username -> POST /validate/username, target: #form_username-validation
+```
+
+**Using `{value}` for dynamic routes:**
+
+```php
+// Cascading select - fetch cities based on selected country
+$builder->add('country', ChoiceType::class, [
+    'htmx' => HtmxOptions::create()
+        ->getRoute('app_cities', ['country' => '{value}'])
+        ->trigger(Trigger::change())
+        ->target('#city-wrapper'),
+]);
+
+// When user selects "usa", htmx makes request to: GET /cities/usa
+// The {value} is replaced client-side via auto-generated hx-on::config-request
+```
+
 ### HtmxOptions Methods
 
 ```php
 HtmxOptions::create()
-    // HTTP Methods
+    // HTTP Methods (URL)
     ->get('/url')
     ->post('/url')
     ->put('/url')
     ->patch('/url')
     ->delete('/url')
+
+    // HTTP Methods (Symfony Route)
+    ->getRoute('app_search')
+    ->getRoute('app_search', ['query' => 'foo'])
+    ->postRoute('app_validate', ['field' => '{name}'])  // {name} = field name
+    ->putRoute('app_update', ['id' => 1])
+    ->patchRoute('app_patch', ['id' => 1])
+    ->deleteRoute('app_delete', ['id' => 1])
 
     // Core attributes
     ->trigger('click')                // or Trigger object

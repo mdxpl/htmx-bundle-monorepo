@@ -303,7 +303,7 @@ final class AdvancedFormController extends AbstractController
                     ),
                 ],
                 'htmx' => HtmxOptions::create()
-                    ->get('/advanced-form/search/users')
+                    ->getRoute('app_advanced_form_search_users')
                     ->trigger(Trigger::keyup()->changed()->delay(300)->condition('target.value.length >= 2'))
                     ->target('#user-results')
                     ->indicator('#search-spinner')
@@ -363,9 +363,9 @@ final class AdvancedFormController extends AbstractController
                     new Email(message: 'Please enter a valid email address'),
                 ],
                 'htmx' => HtmxOptions::create()
-                    ->post('/advanced-form/validate/email')
+                    ->postRoute('app_advanced_form_validate', ['field' => '{name}'])
                     ->trigger(Trigger::blur()->changed()->delay(500))
-                    ->target('#form_email-validation')
+                    ->target('#form_{name}-validation')
                     ->swap(SwapStyle::InnerHTML),
             ])
             // Username with inline validation
@@ -379,9 +379,9 @@ final class AdvancedFormController extends AbstractController
                     new Regex(pattern: '/^[a-zA-Z0-9_]+$/', message: 'Username can only contain letters, numbers and underscores'),
                 ],
                 'htmx' => HtmxOptions::create()
-                    ->post('/advanced-form/validate/username')
+                    ->postRoute('app_advanced_form_validate', ['field' => '{name}'])
                     ->trigger(Trigger::blur()->changed()->delay(500))
-                    ->target('#form_username-validation')
+                    ->target('#form_{name}-validation')
                     ->swap(SwapStyle::InnerHTML),
             ])
             // Account Type with conditional fields

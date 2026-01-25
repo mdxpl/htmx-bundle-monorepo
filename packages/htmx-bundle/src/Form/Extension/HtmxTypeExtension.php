@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mdxpl\HtmxBundle\Form\Extension;
 
 use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
+use Mdxpl\HtmxBundle\Form\Htmx\Route;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Form extension that adds HTMX attributes support to all form fields.
@@ -39,9 +41,24 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *         ->indicator('#spinner'),
  * ]);
  * ```
+ *
+ * Usage with routes:
+ * ```php
+ * $builder->add('search', TextType::class, [
+ *     'htmx' => HtmxOptions::create()
+ *         ->getRoute('app_search', ['query' => 'foo'])
+ *         ->trigger(Trigger::keyup()->changed()->delay(300))
+ *         ->target('#results'),
+ * ]);
+ * ```
  */
 final class HtmxTypeExtension extends AbstractTypeExtension
 {
+    public function __construct(
+        private readonly ?UrlGeneratorInterface $urlGenerator = null,
+    ) {
+    }
+
     private const HTMX_ATTRIBUTE_MAP = [
         'get' => 'hx-get',
         'post' => 'hx-post',
@@ -104,13 +121,38 @@ final class HtmxTypeExtension extends AbstractTypeExtension
         /** @var array<string, string> $attrs */
         $attrs = $view->vars['attr'] ?? [];
 
+        // Extract form field info for placeholder resolution
+        /** @var string $fieldName */
+        $fieldName = $view->vars['name'];
+        /** @var string $fieldId */
+        $fieldId = $view->vars['id'];
+        /** @var string $fieldFullName */
+        $fieldFullName = $view->vars['full_name'];
+
+        $hasValuePlaceholder = false;
+
         foreach ($htmxOptions as $key => $value) {
             if (null === $value) {
                 continue;
             }
 
             $attributeName = $this->resolveAttributeName($key);
-            $attrs[$attributeName] = $this->formatAttributeValue($value);
+            $formattedValue = $this->formatAttributeValue($value, $fieldName, $fieldId, $fieldFullName);
+
+            // Check if {value} placeholder is used (needs client-side resolution)
+            if (str_contains($formattedValue, Route::PLACEHOLDER_VALUE)) {
+                $hasValuePlaceholder = true;
+            }
+
+            $attrs[$attributeName] = $formattedValue;
+        }
+
+        // Auto-add config-request handler for {value} placeholder resolution
+        if ($hasValuePlaceholder && !isset($attrs['hx-on::config-request'])) {
+            $attrs['hx-on::config-request'] = sprintf(
+                "event.detail.path = event.detail.path.replace('%s', encodeURIComponent(this.value))",
+                Route::PLACEHOLDER_VALUE,
+            );
         }
 
         $view->vars['attr'] = $attrs;
@@ -138,10 +180,33 @@ final class HtmxTypeExtension extends AbstractTypeExtension
     }
 
     /**
-     * @param mixed $value
+     * Formats an attribute value for output.
+     *
+     * @param mixed $value The value to format
+     * @param string $fieldName Form field name (for placeholder resolution)
+     * @param string $fieldId Form field id (for placeholder resolution)
+     * @param string $fieldFullName Form field full name (for placeholder resolution)
      */
-    private function formatAttributeValue($value): string
-    {
+    private function formatAttributeValue(
+        mixed $value,
+        string $fieldName = '',
+        string $fieldId = '',
+        string $fieldFullName = '',
+    ): string {
+        // Handle Route objects - resolve placeholders and generate URL
+        if ($value instanceof Route) {
+            if ($this->urlGenerator === null) {
+                throw new \LogicException(
+                    'Cannot use route references in htmx options without UrlGeneratorInterface. '
+                    . 'Make sure the router service is available.',
+                );
+            }
+
+            $resolvedParams = $value->resolveParams($fieldName, $fieldId, $fieldFullName);
+
+            return $this->urlGenerator->generate($value->name, $resolvedParams);
+        }
+
         if (\is_bool($value)) {
             return $value ? 'true' : 'false';
         }
@@ -150,7 +215,16 @@ final class HtmxTypeExtension extends AbstractTypeExtension
             return json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
         }
 
-        if (\is_string($value) || \is_int($value) || \is_float($value)) {
+        if (\is_string($value)) {
+            // Resolve placeholders in string values
+            return str_replace(
+                [Route::PLACEHOLDER_NAME, Route::PLACEHOLDER_ID, Route::PLACEHOLDER_FULL_NAME],
+                [$fieldName, $fieldId, $fieldFullName],
+                $value,
+            );
+        }
+
+        if (\is_int($value) || \is_float($value)) {
             return (string) $value;
         }
 
