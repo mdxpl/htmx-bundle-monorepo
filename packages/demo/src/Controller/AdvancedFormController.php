@@ -214,7 +214,7 @@ final class AdvancedFormController extends AbstractController
             ->viewBlock('advanced_form.html.twig', 'fieldValidation', [
                 'errors' => $errors,
                 'field' => $field,
-                'isValid' => \count($errors) === 0 && $value !== '',
+                'isValid' => $errors === [] && $value !== '',
             ])
             ->build();
     }
@@ -269,7 +269,7 @@ final class AdvancedFormController extends AbstractController
             ->viewBlock('advanced_form.html.twig', 'fieldValidation', [
                 'errors' => $errors,
                 'field' => $field,
-                'isValid' => \count($errors) === 0 && $value !== '',
+                'isValid' => $errors === [] && $value !== '',
             ])
             ->build();
     }

@@ -39,6 +39,13 @@ Demonstrates the `htmx` option on Symfony form fields:
 - Inline field validation on blur
 - Conditional fields based on selection
 
+### Wizard Form
+Session-based multi-step form with:
+- Schema versioning for state migration
+- Per-step validation with error indicators on tabs
+- Configurable navigation strategies (free, sequential, linear)
+- Smooth htmx transitions between steps
+
 ### Infinite Scroll
 Load more content automatically as you scroll using `hx-trigger="revealed"`.
 

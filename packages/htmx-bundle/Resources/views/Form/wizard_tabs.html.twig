@@ -1,0 +1,193 @@
+{#
+ # Wizard Tabs Component for Multi-Step Forms
+ #
+ # This template provides reusable blocks for rendering wizard navigation tabs
+ # with htmx support for dynamic step navigation.
+ #
+ # Usage in your wizard template:
+ #   {% import "@MdxplHtmx/Form/wizard_tabs.html.twig" as wizard %}
+ #   {{ wizard.tabs(form, path('app_register')) }}
+ #
+ # Or extend and use as blocks:
+ #   {% use "@MdxplHtmx/Form/wizard_tabs.html.twig" %}
+ #   {{ block('wizard_tabs') }}
+ #}
+
+{# ============================================= #}
+{# Wizard Tabs Navigation                        #}
+{# ============================================= #}
+{% macro tabs(form, route, options) %}
+    {% set options = options|default({}) %}
+    {% set tabClass = options.tabClass|default('tabs tabs-boxed mb-6') %}
+    {% set containerId = options.containerId|default('wizard-container') %}
+    {% set extraParams = options.extraParams|default({}) %}
+
+    {% if form.vars.wizard is defined %}
+        {% set wizard = form.vars.wizard %}
+        {% set navStrategy = wizard.navigation_strategy|default('linear') %}
+        {# Determine URL separator based on whether route already has query params #}
+        {% set separator = '?' in route ? '&' : '?' %}
+        <div id="wizard-tabs" class="{{ tabClass }}">
+            {% for step in wizard.steps %}
+                <a class="tab {{ step.is_current ? 'tab-active' : '' }} {{ step.has_errors ? 'text-error' : '' }}"
+                   {% if step.can_navigate and not step.is_current %}
+                       hx-get="{{ route }}{{ separator }}_step={{ step.index }}"
+                       hx-target="#{{ containerId }}"
+                       hx-swap="innerHTML"
+                   {% endif %}>
+                    {% if step.has_errors %}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    {% elseif step.is_completed %}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    {% endif %}
+                    {{ step.label }}
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{# ============================================= #}
+{# Wizard Navigation Buttons                     #}
+{# ============================================= #}
+{% macro navigation(form, options) %}
+    {% set options = options|default({}) %}
+    {% set backLabel = options.backLabel|default('Back') %}
+    {% set nextLabel = options.nextLabel|default('Next') %}
+    {% set submitLabel = options.submitLabel|default('Complete') %}
+    {% set containerClass = options.containerClass|default('flex justify-between mt-6') %}
+    {% set backClass = options.backClass|default('btn btn-ghost') %}
+    {% set nextClass = options.nextClass|default('btn btn-primary') %}
+    {% set submitClass = options.submitClass|default('btn btn-primary') %}
+
+    {% if form.vars.wizard is defined %}
+        {% set wizard = form.vars.wizard %}
+        {% set currentStep = wizard.steps[wizard.current_step] %}
+
+        <div class="{{ containerClass }}">
+            {# Back button #}
+            <div>
+                {% if not wizard.is_first_step and currentStep.allow_back %}
+                    <button type="submit" name="_wizard_action" value="back" class="{{ backClass }}">
+                        {{ backLabel }}
+                    </button>
+                {% endif %}
+            </div>
+
+            {# Next/Submit button #}
+            <div>
+                {% if wizard.is_last_step %}
+                    <button type="submit" name="_wizard_action" value="submit" class="{{ submitClass }}">
+                        <span class="htmx-indicator loading loading-spinner loading-sm mr-2"></span>
+                        {{ submitLabel }}
+                    </button>
+                {% else %}
+                    <button type="submit" name="_wizard_action" value="next" class="{{ nextClass }}">
+                        {{ nextLabel }}
+                        <span class="htmx-indicator loading loading-spinner loading-sm ml-2"></span>
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{# ============================================= #}
+{# Wizard Progress Bar                           #}
+{# ============================================= #}
+{% macro progress(form, options) %}
+    {% set options = options|default({}) %}
+    {% set containerClass = options.containerClass|default('w-full mb-6') %}
+    {% set progressClass = options.progressClass|default('progress progress-primary') %}
+    {% set animated = options.animated|default(true) %}
+
+    {% if form.vars.wizard is defined %}
+        {% set wizard = form.vars.wizard %}
+        {% set totalSteps = wizard.steps|length %}
+        {% set currentStep = wizard.current_step + 1 %}
+        {% set percentage = (currentStep / totalSteps) * 100 %}
+
+        <div class="{{ containerClass }}">
+            {# Animated progress bar using custom div instead of native progress element #}
+            {% if animated %}
+            <div class="w-full bg-base-300 rounded-full h-3 overflow-hidden">
+                <div class="wizard-progress-bar h-full bg-primary rounded-full"
+                     style="width: {{ percentage }}%"
+                     data-progress="{{ percentage }}"></div>
+            </div>
+            {% else %}
+            <progress class="{{ progressClass }}" value="{{ percentage }}" max="100"></progress>
+            {% endif %}
+            <div class="text-sm text-center mt-1 text-base-content/70">
+                Step {{ currentStep }} of {{ totalSteps }}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{# ============================================= #}
+{# Wizard Steps List (Vertical)                  #}
+{# ============================================= #}
+{% macro steps_list(form, route, options) %}
+    {% set options = options|default({}) %}
+    {% set containerClass = options.containerClass|default('steps steps-vertical') %}
+    {% set containerId = options.containerId|default('wizard-container') %}
+
+    {% if form.vars.wizard is defined %}
+        {% set wizard = form.vars.wizard %}
+        {# Determine URL separator based on whether route already has query params #}
+        {% set separator = '?' in route ? '&' : '?' %}
+        <ul class="{{ containerClass }}">
+            {% for step in wizard.steps %}
+                <li class="step {{ step.is_completed or step.is_current ? 'step-primary' : '' }} {{ step.has_errors ? 'step-error' : '' }}">
+                    {% if step.can_navigate and not step.is_current %}
+                        <a hx-get="{{ route }}{{ separator }}_step={{ step.index }}"
+                           hx-target="#{{ containerId }}"
+                           hx-swap="innerHTML"
+                           class="cursor-pointer {{ step.has_errors ? 'text-error' : '' }}">
+                            {{ step.label }}
+                        </a>
+                    {% else %}
+                        <span class="{{ step.is_current ? 'font-bold' : '' }} {{ step.has_errors ? 'text-error' : '' }}">
+                            {{ step.label }}
+                        </span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}
+
+{# ============================================= #}
+{# Full Wizard Container                         #}
+{# ============================================= #}
+{% macro container(form, route, content, options) %}
+    {% set options = options|default({}) %}
+    {% set containerId = options.containerId|default('wizard-container') %}
+    {% set containerClass = options.containerClass|default('') %}
+    {% set showProgress = options.showProgress|default(false) %}
+    {% set showTabs = options.showTabs|default(true) %}
+    {% set showNavigation = options.showNavigation|default(true) %}
+
+    <div id="{{ containerId }}" class="{{ containerClass }}">
+        {% if showProgress %}
+            {{ _self.progress(form, options) }}
+        {% endif %}
+
+        {% if showTabs %}
+            {{ _self.tabs(form, route, options) }}
+        {% endif %}
+
+        <div id="wizard-content">
+            {{ content|raw }}
+        </div>
+
+        {% if showNavigation %}
+            {{ _self.navigation(form, options) }}
+        {% endif %}
+    </div>
+{% endmacro %}

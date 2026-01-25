@@ -67,6 +67,7 @@
                 <li><a href="{{ path('app_simple_page') }}" class="btn btn-sm {{ app.request.attributes.get('_route') == 'app_simple_page' ? 'btn-primary' : 'btn-ghost' }}">Simple Page</a></li>
                 <li><a href="{{ path('app_form') }}" class="btn btn-sm {{ app.request.attributes.get('_route') == 'app_form' ? 'btn-primary' : 'btn-ghost' }}">Simple Form</a></li>
                 <li><a href="{{ path('app_advanced_form') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_advanced_form' ? 'btn-primary' : 'btn-ghost' }}">Advanced Form</a></li>
+                <li><a href="{{ path('app_wizard') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_wizard' ? 'btn-primary' : 'btn-ghost' }}">Wizard Form</a></li>
                 <li><a href="{{ path('app_infinite_scroll') }}" class="btn btn-sm {{ app.request.attributes.get('_route') == 'app_infinite_scroll' ? 'btn-primary' : 'btn-ghost' }}">Infinite Scroll</a></li>
                 <li><a href="{{ path('app_click_to_edit') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_click_to_edit' ? 'btn-primary' : 'btn-ghost' }}">Click to Edit</a></li>
                 <li><a href="{{ path('app_polling') }}" class="btn btn-sm {{ app.request.attributes.get('_route') starts with 'app_polling' ? 'btn-primary' : 'btn-ghost' }}">Live Polling</a></li>

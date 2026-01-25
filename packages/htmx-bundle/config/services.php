@@ -7,6 +7,10 @@ use Mdxpl\HtmxBundle\EventSubscriber\HtmxResponseSubscriber;
 use Mdxpl\HtmxBundle\Form\Extension\CascadingTypeExtension;
 use Mdxpl\HtmxBundle\Form\Extension\ConditionalTypeExtension;
 use Mdxpl\HtmxBundle\Form\Extension\HtmxTypeExtension;
+use Mdxpl\HtmxBundle\Form\Extension\WizardTypeExtension;
+use Mdxpl\HtmxBundle\Form\Wizard\Storage\SessionWizardStorage;
+use Mdxpl\HtmxBundle\Form\Wizard\Storage\WizardStorageInterface;
+use Mdxpl\HtmxBundle\Form\Wizard\WizardHelper;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilderFactory;
 use Mdxpl\HtmxBundle\Response\ResponseFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -53,5 +57,23 @@ return static function (ContainerConfigurator $container): void {
             '%mdx_htmx.htmx_only.status_code%',
             '%mdx_htmx.htmx_only.message%',
         ])
-        ->tag('kernel.event_subscriber');
+        ->tag('kernel.event_subscriber')
+
+        // Wizard Form Extension
+        ->set(WizardTypeExtension::class)
+            ->tag('form.type_extension')
+
+        // Wizard Storage
+        ->set(SessionWizardStorage::class)
+            ->args([new Reference('request_stack')])
+
+        ->alias(WizardStorageInterface::class, SessionWizardStorage::class)
+
+        // Wizard Helper
+        ->set(WizardHelper::class)
+            ->args([
+                new Reference(WizardStorageInterface::class),
+                new Reference('validator'),
+            ])
+            ->public();
 };
