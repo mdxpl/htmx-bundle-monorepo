@@ -33,7 +33,7 @@ final class FormController extends AbstractController
 {
     public function __invoke(HtmxRequest $htmx, Request $request): HtmxResponse
     {
-        $form = $this->createForm();
+        $form = $this->createRegistrationForm();
         $form->handleRequest($request);
 
         $template = 'form.html.twig';
@@ -69,7 +69,7 @@ final class FormController extends AbstractController
     /**
      * @return FormInterface<array<string, mixed>>
      */
-    private function createForm(): FormInterface
+    private function createRegistrationForm(): FormInterface
     {
         return $this->createFormBuilder()
             ->add('name', TextType::class, [

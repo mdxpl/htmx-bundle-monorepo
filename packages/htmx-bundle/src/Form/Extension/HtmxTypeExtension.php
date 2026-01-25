@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mdxpl\HtmxBundle\Form\Extension;
 
+use LogicException;
 use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
 use Mdxpl\HtmxBundle\Form\Htmx\Route;
 use Symfony\Component\Form\AbstractTypeExtension;
@@ -149,7 +150,7 @@ final class HtmxTypeExtension extends AbstractTypeExtension
 
         // Auto-add config-request handler for {value} placeholder resolution
         if ($hasValuePlaceholder && !isset($attrs['hx-on::config-request'])) {
-            $attrs['hx-on::config-request'] = sprintf(
+            $attrs['hx-on::config-request'] = \sprintf(
                 "event.detail.path = event.detail.path.replace('%s', encodeURIComponent(this.value))",
                 Route::PLACEHOLDER_VALUE,
             );
@@ -196,7 +197,7 @@ final class HtmxTypeExtension extends AbstractTypeExtension
         // Handle Route objects - resolve placeholders and generate URL
         if ($value instanceof Route) {
             if ($this->urlGenerator === null) {
-                throw new \LogicException(
+                throw new LogicException(
                     'Cannot use route references in htmx options without UrlGeneratorInterface. '
                     . 'Make sure the router service is available.',
                 );

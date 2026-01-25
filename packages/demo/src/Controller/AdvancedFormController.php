@@ -169,8 +169,8 @@ final class AdvancedFormController extends AbstractController
     #[HtmxOnly]
     public function cities(HtmxRequest $htmx, ?string $country = null): HtmxResponse
     {
-        $cities = $country ? (self::LOCATIONS[$country]['cities'] ?? []) : [];
-        $isEmpty = empty($cities);
+        $cities = $country !== null ? (self::LOCATIONS[$country]['cities'] ?? []) : [];
+        $isEmpty = $cities === [];
 
         // Create a standalone form with just the city field
         $cityForm = $this->createFormBuilder(options: ['csrf_protection' => false])
@@ -324,8 +324,8 @@ final class AdvancedFormController extends AbstractController
 
         // Add city field dynamically based on country selection
         $addCityField = function (FormInterface $form, ?string $countryCode): void {
-            $cities = $countryCode ? (self::LOCATIONS[$countryCode]['cities'] ?? []) : [];
-            $isEmpty = empty($cities);
+            $cities = $countryCode !== null ? (self::LOCATIONS[$countryCode]['cities'] ?? []) : [];
+            $isEmpty = $cities === [];
 
             $form->add('city', ChoiceType::class, [
                 'label' => 'City',
@@ -448,21 +448,5 @@ final class AdvancedFormController extends AbstractController
             ],
             default => [],
         };
-    }
-
-
-    /**
-     * @return array<string, string>
-     */
-    private function getAllCities(): array
-    {
-        $cities = ['' => ''];
-        foreach (self::LOCATIONS as $country) {
-            foreach ($country['cities'] as $code => $name) {
-                $cities[$name] = $code;
-            }
-        }
-
-        return $cities;
     }
 }

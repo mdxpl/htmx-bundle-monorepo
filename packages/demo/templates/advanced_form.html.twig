@@ -140,40 +140,42 @@
     <div class="space-y-6">
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
-                <h2 class="card-title">HtmxTypeExtension Usage</h2>
-                <p class="text-sm text-base-content/70 mb-4">Add htmx attributes to any form field using the <code class="badge badge-ghost badge-sm">htmx</code> option:</p>
+                <h2 class="card-title">HtmxOptions Builder</h2>
+                <p class="text-sm text-base-content/70 mb-4">Use fluent builder API with <code class="badge badge-ghost badge-sm">HtmxOptions</code>:</p>
 
                 <div class="mockup-code text-xs">
-                    <pre><code class="language-php">$builder->add('search', TextType::class, [
-    'htmx' => [
-        'get' => '/search',
-        'trigger' => 'keyup changed delay:300ms',
-        'target' => '#results',
-        'indicator' => '#spinner',
-    ],
+                    <pre><code class="language-php">use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
+use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
+
+$builder->add('search', TextType::class, [
+    'htmx' => HtmxOptions::create()
+        ->getRoute('app_search')
+        ->trigger(Trigger::keyup()->changed()->delay(300))
+        ->target('#results')
+        ->indicator('#spinner'),
 ]);</code></pre>
                 </div>
 
-                <h3 class="font-semibold mt-4 mb-2">Supported Options</h3>
+                <h3 class="font-semibold mt-4 mb-2">Available Methods</h3>
                 <div class="overflow-x-auto">
                     <table class="table table-xs">
                         <thead>
                             <tr>
-                                <th>Option</th>
+                                <th>Method</th>
                                 <th>Attribute</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>get</td><td>hx-get</td></tr>
-                            <tr><td>post</td><td>hx-post</td></tr>
-                            <tr><td>trigger</td><td>hx-trigger</td></tr>
-                            <tr><td>target</td><td>hx-target</td></tr>
-                            <tr><td>swap</td><td>hx-swap</td></tr>
-                            <tr><td>indicator</td><td>hx-indicator</td></tr>
-                            <tr><td>include</td><td>hx-include</td></tr>
-                            <tr><td>vals</td><td>hx-vals</td></tr>
-                            <tr><td>confirm</td><td>hx-confirm</td></tr>
-                            <tr><td>on::{event}</td><td>hx-on::{event}</td></tr>
+                            <tr><td>get() / getRoute()</td><td>hx-get</td></tr>
+                            <tr><td>post() / postRoute()</td><td>hx-post</td></tr>
+                            <tr><td>trigger()</td><td>hx-trigger</td></tr>
+                            <tr><td>target()</td><td>hx-target</td></tr>
+                            <tr><td>swap()</td><td>hx-swap</td></tr>
+                            <tr><td>indicator()</td><td>hx-indicator</td></tr>
+                            <tr><td>include()</td><td>hx-include</td></tr>
+                            <tr><td>vals()</td><td>hx-vals</td></tr>
+                            <tr><td>confirm()</td><td>hx-confirm</td></tr>
+                            <tr><td>onBeforeRequest()</td><td>hx-on::before-request</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -182,15 +184,42 @@
 
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
-                <h2 class="card-title">Event Handlers</h2>
-                <p class="text-sm text-base-content/70 mb-4">Use <code class="badge badge-ghost badge-sm">on::{event}</code> for htmx event handlers:</p>
+                <h2 class="card-title">Trigger Builder</h2>
+                <p class="text-sm text-base-content/70 mb-4">Build complex triggers with <code class="badge badge-ghost badge-sm">Trigger</code> class:</p>
 
                 <div class="mockup-code text-xs">
-                    <pre><code class="language-php">'htmx' => [
-    'get' => '/cities/__VALUE__',
-    'on::config-request' => "event.detail.path =
-        event.detail.path.replace('__VALUE__', this.value)",
-]</code></pre>
+                    <pre><code class="language-php">use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
+
+// keyup changed delay:300ms
+Trigger::keyup()->changed()->delay(300)
+
+// blur changed delay:500ms
+Trigger::blur()->changed()->delay(500)
+
+// change (for selects)
+Trigger::change()
+
+// keyup[target.value.length >= 2]
+Trigger::keyup()->condition('target.value.length >= 2')</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Route with Placeholders</h2>
+                <p class="text-sm text-base-content/70 mb-4">Use placeholders for dynamic field values:</p>
+
+                <div class="mockup-code text-xs">
+                    <pre><code class="language-php">// Server-side: {name}, {id}, {full_name}
+HtmxOptions::create()
+    ->postRoute('app_validate', ['field' => '{name}'])
+    ->target('#{id}-validation')
+
+// Client-side: {value} (auto-generates JS)
+HtmxOptions::create()
+    ->getRoute('app_cities', ['country' => '{value}'])
+    ->trigger(Trigger::change())</code></pre>
                 </div>
             </div>
         </div>
@@ -198,12 +227,15 @@
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
                 <h2 class="card-title">Conditional Fields</h2>
-                <p class="text-sm text-base-content/70 mb-4">Use <code class="badge badge-ghost badge-sm">conditional</code> to show/hide fields based on another field's value:</p>
+                <p class="text-sm text-base-content/70 mb-4">Use <code class="badge badge-ghost badge-sm">conditional</code> to show/hide fields:</p>
 
                 <div class="mockup-code text-xs">
                     <pre><code class="language-php">$builder
     ->add('accountType', ChoiceType::class, [
-        'choices' => ['Personal' => 'personal', 'Business' => 'business'],
+        'choices' => [
+            'Personal' => 'personal',
+            'Business' => 'business',
+        ],
         'expanded' => true,
     ])
     ->add('business', BusinessFieldsType::class, [
