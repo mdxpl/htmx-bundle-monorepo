@@ -9,6 +9,7 @@ use Twig\TwigFunction;
 
 final class ViteExtension extends AbstractExtension
 {
+    /** @var array<string, array{file?: string, css?: list<string>}>|null */
     private ?array $manifest = null;
 
     public function __construct(
@@ -37,8 +38,8 @@ final class ViteExtension extends AbstractExtension
         if (isset($entryData['css'])) {
             foreach ($entryData['css'] as $cssFile) {
                 $href = '/build/' . $cssFile;
-                $tags[] = sprintf('<link rel="preload" href="%s" as="style">', $href);
-                $tags[] = sprintf('<link rel="stylesheet" href="%s">', $href);
+                $tags[] = \sprintf('<link rel="preload" href="%s" as="style">', $href);
+                $tags[] = \sprintf('<link rel="stylesheet" href="%s">', $href);
             }
         }
 
@@ -61,12 +62,13 @@ final class ViteExtension extends AbstractExtension
 
         $src = '/build/' . $file;
         $tags = [];
-        $tags[] = sprintf('<link rel="modulepreload" href="%s">', $src);
-        $tags[] = sprintf('<script type="module" src="%s"></script>', $src);
+        $tags[] = \sprintf('<link rel="modulepreload" href="%s">', $src);
+        $tags[] = \sprintf('<script type="module" src="%s"></script>', $src);
 
         return implode("\n", $tags);
     }
 
+    /** @return array{file?: string, css?: list<string>}|null */
     private function getEntry(string $entry): ?array
     {
         $manifest = $this->getManifest();
@@ -85,6 +87,7 @@ final class ViteExtension extends AbstractExtension
         return null;
     }
 
+    /** @return array<string, array{file?: string, css?: list<string>}> */
     private function getManifest(): array
     {
         if ($this->manifest !== null) {
@@ -98,6 +101,10 @@ final class ViteExtension extends AbstractExtension
         }
 
         $content = file_get_contents($manifestPath);
+
+        if ($content === false) {
+            return $this->manifest = [];
+        }
 
         return $this->manifest = json_decode($content, true) ?? [];
     }
