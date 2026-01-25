@@ -103,6 +103,52 @@ Read the documentation at:
     }
 ```
 
+### Form Extensions
+
+> Add htmx attributes to any form field using the `htmx` option via HtmxTypeExtension.
+
+```php
+$builder->add('search', TextType::class, [
+    'htmx' => [
+        'get' => '/search',
+        'trigger' => 'keyup changed delay:300ms',
+        'target' => '#results',
+    ],
+]);
+```
+
+> Create cascading (dependent) selects with CascadingTypeExtension.
+
+```php
+$builder
+    ->add('country', ChoiceType::class, [
+        'cascading' => [
+            'target' => 'city',
+            'endpoint' => '/cities/{value}',
+        ],
+    ])
+    ->add('city', ChoiceType::class);
+```
+
+### Form Themes
+
+> Use DaisyUI form themes for beautifully styled forms with minimal configuration.
+
+```yaml
+# config/packages/twig.yaml
+twig:
+    form_themes:
+        - '@MdxplHtmx/Form/daisyui_htmx_layout.html.twig'
+```
+
+```twig
+{# Just use form_row and get styled forms with loading indicators #}
+{{ form_start(form) }}
+    {{ form_row(form.email) }}
+    {{ form_row(form.submit) }}
+{{ form_end(form) }}
+```
+
 ### Attributes
 
 > Thanks to the `#[HtmxOnly]` attribute, you can limit the endpoint to requests coming from htmx.
@@ -122,6 +168,8 @@ The source code is fully documented with PHPDoc including examples and links to 
 
 - **[HtmxRequest](src/Request/HtmxRequest.php)** - All htmx request headers (`isHtmx`, `isBoosted`, `currentUrl`, `target`, `trigger`, `prompt`, etc.)
 - **[HtmxResponseBuilder](src/Response/HtmxResponseBuilder.php)** - Fluent builder with all response methods (`success()`, `failure()`, `view()`, `trigger()`, `redirect()`, `pushUrl()`, `retarget()`, `withReswap()`, etc.)
+- **[Form Extensions](docs/form-extensions.md)** - HtmxTypeExtension, CascadingTypeExtension, ConditionalTypeExtension
+- **[Form Themes](docs/form-themes.md)** - DaisyUI form themes with htmx support
 
 ### Demo project and code examples
 

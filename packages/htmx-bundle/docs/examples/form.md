@@ -153,3 +153,41 @@ When the request comes from htmx, it will automatically return a specific block 
 ```
 
 ### Step 4: That's it! You're ready to go!
+
+---
+
+## Recommended: Use Form Themes
+
+For a better developer experience, use the bundled DaisyUI form themes:
+
+```yaml
+# config/packages/twig.yaml
+twig:
+    form_themes:
+        - '@MdxplHtmx/Form/daisyui_htmx_layout.html.twig'
+```
+
+This gives you:
+- Styled forms with DaisyUI classes
+- Automatic loading indicators for htmx fields
+- Validation containers for inline validation
+- Cascading select wrappers
+
+See **[Form Themes](../form-themes.md)** for full documentation.
+
+## Add htmx to Form Fields
+
+Use the `htmx` option on any field for live search, inline validation, etc.:
+
+```php
+$builder->add('email', EmailType::class, [
+    'htmx' => [
+        'post' => '/validate/email',
+        'trigger' => 'blur changed delay:500ms',
+        'target' => '#form_email-validation',
+        'swap' => 'innerHTML',
+    ],
+]);
+```
+
+See **[Form Extensions](../form-extensions.md)** for full documentation.

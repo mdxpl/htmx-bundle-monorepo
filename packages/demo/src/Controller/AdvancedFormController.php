@@ -14,6 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -119,6 +121,7 @@ final class AdvancedFormController extends AbstractController
 
             return $builder
                 ->failure()
+                ->triggerAfterSwap(['scrollTo' => '#form-error'])
                 ->viewBlock($template, 'formContent', $viewData)
                 ->build();
         }
@@ -159,15 +162,28 @@ final class AdvancedFormController extends AbstractController
             ->build();
     }
 
-    #[Route('/cities/{country}', name: 'app_advanced_form_cities', methods: ['GET'])]
+    #[Route('/cities/{country?}', name: 'app_advanced_form_cities', methods: ['GET'])]
     #[HtmxOnly]
-    public function cities(HtmxRequest $htmx, string $country): HtmxResponse
+    public function cities(HtmxRequest $htmx, ?string $country = null): HtmxResponse
     {
-        $cities = self::LOCATIONS[$country]['cities'] ?? [];
+        $cities = $country ? (self::LOCATIONS[$country]['cities'] ?? []) : [];
+        $isEmpty = empty($cities);
+
+        // Create a standalone form with just the city field
+        $cityForm = $this->createFormBuilder(options: ['csrf_protection' => false])
+            ->add('city', ChoiceType::class, [
+                'label' => 'City',
+                'placeholder' => $isEmpty ? 'Select a country first...' : 'Select a city...',
+                'choices' => $isEmpty ? [] : array_flip($cities),
+                'disabled' => $isEmpty,
+            ])
+            ->getForm();
 
         return HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
-            ->viewBlock('advanced_form.html.twig', 'citySelect', ['cities' => $cities])
+            ->viewBlock('advanced_form.html.twig', 'citySelect', [
+                'cityField' => $cityForm->get('city')->createView(),
+            ])
             ->build();
     }
 
@@ -265,7 +281,7 @@ final class AdvancedFormController extends AbstractController
             array_keys(self::LOCATIONS),
         );
 
-        return $this->createFormBuilder(options: [
+        $builder = $this->createFormBuilder(options: [
                 'csrf_protection' => false,
             ])
             // Live Search field
@@ -291,27 +307,50 @@ final class AdvancedFormController extends AbstractController
                     'on::before-request' => 'document.querySelector("#user-results").innerHTML = ""',
                 ],
             ])
-            // Cascading Selects
+            // Cascading Selects - uses CascadingTypeExtension
             ->add('country', ChoiceType::class, [
                 'label' => 'Country',
                 'choices' => array_merge(['' => ''], $countries),
                 'constraints' => [
                     new NotBlank(message: 'Please select a country'),
                 ],
-                'htmx' => [
-                    'get' => '/advanced-form/cities/__VALUE__',
-                    'trigger' => 'change',
-                    'target' => '#city-select-wrapper',
-                    'on::config-request' => "event.detail.path = event.detail.path.replace('__VALUE__', this.value)",
+                'cascading' => [
+                    'target' => 'city',
+                    'endpoint' => '/advanced-form/cities/{value}',
                 ],
-            ])
-            ->add('city', ChoiceType::class, [
+            ]);
+
+        // Add city field dynamically based on country selection
+        $addCityField = function (FormInterface $form, ?string $countryCode): void {
+            $cities = $countryCode ? (self::LOCATIONS[$countryCode]['cities'] ?? []) : [];
+            $isEmpty = empty($cities);
+
+            $form->add('city', ChoiceType::class, [
                 'label' => 'City',
-                'choices' => $this->getAllCities(),
+                'placeholder' => $isEmpty ? 'Select a country first...' : 'Select a city...',
+                'choices' => $isEmpty ? [] : array_flip($cities),
+                'disabled' => $isEmpty,
                 'constraints' => [
                     new NotBlank(message: 'Please select a city'),
                 ],
-            ])
+            ]);
+        };
+
+        // Set initial city field
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($addCityField): void {
+            $data = $event->getData();
+            $countryCode = \is_array($data) ? ($data['country'] ?? null) : null;
+            $addCityField($event->getForm(), $countryCode);
+        });
+
+        // Update city field when form is submitted
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($addCityField): void {
+            $data = $event->getData();
+            $countryCode = \is_array($data) ? ($data['country'] ?? null) : null;
+            $addCityField($event->getForm(), $countryCode);
+        });
+
+        $builder
             // Email with inline validation
             ->add('email', EmailType::class, [
                 'label' => 'Email',
@@ -324,7 +363,7 @@ final class AdvancedFormController extends AbstractController
                 'htmx' => [
                     'post' => '/advanced-form/validate/email',
                     'trigger' => 'blur changed delay:500ms',
-                    'target' => '#email-validation',
+                    'target' => '#form_email-validation',
                     'swap' => 'innerHTML',
                 ],
             ])
@@ -341,7 +380,7 @@ final class AdvancedFormController extends AbstractController
                 'htmx' => [
                     'post' => '/advanced-form/validate/username',
                     'trigger' => 'blur changed delay:500ms',
-                    'target' => '#username-validation',
+                    'target' => '#form_username-validation',
                     'swap' => 'innerHTML',
                 ],
             ])
@@ -366,9 +405,9 @@ final class AdvancedFormController extends AbstractController
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Submit Form',
-                'attr' => ['class' => 'btn btn-primary'],
-            ])
-            ->getForm();
+            ]);
+
+        return $builder->getForm();
     }
 
     /**

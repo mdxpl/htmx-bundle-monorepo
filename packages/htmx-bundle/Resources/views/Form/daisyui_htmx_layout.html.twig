@@ -1,0 +1,111 @@
+{% use "@MdxplHtmx/Form/daisyui_layout.html.twig" %}
+
+{#
+ # DaisyUI + htmx Form Theme for Symfony Forms
+ #
+ # Extends the pure DaisyUI theme with htmx-specific features:
+ # - Loading indicators with htmx-indicator
+ # - Validation containers for inline validation
+ # - Conditional field wrappers
+ #
+ # Usage in twig.yaml:
+ #   twig:
+ #     form_themes: ['@MdxplHtmx/Form/daisyui_htmx_layout.html.twig']
+ #}
+
+{# ============================================= #}
+{# Form Row with htmx loading indicator          #}
+{# ============================================= #}
+{% block form_row %}
+{% apply spaceless %}
+    {% set hasHtmx = attr.get is defined or attr['hx-get'] is defined or attr['hx-post'] is defined or attr.post is defined %}
+    {% set hasCascadingWrapper = cascading is defined and cascading.wrapper_id is defined %}
+
+    {# Cascading wrapper for fields that are targets of cascading selects #}
+    {% if hasCascadingWrapper %}<div id="{{ cascading.wrapper_id }}">{% endif %}
+
+    <div class="form-control w-full{% if not valid %} has-error{% endif %}">
+        <div class="flex items-center justify-between">
+            {{- form_label(form) -}}
+            {% if hasHtmx %}
+                <span class="htmx-indicator">
+                    <span class="loading loading-spinner loading-xs"></span>
+                </span>
+            {% endif %}
+        </div>
+        {{- form_widget(form) -}}
+        {{- form_help(form) -}}
+        {# Validation container for htmx inline validation #}
+        <div id="{{ id }}-validation">
+            {{- form_errors(form) -}}
+        </div>
+    </div>
+
+    {% if hasCascadingWrapper %}</div>{% endif %}
+{% endapply %}
+{% endblock form_row %}
+
+{# ============================================= #}
+{# Checkbox Row with htmx support                #}
+{# ============================================= #}
+{% block checkbox_row %}
+{% apply spaceless %}
+    <div class="form-control">
+        <label class="label cursor-pointer justify-start gap-3">
+            {{- form_widget(form) -}}
+            <span class="label-text">{{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) : '' }}</span>
+        </label>
+        {{- form_help(form) -}}
+        <div id="{{ id }}-validation">
+            {{- form_errors(form) -}}
+        </div>
+    </div>
+{% endapply %}
+{% endblock checkbox_row %}
+
+{# ============================================= #}
+{# Expanded Choice Row with conditional support  #}
+{# ============================================= #}
+{% block choice_widget_expanded %}
+{% apply spaceless %}
+    {% set wrapperAttr = '' %}
+    {% if id is defined %}
+        {% set wrapperAttr = ' id="' ~ id ~ '"' %}
+    {% endif %}
+    <div{{ wrapperAttr|raw }} class="flex flex-wrap gap-4">
+        {% for child in form %}
+            {{- form_row(child) -}}
+        {% endfor %}
+    </div>
+{% endapply %}
+{% endblock choice_widget_expanded %}
+
+{# ============================================= #}
+{# Compound Form Row (for nested types)          #}
+{# with conditional field wrapper support        #}
+{# ============================================= #}
+{% block form_widget_compound %}
+{% apply spaceless %}
+    {% if conditional is defined and conditional.wrapper_id is defined %}
+        <div id="{{ conditional.wrapper_id }}">
+            {{ parent() }}
+        </div>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endapply %}
+{% endblock form_widget_compound %}
+
+{# ============================================= #}
+{# Submit Button with loading indicator          #}
+{# ============================================= #}
+{% block submit_widget %}
+{% apply spaceless %}
+    <span class="inline-flex items-center gap-2">
+        {{- parent() -}}
+        <span class="htmx-indicator">
+            <span class="loading loading-spinner loading-sm"></span>
+        </span>
+    </span>
+{% endapply %}
+{% endblock submit_widget %}
