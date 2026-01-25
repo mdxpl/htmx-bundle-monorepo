@@ -1,0 +1,404 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Multi-Step Wizard - htmx-bundle Demo{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* Wizard content transitions */
+    @keyframes wizard-fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes wizard-fade-out {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+    }
+
+    .wizard-content-animate {
+        animation: wizard-fade-in 0.3s ease-out forwards;
+    }
+
+    /* htmx swapping classes */
+    .htmx-swapping #wizard-content {
+        animation: wizard-fade-out 0.15s ease-in forwards;
+    }
+
+    /* Tab transition */
+    .tabs .tab {
+        transition: all 0.2s ease-out;
+    }
+
+    .tabs .tab:hover:not(.tab-active) {
+        transform: translateY(-2px);
+    }
+
+    /* Success animation */
+    @keyframes success-bounce {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .success-animate {
+        animation: success-bounce 0.5s ease-out;
+    }
+
+    /* Checkmark draw animation */
+    @keyframes checkmark-circle {
+        0% { stroke-dashoffset: 166; }
+        100% { stroke-dashoffset: 0; }
+    }
+
+    @keyframes checkmark-check {
+        0% { stroke-dashoffset: 50; }
+        100% { stroke-dashoffset: 0; }
+    }
+
+    .checkmark-animated circle {
+        stroke-dasharray: 166;
+        stroke-dashoffset: 166;
+        animation: checkmark-circle 0.6s ease-out forwards;
+    }
+
+    .checkmark-animated path {
+        stroke-dasharray: 50;
+        stroke-dashoffset: 50;
+        animation: checkmark-check 0.3s 0.4s ease-out forwards;
+    }
+
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2">Multi-Step Wizard Form</h1>
+        <p class="text-base-content/70">
+            A session-based multi-step form with schema versioning, validation per step, and error indicators on tabs.
+        </p>
+    </div>
+
+    {{ block('wizard') }}
+</div>
+{% endblock %}
+
+{% block wizard %}
+{% import "@MdxplHtmx/Form/wizard_tabs.html.twig" as wizardMacros %}
+{% set navStrategy = current_navigation_strategy.value|default('free') %}
+
+<div id="wizard-container">
+    {# Controls section #}
+    {% set currentStepNameForUrl = wizard_current_step.name|default('account') %}
+    <div class="mb-4 px-2 flex flex-wrap justify-between items-center gap-2">
+        <div class="flex items-center gap-2">
+            <span class="text-sm text-base-content/70">Navigation:</span>
+            <select class="select select-bordered select-sm"
+                    hx-get="{{ path('app_wizard_step', {step: currentStepNameForUrl}) }}"
+                    hx-target="#wizard-container"
+                    hx-swap="innerHTML swap:150ms"
+                    hx-push-url="true"
+                    name="_nav">
+                {% for strategy in navigation_strategies|default([]) %}
+                    <option value="{{ strategy.value }}" {{ navStrategy == strategy.value ? 'selected' : '' }}>
+                        {{ strategy.label }}
+                    </option>
+                {% endfor %}
+            </select>
+            <span class="text-xs text-base-content/50">
+                {% if navStrategy == 'free' %}
+                    — jump to any step freely
+                {% elseif navStrategy == 'sequential' %}
+                    — one step at a time only
+                {% else %}
+                    — complete before moving forward
+                {% endif %}
+            </span>
+        </div>
+        <button type="button"
+                hx-post="{{ path('app_wizard_reset') }}"
+                hx-target="#wizard-container"
+                hx-swap="innerHTML swap:150ms"
+                hx-confirm="Are you sure you want to reset the wizard? All data will be lost."
+                class="btn btn-ghost btn-sm text-error">
+            Reset
+        </button>
+    </div>
+
+    {# Wizard form card #}
+    <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+        {# Build URL params for tabs and form #}
+        {% set urlParams = {} %}
+        {% if navStrategy != 'free' %}
+            {% set urlParams = urlParams|merge({_nav: navStrategy}) %}
+        {% endif %}
+
+        {# Wizard Tabs - using step-based URLs #}
+        {% if form.vars.wizard is defined %}
+            {% set wizard = form.vars.wizard %}
+            <div class="flex items-center justify-between mb-6">
+                <div id="wizard-tabs" class="tabs tabs-bordered tabs-lg">
+                    {% for step in wizard.steps %}
+                        <a class="tab {{ step.is_current ? 'tab-active' : '' }} {{ step.has_errors ? 'text-error' : (step.is_completed ? 'text-success' : '') }}"
+                           {% if step.can_navigate and not step.is_current %}
+                               hx-get="{{ path('app_wizard_step', {step: step.name}|merge(urlParams)) }}"
+                               hx-target="#wizard-container"
+                               hx-swap="innerHTML swap:150ms"
+                               hx-push-url="true"
+                           {% endif %}>
+                            {% if step.has_errors %}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            {% elseif step.is_completed %}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                            {% endif %}
+                            {{ step.label }}
+                        </a>
+                    {% endfor %}
+                </div>
+                <span class="text-sm text-base-content/60">
+                    Step {{ wizard.current_step + 1 }} of {{ wizard.steps|length }}
+                </span>
+            </div>
+        {% endif %}
+
+        {# Form with current step content #}
+        {% set currentStepName = form.vars.wizard.steps[form.vars.wizard.current_step].name|default('account') %}
+        {{ form_start(form, {
+            attr: {
+                'hx-post': path('app_wizard_step', {step: currentStepName}|merge(urlParams)),
+                'hx-target': '#wizard-container',
+                'hx-swap': 'innerHTML swap:150ms',
+                'novalidate': 'novalidate'
+            }
+        }) }}
+
+        {# Hidden field to ensure form is always submitted #}
+        {{ form_widget(form._submitted) }}
+
+        <div id="wizard-content" class="min-h-[300px] wizard-content-animate">
+            {% if form.vars.wizard is defined %}
+                {% set currentStepName = form.vars.wizard.steps[form.vars.wizard.current_step].name %}
+
+                {% if currentStepName == 'account' %}
+                    {{ block('step_account') }}
+                {% elseif currentStepName == 'profile' %}
+                    {{ block('step_profile') }}
+                {% elseif currentStepName == 'preferences' %}
+                    {{ block('step_preferences') }}
+                {% elseif currentStepName == 'confirmation' %}
+                    {{ block('step_confirmation') }}
+                {% endif %}
+            {% endif %}
+        </div>
+
+        {# Navigation buttons #}
+        {{ wizardMacros.navigation(form, {
+            backLabel: 'Previous',
+            nextLabel: 'Continue',
+            submitLabel: 'Complete Registration',
+            containerClass: 'flex justify-between mt-8 pt-4 border-t border-base-300',
+            backClass: 'btn btn-ghost',
+            nextClass: 'btn btn-primary',
+            submitClass: 'btn btn-success'
+        }) }}
+
+        {{ form_end(form, {render_rest: false}) }}
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block step_account %}
+<div class="space-y-4">
+    <h2 class="text-xl font-semibold mb-4">Create Your Account</h2>
+    <p class="text-base-content/70 mb-6">
+        Enter your email and create a secure password.
+    </p>
+
+    <div class="grid gap-4">
+        {{ form_row(form.account.email) }}
+
+        <div class="grid md:grid-cols-2 gap-4">
+            {{ form_row(form.account.password) }}
+            {{ form_row(form.account.confirmPassword) }}
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-6">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>Your password should be at least 8 characters long.</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block step_profile %}
+<div class="space-y-4">
+    <h2 class="text-xl font-semibold mb-4">Tell Us About Yourself</h2>
+    <p class="text-base-content/70 mb-6">
+        Help us personalize your experience.
+    </p>
+
+    <div class="grid gap-4">
+        <div class="grid md:grid-cols-2 gap-4">
+            {{ form_row(form.profile.firstName) }}
+            {{ form_row(form.profile.lastName) }}
+        </div>
+
+        {{ form_row(form.profile.bio) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block step_preferences %}
+<div class="space-y-4">
+    <h2 class="text-xl font-semibold mb-4">Set Your Preferences</h2>
+    <p class="text-base-content/70 mb-6">
+        Customize how you want to use the application.
+    </p>
+
+    <div class="grid gap-6">
+        <div class="form-control">
+            {{ form_row(form.preferences.newsletter) }}
+        </div>
+
+        <div class="divider">Appearance</div>
+
+        {{ form_row(form.preferences.theme) }}
+
+        <div class="divider">Notifications</div>
+
+        {{ form_row(form.preferences.notifications) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block step_confirmation %}
+<div class="space-y-4">
+    <h2 class="text-xl font-semibold mb-4">Review Your Information</h2>
+    <p class="text-base-content/70 mb-6">
+        Please review your registration details before completing.
+    </p>
+
+    {% set data = wizard_state.allData %}
+
+    <div class="bg-base-200 rounded-lg p-6">
+        <div class="grid gap-4">
+            <div>
+                <h3 class="font-semibold text-sm text-base-content/70 mb-2">Account</h3>
+                <dl class="grid grid-cols-[120px_1fr] gap-1 text-sm">
+                    <dt class="text-base-content/50">Email:</dt>
+                    <dd>{{ data.account.email|default('—') }}</dd>
+                </dl>
+            </div>
+
+            <div class="divider my-2"></div>
+
+            <div>
+                <h3 class="font-semibold text-sm text-base-content/70 mb-2">Profile</h3>
+                <dl class="grid grid-cols-[120px_1fr] gap-1 text-sm">
+                    <dt class="text-base-content/50">Name:</dt>
+                    <dd>{{ data.profile.firstName|default('—') }} {{ data.profile.lastName|default('') }}</dd>
+                    <dt class="text-base-content/50">Bio:</dt>
+                    <dd>{{ (data.profile.bio|default('—'))|slice(0, 100) }}{% if (data.profile.bio|default(''))|length > 100 %}...{% endif %}</dd>
+                </dl>
+            </div>
+
+            <div class="divider my-2"></div>
+
+            <div>
+                <h3 class="font-semibold text-sm text-base-content/70 mb-2">Preferences</h3>
+                <dl class="grid grid-cols-[120px_1fr] gap-1 text-sm">
+                    <dt class="text-base-content/50">Newsletter:</dt>
+                    <dd>{{ data.preferences.newsletter|default(false) ? 'Yes' : 'No' }}</dd>
+                    <dt class="text-base-content/50">Theme:</dt>
+                    <dd>{{ data.preferences.theme|default('system')|capitalize }}</dd>
+                    <dt class="text-base-content/50">Notifications:</dt>
+                    <dd>{{ (data.preferences.notifications|default('—'))|replace({'_': ' '})|capitalize }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider my-4"></div>
+
+    {{ form_row(form.confirmation.confirm) }}
+</div>
+{% endblock %}
+
+{% block success %}
+<div class="card bg-base-100 shadow-xl success-animate">
+    <div class="card-body text-center">
+        <div class="flex justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 text-success checkmark-animated" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" stroke-linecap="round" stroke-linejoin="round" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" />
+            </svg>
+        </div>
+
+        <h2 class="text-2xl font-bold text-success mb-4">Registration Complete!</h2>
+
+        <p class="text-base-content/70 mb-6">
+            Welcome, {{ data.profile.firstName|default('') }} {{ data.profile.lastName|default('') }}! Your account has been created successfully.
+        </p>
+
+        <div class="bg-base-200 rounded-lg p-6 mb-6 text-left">
+            <h3 class="font-semibold mb-4">Registration Summary:</h3>
+            <dl class="grid grid-cols-2 gap-2 text-sm">
+                <dt class="text-base-content/70">Email:</dt>
+                <dd>{{ data.account.email|default('—') }}</dd>
+
+                <dt class="text-base-content/70">Name:</dt>
+                <dd>{{ data.profile.firstName|default('—') }} {{ data.profile.lastName|default('') }}</dd>
+
+                {% if data.profile.bio|default('') %}
+                <dt class="text-base-content/70">Bio:</dt>
+                <dd>{{ data.profile.bio|slice(0, 50) }}{% if data.profile.bio|length > 50 %}...{% endif %}</dd>
+                {% endif %}
+
+                <dt class="text-base-content/70">Newsletter:</dt>
+                <dd>{{ data.preferences.newsletter|default(false) ? 'Subscribed' : 'Not subscribed' }}</dd>
+
+                <dt class="text-base-content/70">Theme:</dt>
+                <dd>{{ data.preferences.theme|default('system')|capitalize }}</dd>
+
+                <dt class="text-base-content/70">Notifications:</dt>
+                <dd>{{ data.preferences.notifications|default('none')|capitalize }}</dd>
+            </dl>
+        </div>
+
+        <div class="flex gap-4 justify-center">
+            <a href="{{ path('app_wizard') }}" class="btn btn-primary">
+                Start New Registration
+            </a>
+            <a href="{{ path('app_home') }}" class="btn btn-ghost">
+                Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block sourceCode %}
+{% include '_source_code.html.twig' with {
+    controller: 'WizardDemoController.php',
+    template: 'wizard_demo.html.twig'
+} %}
+{% endblock %}

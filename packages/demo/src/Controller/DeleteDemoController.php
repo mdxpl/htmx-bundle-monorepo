@@ -61,7 +61,7 @@ final class DeleteDemoController extends AbstractController
             ->viewBlock('delete_demo.html.twig', 'empty')
             ->viewBlock('delete_demo.html.twig', 'notificationOob', ['deletedName' => $deletedItem['name']]);
 
-        if (\count($items) === 0) {
+        if ($items === []) {
             $builder->viewBlock('delete_demo.html.twig', 'itemsListOob', ['items' => []]);
         }
 

@@ -11,27 +11,38 @@ We don't even need a single line of JavaScript!
 
 namespace App\Controller;
 
-use Mdxpl\HtmxBundle\Controller\HtmxControllerTrait;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
+use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class DemoController extends AbstractController
 {
+    private const PAGES = [
+        'home' => ['name' => 'Home', 'description' => 'This is the home page'],
+        'about' => ['name' => 'About', 'description' => 'This is the about page'],
+    ];
+
     #[Route('/simple-page/{slug}', name: 'app_demo_simple_page')]
-    public function index(HtmxRequest $request, string $slug = 'home'): Response
+    public function index(HtmxRequest $request, string $slug = 'home'): HtmxResponse
     {
-        $responseBuilder = HtmxResponseBuilder::create($request->isHtmx, 'demo/simple_page.html.twig')
-            
+        $page = self::PAGES[$slug] ?? throw $this->createNotFoundException('Page not found');
+
+        $builder = HtmxResponseBuilder::create($request->isHtmx);
+        $viewData = ['menu' => self::PAGES, 'page' => $page];
+
         if ($request->isHtmx) {
-            // 6. Specify the block to render for htmx requests, by default it's 'successComponent'
-            $responseBuilder->withBlock('pageContentPartial');
+            return $builder
+                ->success()
+                ->viewBlock('demo/simple_page.html.twig', 'pageContentPartial', $viewData)
+                ->build();
         }
 
-        // 7. Render the response
-        return $this->renderHtmx($responseBuilder);
+        return $builder
+            ->success()
+            ->view('demo/simple_page.html.twig', $viewData)
+            ->build();
     }
 }
 ```
