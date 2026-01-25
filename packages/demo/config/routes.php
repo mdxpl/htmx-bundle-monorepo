@@ -4,4 +4,11 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 return static function (RoutingConfigurator $routes): void {
     $routes->import('../src/Controller/', 'attribute');
+
+    if ($routes->env() === 'dev') {
+        $routes->import('@WebProfilerBundle/Resources/config/routing/wdt.php')
+            ->prefix('/_wdt');
+        $routes->import('@WebProfilerBundle/Resources/config/routing/profiler.php')
+            ->prefix('/_profiler');
+    }
 };

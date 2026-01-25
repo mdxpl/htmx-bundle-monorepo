@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Item List - htmx-bundle Demo{% endblock %}
+{% block csrf %}{{ htmx_csrf_meta() }}{% endblock %}
 
 {% block body %}
 <div class="mb-6">

@@ -125,6 +125,7 @@ final class AdvancedFormController extends AbstractController
             return $builder
                 ->failure()
                 ->viewBlock($template, 'formContent', $viewData)
+                ->triggerAfterSwap(['scrollTo' => '#form-error'])
                 ->build();
         }
 

@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Multi-Step Wizard - htmx-bundle Demo{% endblock %}
+{% block csrf %}{{ htmx_csrf_meta() }}{% endblock %}
 
 {% block stylesheets %}
 <style>
