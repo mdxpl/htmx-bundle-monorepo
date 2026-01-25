@@ -20,5 +20,6 @@ return static function (ContainerConfigurator $container): void {
         ->arg('$projectDir', '%kernel.project_dir%');
 
     $services->set(ViteExtension::class)
-        ->arg('$publicDir', '%kernel.project_dir%/public');
+        ->arg('$publicDir', '%kernel.project_dir%/public')
+        ->arg('$debug', '%kernel.debug%');
 };
