@@ -1,13 +1,9 @@
-FROM php:8.4-fpm-alpine AS base
+FROM dunglas/frankenphp:1-php8.4-alpine AS base
 
-RUN apk add --no-cache \
-    nginx \
-    supervisor \
-    && docker-php-ext-install opcache
+RUN install-php-extensions opcache intl
 
-COPY packages/demo/docker/nginx.conf /etc/nginx/nginx.conf
-COPY packages/demo/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY packages/demo/docker/php.ini /usr/local/etc/php/conf.d/custom.ini
+COPY packages/demo/docker/Caddyfile /etc/caddy/Caddyfile
 
 WORKDIR /app
 
@@ -28,8 +24,13 @@ COPY packages/demo/ .
 RUN composer dump-autoload --optimize --classmap-authoritative
 
 # Set permissions
-RUN chown -R www-data:www-data /app/var 2>/dev/null || mkdir -p /app/var && chown -R www-data:www-data /app/var
+RUN mkdir -p /app/var && chown -R www-data:www-data /app/var
+
+# Configure FrankenPHP with worker mode
+ENV SERVER_NAME=:80
+ENV APP_RUNTIME=Runtime\\FrankenPhpSymfony\\Runtime
+ENV FRANKENPHP_CONFIG="worker ./public/index.php 500"
 
 EXPOSE 80
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]

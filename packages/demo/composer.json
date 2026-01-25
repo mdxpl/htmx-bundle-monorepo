@@ -11,7 +11,13 @@
         "symfony/validator": "^7.4",
         "symfony/security-csrf": "^7.4",
         "symfony/runtime": "^7.4",
+        "runtime/frankenphp-symfony": "^0.2",
         "mdxpl/htmx-bundle": "@dev"
+    },
+    "require-dev": {
+        "symfony/web-profiler-bundle": "^8.0",
+        "symfony/debug-bundle": "^7.4",
+        "symfony/stopwatch": "^7.4"
     },
     "autoload": {
         "psr-4": {
