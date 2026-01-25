@@ -3,38 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block description %}Interactive demo of htmx-bundle for Symfony - forms, wizards, infinite scroll, live polling and more with htmx.{% endblock %}">
     <title>{% block title %}htmx-bundle Demo{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <script>
-        if (localStorage.getItem('htmx-debug') === 'true') {
-            htmx.logAll();
-        }
-    </script>
+    {{ vite_entry_link_tags('app') }}
     {% block csrf %}{% endblock %}
-    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <style>
-        .htmx-indicator {
-            display: none;
-        }
-        .htmx-request .htmx-indicator,
-        .htmx-request.htmx-indicator {
-            display: inline-flex;
-        }
-        pre[class*="language-"] {
-            margin: 0;
-            border-radius: 0 0 0.5rem 0.5rem;
-            max-height: 500px;
-            font-size: 0.85rem;
-        }
-        .code-tabs .tab-content {
-            display: none;
-        }
-        .code-tabs .tab-content.active {
-            display: block;
-        }
-    </style>
     {% block stylesheets %}{% endblock %}
 </head>
 <body class="min-h-screen bg-base-200">
@@ -82,78 +54,7 @@
         {% block sourceCode %}{% endblock %}
     </main>
 
-    <script>
-        // Handle 422 status for form validation errors
-        document.body.addEventListener('htmx:beforeOnLoad', function(evt) {
-            if (evt.detail.xhr.status === 422) {
-                evt.detail.shouldSwap = true;
-                evt.detail.isError = false;
-            }
-        });
-
-        // Scroll to element when triggered from server via HX-Trigger header
-        // Usage: ->trigger(['scrollTo' => '#form-error'])
-        document.body.addEventListener('scrollTo', function(evt) {
-            const selector = typeof evt.detail === 'string' ? evt.detail : (evt.detail?.value || evt.detail?.selector);
-            if (selector) {
-                const target = document.querySelector(selector);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }
-        });
-
-        // Global CSRF token injection
-        document.body.addEventListener('htmx:configRequest', function(event) {
-            const meta = document.querySelector('meta[name="csrf-token"]');
-            if (meta) {
-                event.detail.headers['X-CSRF-Token'] = meta.content;
-            }
-        });
-
-        // Handle custom events
-        document.body.addEventListener('itemDeleted', function(evt) {
-            alert(evt.detail.message);
-        });
-
-        // Theme persistence
-        const themeToggle = document.getElementById('theme-toggle');
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-            themeToggle.checked = true;
-            document.documentElement.setAttribute('data-theme', 'light');
-        }
-        themeToggle.addEventListener('change', function() {
-            const theme = this.checked ? 'light' : 'dark';
-            localStorage.setItem('theme', theme);
-            document.documentElement.setAttribute('data-theme', theme);
-        });
-
-        // htmx debug toggle
-        const debugToggle = document.getElementById('htmx-debug-toggle');
-        debugToggle.checked = localStorage.getItem('htmx-debug') === 'true';
-        debugToggle.addEventListener('change', function() {
-            localStorage.setItem('htmx-debug', this.checked);
-            location.reload();
-        });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-markup-templating.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-php.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-twig.min.js"></script>
-    <script>
-        // Code tabs functionality
-        document.addEventListener('click', function(e) {
-            if (e.target.matches('.code-tab-btn')) {
-                const container = e.target.closest('.code-tabs');
-                container.querySelectorAll('.code-tab-btn').forEach(btn => btn.classList.remove('tab-active'));
-                container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                e.target.classList.add('tab-active');
-                const target = container.querySelector(e.target.dataset.target);
-                if (target) target.classList.add('active');
-            }
-        });
-    </script>
+    {{ vite_entry_script_tags('app') }}
     {% block javascripts %}{% endblock %}
 </body>
 </html>

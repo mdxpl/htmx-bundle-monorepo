@@ -1,6 +1,7 @@
 <?php
 
 use App\Twig\SourceCodeExtension;
+use App\Twig\ViteExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return static function (ContainerConfigurator $container): void {
@@ -17,4 +18,7 @@ return static function (ContainerConfigurator $container): void {
 
     $services->set(SourceCodeExtension::class)
         ->arg('$projectDir', '%kernel.project_dir%');
+
+    $services->set(ViteExtension::class)
+        ->arg('$publicDir', '%kernel.project_dir%/public');
 };
