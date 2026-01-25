@@ -78,3 +78,15 @@ jobs:
               -e APP_SECRET=${{ secrets.DEMO_APP_SECRET }} \
               ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             docker image prune -f
+
+      - name: Purge Cloudflare cache
+        if: vars.CF_ENABLED == 'true'
+        env:
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${CF_ZONE_ID}/purge_cache" \
+            -H "Authorization: Bearer ${CF_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}' \
+            -o /dev/null -w "Cloudflare purge: %{http_code}\n"
