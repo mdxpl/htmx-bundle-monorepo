@@ -46,17 +46,17 @@ Session-based multi-step form with:
 - Configurable navigation strategies (free, sequential, linear)
 - Smooth htmx transitions between steps
 
+### Item List
+Demonstrates common list operations:
+- Click to edit item names inline
+- Delete with `hx-confirm` confirmation dialog
+- OOB notifications without custom JavaScript
+
 ### Infinite Scroll
 Load more content automatically as you scroll using `hx-trigger="revealed"`.
 
-### Click to Edit
-Inline editing of fields without page reload.
-
 ### Live Polling
 Auto-refresh content with `hx-trigger="every 2s"`.
-
-### Delete Confirm
-Delete with confirmation dialog and toast notifications via `HX-Trigger`.
 
 ### Builder Showcase
 Interactive demo of all `HtmxResponseBuilder` methods.
