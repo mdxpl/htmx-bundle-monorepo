@@ -9,9 +9,10 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
         "phpstan/phpstan": "^2.0",
-        "phpstan/phpstan-symfony": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "^10.0|^11.0",
+        "rector/rector": "^2.3",
         "symplify/monorepo-builder": "^11.2"
     },
     "autoload": {
@@ -34,6 +35,20 @@
         "cs:fix": "php-cs-fixer fix",
         "phpstan": "phpstan analyse",
         "analyse": "phpstan analyse",
+        "rector": "rector process --dry-run",
+        "rector:fix": "rector process",
+        "fix": [
+            "@rector:fix",
+            "@cs:fix"
+        ],
+        "check": [
+            "@phpstan",
+            "@test"
+        ],
+        "pre-commit": [
+            "@fix",
+            "@check"
+        ],
         "demo": "cd packages/demo && symfony serve",
         "demo:docker": "docker compose up --build",
         "demo:docker:stop": "docker compose down"
