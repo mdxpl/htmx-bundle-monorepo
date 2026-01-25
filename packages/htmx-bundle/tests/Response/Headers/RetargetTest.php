@@ -14,13 +14,13 @@ class RetargetTest extends TestCase
     {
         $retarget = new Retarget('#element');
 
-        $this->assertEquals('#element', $retarget->getValue());
+        self::assertEquals('#element', $retarget->getValue());
     }
 
     public function testType(): void
     {
         $retarget = new Retarget('#element');
 
-        $this->assertEquals(HtmxResponseHeaderType::RETARGET, $retarget->getType());
+        self::assertEquals(HtmxResponseHeaderType::RETARGET, $retarget->getType());
     }
 }

@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Form\BusinessFieldsType;
 use Mdxpl\HtmxBundle\Attribute\HtmxOnly;
+use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
+use Mdxpl\HtmxBundle\Form\Htmx\SwapStyle;
+use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
 use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
@@ -12,9 +16,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -82,7 +86,12 @@ final class AdvancedFormController extends AbstractController
     public function index(HtmxRequest $htmx, Request $request): HtmxResponse
     {
         $template = 'advanced_form.html.twig';
-        $form = $this->createAdvancedForm();
+
+        // Check if this is a POST with business account type to enable business validation
+        $formData = $request->request->all('form');
+        $isBusiness = ($formData['accountType'] ?? 'personal') === 'business';
+
+        $form = $this->createAdvancedForm($isBusiness);
         $form->handleRequest($request);
 
         $countries = array_combine(
@@ -97,34 +106,25 @@ final class AdvancedFormController extends AbstractController
             'form' => $form->createView(),
             'countries' => $countries,
             'cities' => $cities,
+            'isBusiness' => $isBusiness,
         ];
 
         $builder = HtmxResponseBuilder::create($htmx->isHtmx);
 
         if ($form->isSubmitted()) {
-            // Additional validation for business account fields
-            $data = $form->getData();
-            if (($data['accountType'] ?? '') === 'business') {
-                if (($data['companyName'] ?? '') === '') {
-                    $form->get('companyName')->addError(new FormError('Company name is required for business accounts'));
-                }
-                if (($data['taxId'] ?? '') === '') {
-                    $form->get('taxId')->addError(new FormError('Tax ID is required for business accounts'));
-                }
-            }
-
-            // Recreate view data after adding errors
-            $viewData['form'] = $form->createView();
-
-            if ($form->isValid() && $form->getErrors(true)->count() === 0) {
+            if ($form->isValid()) {
                 return $builder
                     ->success()
                     ->viewBlock($template, 'submitSuccess', ['data' => $form->getData()])
                     ->build();
             }
 
+            // Recreate view data after validation errors
+            $viewData['form'] = $form->createView();
+
             return $builder
                 ->failure()
+                ->triggerAfterSwap(['scrollTo' => '#form-error'])
                 ->viewBlock($template, 'formContent', $viewData)
                 ->build();
         }
@@ -165,15 +165,28 @@ final class AdvancedFormController extends AbstractController
             ->build();
     }
 
-    #[Route('/cities/{country}', name: 'app_advanced_form_cities', methods: ['GET'])]
+    #[Route('/cities/{country?}', name: 'app_advanced_form_cities', methods: ['GET'])]
     #[HtmxOnly]
-    public function cities(HtmxRequest $htmx, string $country): HtmxResponse
+    public function cities(HtmxRequest $htmx, ?string $country = null): HtmxResponse
     {
-        $cities = self::LOCATIONS[$country]['cities'] ?? [];
+        $cities = $country !== null ? (self::LOCATIONS[$country]['cities'] ?? []) : [];
+        $isEmpty = $cities === [];
+
+        // Create a standalone form with just the city field
+        $cityForm = $this->createFormBuilder(options: ['csrf_protection' => false])
+            ->add('city', ChoiceType::class, [
+                'label' => 'City',
+                'placeholder' => $isEmpty ? 'Select a country first...' : 'Select a city...',
+                'choices' => $isEmpty ? [] : array_flip($cities),
+                'disabled' => $isEmpty,
+            ])
+            ->getForm();
 
         return HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
-            ->viewBlock('advanced_form.html.twig', 'citySelect', ['cities' => $cities])
+            ->viewBlock('advanced_form.html.twig', 'citySelect', [
+                'cityField' => $cityForm->get('city')->createView(),
+            ])
             ->build();
     }
 
@@ -206,29 +219,72 @@ final class AdvancedFormController extends AbstractController
             ->build();
     }
 
-    #[Route('/conditional', name: 'app_advanced_form_conditional', methods: ['GET'])]
+    #[Route('/business-fields', name: 'app_advanced_form_business_fields', methods: ['GET'])]
     #[HtmxOnly]
-    public function conditionalFields(HtmxRequest $htmx, Request $request): HtmxResponse
+    public function businessFields(HtmxRequest $htmx, Request $request): HtmxResponse
     {
-        $accountType = $request->query->getString('type', 'personal');
+        /** @var array<string, string> $formData */
+        $formData = $request->query->all('form');
+        $isBusiness = ($formData['accountType'] ?? 'personal') === 'business';
+
+        // Create a minimal form with just the business fields, using same structure as main form
+        $form = $this->createFormBuilder(options: ['csrf_protection' => false])
+            ->add('business', BusinessFieldsType::class, [
+                'is_required' => $isBusiness,
+            ])
+            ->getForm();
 
         return HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
-            ->viewBlock('advanced_form.html.twig', 'conditionalFields', ['accountType' => $accountType])
+            ->viewBlock('advanced_form.html.twig', 'businessFields', [
+                'businessForm' => $form->get('business')->createView(),
+                'isBusiness' => $isBusiness,
+            ])
+            ->build();
+    }
+
+    #[Route('/validate/business/{field}', name: 'app_advanced_form_validate_business', methods: ['POST'])]
+    #[HtmxOnly]
+    public function validateBusinessField(
+        HtmxRequest $htmx,
+        Request $request,
+        ValidatorInterface $validator,
+        string $field,
+    ): HtmxResponse {
+        /** @var array<string, array<string, string>> $formData */
+        $formData = $request->request->all('form');
+        $businessData = $formData['business'] ?? [];
+        $value = $businessData[$field] ?? '';
+
+        $constraints = $this->getBusinessFieldConstraints($field);
+        $violations = $validator->validate($value, $constraints);
+
+        $errors = [];
+        foreach ($violations as $violation) {
+            $errors[] = $violation->getMessage();
+        }
+
+        return HtmxResponseBuilder::create($htmx->isHtmx)
+            ->success()
+            ->viewBlock('advanced_form.html.twig', 'fieldValidation', [
+                'errors' => $errors,
+                'field' => $field,
+                'isValid' => \count($errors) === 0 && $value !== '',
+            ])
             ->build();
     }
 
     /**
      * @return FormInterface<array<string, mixed>>
      */
-    private function createAdvancedForm(): FormInterface
+    private function createAdvancedForm(bool $requireBusinessFields = false): FormInterface
     {
         $countries = array_combine(
             array_map(static fn ($data) => $data['name'], self::LOCATIONS),
             array_keys(self::LOCATIONS),
         );
 
-        return $this->createFormBuilder(options: [
+        $builder = $this->createFormBuilder(options: [
                 'csrf_protection' => false,
             ])
             // Live Search field
@@ -246,35 +302,57 @@ final class AdvancedFormController extends AbstractController
                         message: 'Please select a valid user from the list',
                     ),
                 ],
-                'htmx' => [
-                    'get' => '/advanced-form/search/users',
-                    'trigger' => 'keyup changed delay:300ms[target.value.length >= 2]',
-                    'target' => '#user-results',
-                    'indicator' => '#search-spinner',
-                    'on::before-request' => 'document.querySelector("#user-results").innerHTML = ""',
-                ],
+                'htmx' => HtmxOptions::create()
+                    ->getRoute('app_advanced_form_search_users')
+                    ->trigger(Trigger::keyup()->changed()->delay(300)->condition('target.value.length >= 2'))
+                    ->target('#user-results')
+                    ->indicator('#search-spinner')
+                    ->onBeforeRequest('document.querySelector("#user-results").innerHTML = ""'),
             ])
-            // Cascading Selects
+            // Cascading Selects - uses CascadingTypeExtension
             ->add('country', ChoiceType::class, [
                 'label' => 'Country',
                 'choices' => array_merge(['' => ''], $countries),
                 'constraints' => [
                     new NotBlank(message: 'Please select a country'),
                 ],
-                'htmx' => [
-                    'get' => '/advanced-form/cities/__VALUE__',
-                    'trigger' => 'change',
-                    'target' => '#city-select-wrapper',
-                    'on::config-request' => "event.detail.path = event.detail.path.replace('__VALUE__', this.value)",
+                'cascading' => [
+                    'target' => 'city',
+                    'endpoint' => '/advanced-form/cities/{value}',
                 ],
-            ])
-            ->add('city', ChoiceType::class, [
+            ]);
+
+        // Add city field dynamically based on country selection
+        $addCityField = function (FormInterface $form, ?string $countryCode): void {
+            $cities = $countryCode !== null ? (self::LOCATIONS[$countryCode]['cities'] ?? []) : [];
+            $isEmpty = $cities === [];
+
+            $form->add('city', ChoiceType::class, [
                 'label' => 'City',
-                'choices' => $this->getAllCities(),
+                'placeholder' => $isEmpty ? 'Select a country first...' : 'Select a city...',
+                'choices' => $isEmpty ? [] : array_flip($cities),
+                'disabled' => $isEmpty,
                 'constraints' => [
                     new NotBlank(message: 'Please select a city'),
                 ],
-            ])
+            ]);
+        };
+
+        // Set initial city field
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($addCityField): void {
+            $data = $event->getData();
+            $countryCode = \is_array($data) ? ($data['country'] ?? null) : null;
+            $addCityField($event->getForm(), $countryCode);
+        });
+
+        // Update city field when form is submitted
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($addCityField): void {
+            $data = $event->getData();
+            $countryCode = \is_array($data) ? ($data['country'] ?? null) : null;
+            $addCityField($event->getForm(), $countryCode);
+        });
+
+        $builder
             // Email with inline validation
             ->add('email', EmailType::class, [
                 'label' => 'Email',
@@ -284,12 +362,11 @@ final class AdvancedFormController extends AbstractController
                     new NotBlank(message: 'Email is required'),
                     new Email(message: 'Please enter a valid email address'),
                 ],
-                'htmx' => [
-                    'post' => '/advanced-form/validate/email',
-                    'trigger' => 'blur changed delay:500ms',
-                    'target' => '#email-validation',
-                    'swap' => 'innerHTML',
-                ],
+                'htmx' => HtmxOptions::create()
+                    ->postRoute('app_advanced_form_validate', ['field' => '{name}'])
+                    ->trigger(Trigger::blur()->changed()->delay(500))
+                    ->target('#form_{name}-validation')
+                    ->swap(SwapStyle::InnerHTML),
             ])
             // Username with inline validation
             ->add('username', TextType::class, [
@@ -301,17 +378,13 @@ final class AdvancedFormController extends AbstractController
                     new Length(min: 3, max: 20, minMessage: 'Username must be at least {{ limit }} characters', maxMessage: 'Username cannot exceed {{ limit }} characters'),
                     new Regex(pattern: '/^[a-zA-Z0-9_]+$/', message: 'Username can only contain letters, numbers and underscores'),
                 ],
-                'htmx' => [
-                    'post' => '/advanced-form/validate/username',
-                    'trigger' => 'blur changed delay:500ms',
-                    'target' => '#username-validation',
-                    'swap' => 'innerHTML',
-                ],
+                'htmx' => HtmxOptions::create()
+                    ->postRoute('app_advanced_form_validate', ['field' => '{name}'])
+                    ->trigger(Trigger::blur()->changed()->delay(500))
+                    ->target('#form_{name}-validation')
+                    ->swap(SwapStyle::InnerHTML),
             ])
             // Account Type with conditional fields
-            // Note: For expanded ChoiceType (radio/checkbox), htmx attributes are applied
-            // to the container div, not individual inputs. The change event fires on inputs,
-            // so we handle this in the template using hx-trigger="change from:find input".
             ->add('accountType', ChoiceType::class, [
                 'label' => 'Account Type',
                 'choices' => [
@@ -321,27 +394,20 @@ final class AdvancedFormController extends AbstractController
                 'expanded' => true,
                 'data' => 'personal',
             ])
-            // Business fields (shown conditionally)
-            ->add('companyName', TextType::class, [
-                'label' => 'Company Name',
+            // Business fields (embedded form type) - conditionally shown via htmx
+            ->add('business', BusinessFieldsType::class, [
                 'required' => false,
-                'attr' => ['placeholder' => 'Enter company name...'],
-            ])
-            ->add('taxId', TextType::class, [
-                'label' => 'Tax ID / VAT Number',
-                'required' => false,
-                'attr' => ['placeholder' => 'Enter tax ID...'],
-            ])
-            ->add('companyAddress', TextareaType::class, [
-                'label' => 'Company Address',
-                'required' => false,
-                'attr' => ['placeholder' => 'Enter company address...', 'rows' => 2],
+                'is_required' => $requireBusinessFields,
+                'conditional' => [
+                    'trigger' => 'accountType',
+                    'endpoint' => '/advanced-form/business-fields',
+                ],
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Submit Form',
-                'attr' => ['class' => 'btn btn-primary'],
-            ])
-            ->getForm();
+            ]);
+
+        return $builder->getForm();
     }
 
     /**
@@ -364,17 +430,23 @@ final class AdvancedFormController extends AbstractController
     }
 
     /**
-     * @return array<string, string>
+     * @return array<\Symfony\Component\Validator\Constraint>
      */
-    private function getAllCities(): array
+    private function getBusinessFieldConstraints(string $field): array
     {
-        $cities = ['' => ''];
-        foreach (self::LOCATIONS as $country) {
-            foreach ($country['cities'] as $code => $name) {
-                $cities[$name] = $code;
-            }
-        }
-
-        return $cities;
+        return match ($field) {
+            'companyName' => [
+                new NotBlank(message: 'Company name is required'),
+                new Length(min: 2, max: 100, minMessage: 'Company name must be at least {{ limit }} characters'),
+            ],
+            'taxId' => [
+                new NotBlank(message: 'Tax ID is required'),
+                new Regex(
+                    pattern: '/^[A-Z]{2}[0-9A-Z]{8,12}$/',
+                    message: 'Tax ID must be in format: 2 letters followed by 8-12 alphanumeric characters (e.g., PL1234567890)',
+                ),
+            ],
+            default => [],
+        };
     }
 }

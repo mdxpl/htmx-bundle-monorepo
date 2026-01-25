@@ -13,7 +13,7 @@ class RefreshTest extends TestCase
     {
         $refresh = new Refresh();
 
-        $this->assertEquals('HX-Refresh', $refresh->getType()->value);
-        $this->assertEquals('true', $refresh->getValue());
+        self::assertEquals('HX-Refresh', $refresh->getType()->value);
+        self::assertEquals('true', $refresh->getValue());
     }
 }

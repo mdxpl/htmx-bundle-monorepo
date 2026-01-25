@@ -28,13 +28,13 @@ class HtmxRequestTest extends TestCase
 
         $htmxRequest = HtmxRequest::createFromSymfonyHttpRequest($request);
 
-        $this->assertTrue($htmxRequest->isHtmx);
-        $this->assertTrue($htmxRequest->isBoosted);
-        $this->assertTrue($htmxRequest->isForHistoryRestoration);
-        $this->assertEquals('https://example.com', $htmxRequest->currentUrl);
-        $this->assertEquals('Yes', $htmxRequest->prompt);
-        $this->assertEquals('#element', $htmxRequest->target);
-        $this->assertEquals('elementName', $htmxRequest->triggerName);
-        $this->assertEquals('#anAnotherElement', $htmxRequest->trigger);
+        self::assertTrue($htmxRequest->isHtmx);
+        self::assertTrue($htmxRequest->isBoosted);
+        self::assertTrue($htmxRequest->isForHistoryRestoration);
+        self::assertEquals('https://example.com', $htmxRequest->currentUrl);
+        self::assertEquals('Yes', $htmxRequest->prompt);
+        self::assertEquals('#element', $htmxRequest->target);
+        self::assertEquals('elementName', $htmxRequest->triggerName);
+        self::assertEquals('#anAnotherElement', $htmxRequest->trigger);
     }
 }

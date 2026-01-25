@@ -13,8 +13,8 @@ class HtmxRedirectResponseTest extends TestCase
     public function testResponse(): void
     {
         $response = new HtmxRedirectResponse('/path');
-        $this->assertSame(204, $response->responseCode);
-        $this->assertSame(HtmxResponseHeaderType::REDIRECT, $response->headers->first()->getType());
-        $this->assertEquals('/path', $response->headers->first()->getValue());
+        self::assertSame(204, $response->responseCode);
+        self::assertSame(HtmxResponseHeaderType::REDIRECT, $response->headers->first()->getType());
+        self::assertEquals('/path', $response->headers->first()->getValue());
     }
 }

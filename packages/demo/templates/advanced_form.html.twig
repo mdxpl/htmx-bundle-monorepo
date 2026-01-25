@@ -28,7 +28,7 @@
         }) }}
 
         {% if not form.vars.valid and form.vars.submitted %}
-        <div class="alert alert-error shadow-lg">
+        <div id="form-error" class="alert alert-error shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             <span>Please fix the validation errors below.</span>
         </div>
@@ -44,19 +44,9 @@
                 <p class="text-sm text-base-content/70 mb-4">Type at least 2 characters to search users. Uses <code class="badge badge-ghost badge-sm">hx-trigger</code> with delay and condition.</p>
                 <p class="text-xs text-base-content/50 mb-4">Try: <span class="badge badge-outline badge-xs">john</span> <span class="badge badge-outline badge-xs">jane</span> <span class="badge badge-outline badge-xs">alice</span> <span class="badge badge-outline badge-xs">bob</span> <span class="badge badge-outline badge-xs">@example</span></p>
 
-                <div class="form-control w-full relative">
-                    <label class="label">
-                        <span class="label-text">{{ form_label(form.user) }}</span>
-                        <span id="search-spinner" class="htmx-indicator">
-                            <span class="loading loading-spinner loading-xs"></span>
-                        </span>
-                    </label>
-                    {{ form_widget(form.user, {'attr': {'class': 'input input-bordered w-full' ~ (form_errors(form.user)|length > 0 ? ' input-error' : '')}}) }}
-                    {% if form_errors(form.user)|length > 0 %}
-                    <label class="label py-1">
-                        <span class="label-text-alt text-error">{{ form_errors(form.user) }}</span>
-                    </label>
-                    {% endif %}
+                {# Custom: needs relative positioning for dropdown #}
+                <div class="relative">
+                    {{ form_row(form.user) }}
                     <div id="user-results" class="absolute top-full left-0 right-0 z-10 mt-1"></div>
                 </div>
 
@@ -76,35 +66,11 @@
                 <p class="text-sm text-base-content/70 mb-4">Select a country to load cities dynamically. Uses <code class="badge badge-ghost badge-sm">hx-on::config-request</code> to modify the URL.</p>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text">{{ form_label(form.country) }}</span>
-                        </label>
-                        {{ form_widget(form.country, {'attr': {'class': 'select select-bordered w-full' ~ (form_errors(form.country)|length > 0 ? ' select-error' : '')}}) }}
-                        {% if form_errors(form.country)|length > 0 %}
-                        <label class="label py-1">
-                            <span class="label-text-alt text-error">{{ form_errors(form.country) }}</span>
-                        </label>
-                        {% endif %}
+                    <div>
+                        {{ form_row(form.country) }}
                     </div>
-
-                    <div class="form-control w-full" id="city-select-wrapper">
-                        {% if cities is defined and cities|length > 0 %}
-                            {{ block('citySelect') }}
-                            {% if form_errors(form.city)|length > 0 %}
-                            <label class="label py-1">
-                                <span class="label-text-alt text-error">{{ form_errors(form.city) }}</span>
-                            </label>
-                            {% endif %}
-                        {% else %}
-                            <label class="label">
-                                <span class="label-text">{{ form_label(form.city) }}</span>
-                            </label>
-                            <select name="form[city]" id="form_city" class="select select-bordered w-full" disabled>
-                                <option value="">Select a country first</option>
-                            </select>
-                            {% do form.city.setRendered() %}
-                        {% endif %}
+                    <div>
+                        {{ form_row(form.city) }}
                     </div>
                 </div>
 
@@ -123,33 +89,8 @@
                 </h2>
                 <p class="text-sm text-base-content/70 mb-4">Fields validate on blur. Server-side validation without full form submit.</p>
 
-                <div class="form-control w-full mb-4">
-                    <label class="label">
-                        <span class="label-text">{{ form_label(form.email) }}</span>
-                    </label>
-                    {{ form_widget(form.email, {'attr': {'class': 'input input-bordered w-full'}}) }}
-                    <div id="email-validation" class="min-h-[24px]">
-                        {% if form_errors(form.email)|length > 0 %}
-                            <label class="label py-1">
-                                <span class="label-text-alt text-error">{{ form_errors(form.email) }}</span>
-                            </label>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="form-control w-full">
-                    <label class="label">
-                        <span class="label-text">{{ form_label(form.username) }}</span>
-                    </label>
-                    {{ form_widget(form.username, {'attr': {'class': 'input input-bordered w-full'}}) }}
-                    <div id="username-validation" class="min-h-[24px]">
-                        {% if form_errors(form.username)|length > 0 %}
-                            <label class="label py-1">
-                                <span class="label-text-alt text-error">{{ form_errors(form.username) }}</span>
-                            </label>
-                        {% endif %}
-                    </div>
-                </div>
+                {{ form_row(form.email) }}
+                {{ form_row(form.username) }}
 
                 <div class="mt-2 text-xs text-base-content/50">
                     <strong>htmx options:</strong> post, trigger, target, swap
@@ -157,47 +98,29 @@
             </div>
         </div>
 
-        {# Section 4: Conditional Fields #}
+        {# Section 4: Conditional Fields with BusinessFieldsType #}
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
                 <h2 class="card-title">
                     <span class="badge badge-primary">4</span>
                     Conditional Fields
                 </h2>
-                <p class="text-sm text-base-content/70 mb-4">Select account type to show/hide additional fields.</p>
+                <p class="text-sm text-base-content/70 mb-4">Select account type to show/hide additional fields. Uses <code class="badge badge-ghost badge-sm">conditional</code> option from <code class="badge badge-ghost badge-sm">ConditionalTypeExtension</code>.</p>
 
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">{{ form_label(form.accountType) }}</span>
-                    </label>
-                    {# Note: For expanded ChoiceType (radio/checkbox), htmx attrs must be on each input
-                       because the change event fires on the individual input, not the container. #}
-                    <div class="flex gap-4">
-                        {% for child in form.accountType %}
-                            <label class="label cursor-pointer gap-2">
-                                {{ form_widget(child, {'attr': {
-                                    'class': 'radio radio-primary',
-                                    'hx-get': path('app_advanced_form_conditional') ~ '?type=' ~ child.vars.value,
-                                    'hx-trigger': 'change',
-                                    'hx-target': '#conditional-fields',
-                                }}) }}
-                                <span class="label-text">{{ child.vars.label }}</span>
-                            </label>
-                        {% endfor %}
-                    </div>
-                </div>
+                {{ form_row(form.accountType) }}
 
-                <div id="conditional-fields" class="mt-4">
-                    {{ block('conditionalFields') }}
+                {# Conditional field wrapper - ID set by ConditionalTypeExtension #}
+                <div id="{{ form.business.vars.conditional.wrapper_id|default('business-fields') }}" class="mt-4">
+                    {{ block('businessFields') }}
                 </div>
 
                 <div class="mt-2 text-xs text-base-content/50">
-                    <strong>Note:</strong> For expanded ChoiceType (radio/checkbox), htmx attrs must be applied directly to each input in template.
+                    <strong>conditional:</strong> trigger, endpoint (auto-configures htmx)
                 </div>
             </div>
         </div>
 
-        {# Submit #}
+        {# Submit - uses theme's loading indicator #}
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
                 <h2 class="card-title">
@@ -206,12 +129,7 @@
                 </h2>
                 <p class="text-sm text-base-content/70 mb-4">The entire form submits via htmx using form_start attributes.</p>
 
-                <div class="flex items-center gap-2">
-                    {{ form_widget(form.submit) }}
-                    <span class="htmx-indicator">
-                        <span class="loading loading-spinner loading-sm"></span>
-                    </span>
-                </div>
+                {{ form_row(form.submit) }}
             </div>
         </div>
 
@@ -222,40 +140,42 @@
     <div class="space-y-6">
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
-                <h2 class="card-title">HtmxTypeExtension Usage</h2>
-                <p class="text-sm text-base-content/70 mb-4">Add htmx attributes to any form field using the <code class="badge badge-ghost badge-sm">htmx</code> option:</p>
+                <h2 class="card-title">HtmxOptions Builder</h2>
+                <p class="text-sm text-base-content/70 mb-4">Use fluent builder API with <code class="badge badge-ghost badge-sm">HtmxOptions</code>:</p>
 
                 <div class="mockup-code text-xs">
-                    <pre><code class="language-php">$builder->add('search', TextType::class, [
-    'htmx' => [
-        'get' => '/search',
-        'trigger' => 'keyup changed delay:300ms',
-        'target' => '#results',
-        'indicator' => '#spinner',
-    ],
+                    <pre><code class="language-php">use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
+use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
+
+$builder->add('search', TextType::class, [
+    'htmx' => HtmxOptions::create()
+        ->getRoute('app_search')
+        ->trigger(Trigger::keyup()->changed()->delay(300))
+        ->target('#results')
+        ->indicator('#spinner'),
 ]);</code></pre>
                 </div>
 
-                <h3 class="font-semibold mt-4 mb-2">Supported Options</h3>
+                <h3 class="font-semibold mt-4 mb-2">Available Methods</h3>
                 <div class="overflow-x-auto">
                     <table class="table table-xs">
                         <thead>
                             <tr>
-                                <th>Option</th>
+                                <th>Method</th>
                                 <th>Attribute</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>get</td><td>hx-get</td></tr>
-                            <tr><td>post</td><td>hx-post</td></tr>
-                            <tr><td>trigger</td><td>hx-trigger</td></tr>
-                            <tr><td>target</td><td>hx-target</td></tr>
-                            <tr><td>swap</td><td>hx-swap</td></tr>
-                            <tr><td>indicator</td><td>hx-indicator</td></tr>
-                            <tr><td>include</td><td>hx-include</td></tr>
-                            <tr><td>vals</td><td>hx-vals</td></tr>
-                            <tr><td>confirm</td><td>hx-confirm</td></tr>
-                            <tr><td>on::{event}</td><td>hx-on::{event}</td></tr>
+                            <tr><td>get() / getRoute()</td><td>hx-get</td></tr>
+                            <tr><td>post() / postRoute()</td><td>hx-post</td></tr>
+                            <tr><td>trigger()</td><td>hx-trigger</td></tr>
+                            <tr><td>target()</td><td>hx-target</td></tr>
+                            <tr><td>swap()</td><td>hx-swap</td></tr>
+                            <tr><td>indicator()</td><td>hx-indicator</td></tr>
+                            <tr><td>include()</td><td>hx-include</td></tr>
+                            <tr><td>vals()</td><td>hx-vals</td></tr>
+                            <tr><td>confirm()</td><td>hx-confirm</td></tr>
+                            <tr><td>onBeforeRequest()</td><td>hx-on::before-request</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -264,15 +184,66 @@
 
         <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
-                <h2 class="card-title">Event Handlers</h2>
-                <p class="text-sm text-base-content/70 mb-4">Use <code class="badge badge-ghost badge-sm">on::{event}</code> for htmx event handlers:</p>
+                <h2 class="card-title">Trigger Builder</h2>
+                <p class="text-sm text-base-content/70 mb-4">Build complex triggers with <code class="badge badge-ghost badge-sm">Trigger</code> class:</p>
 
                 <div class="mockup-code text-xs">
-                    <pre><code class="language-php">'htmx' => [
-    'get' => '/cities/__VALUE__',
-    'on::config-request' => "event.detail.path =
-        event.detail.path.replace('__VALUE__', this.value)",
-]</code></pre>
+                    <pre><code class="language-php">use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
+
+// keyup changed delay:300ms
+Trigger::keyup()->changed()->delay(300)
+
+// blur changed delay:500ms
+Trigger::blur()->changed()->delay(500)
+
+// change (for selects)
+Trigger::change()
+
+// keyup[target.value.length >= 2]
+Trigger::keyup()->condition('target.value.length >= 2')</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Route with Placeholders</h2>
+                <p class="text-sm text-base-content/70 mb-4">Use placeholders for dynamic field values:</p>
+
+                <div class="mockup-code text-xs">
+                    <pre><code class="language-php">// Server-side: {name}, {id}, {full_name}
+HtmxOptions::create()
+    ->postRoute('app_validate', ['field' => '{name}'])
+    ->target('#{id}-validation')
+
+// Client-side: {value} (auto-generates JS)
+HtmxOptions::create()
+    ->getRoute('app_cities', ['country' => '{value}'])
+    ->trigger(Trigger::change())</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Conditional Fields</h2>
+                <p class="text-sm text-base-content/70 mb-4">Use <code class="badge badge-ghost badge-sm">conditional</code> to show/hide fields:</p>
+
+                <div class="mockup-code text-xs">
+                    <pre><code class="language-php">$builder
+    ->add('accountType', ChoiceType::class, [
+        'choices' => [
+            'Personal' => 'personal',
+            'Business' => 'business',
+        ],
+        'expanded' => true,
+    ])
+    ->add('business', BusinessFieldsType::class, [
+        'conditional' => [
+            'trigger' => 'accountType',
+            'endpoint' => '/form/business-fields',
+        ],
+    ]);</code></pre>
                 </div>
             </div>
         </div>
@@ -302,20 +273,8 @@
 {% endblock %}
 
 {% block citySelect %}
-{% set selectedCity = form is defined and form.city is defined ? form.city.vars.value : null %}
-<label class="label">
-    <span class="label-text">City</span>
-</label>
-<select name="form[city]" id="form_city" class="select select-bordered w-full{% if form is defined and form.city is defined and form_errors(form.city)|length > 0 %} select-error{% endif %}" {% if cities is not defined or cities is empty %}disabled{% endif %}>
-    {% if cities is defined and cities|length > 0 %}
-        <option value="">Select a city...</option>
-        {% for code, name in cities %}
-            <option value="{{ code }}"{% if selectedCity == code %} selected{% endif %}>{{ name }}</option>
-        {% endfor %}
-    {% else %}
-        <option value="">Select a country first</option>
-    {% endif %}
-</select>
+{# htmx response - replaces content inside #form_city-wrapper #}
+{{ form_row(cityField) }}
 {% endblock %}
 
 {% block fieldValidation %}
@@ -340,79 +299,31 @@
 {% endif %}
 {% endblock %}
 
-{% block conditionalFields %}
-{% set type = accountType is defined ? accountType : (form is defined and form.accountType is defined ? form.accountType.vars.value : 'personal') %}
-{% if type == 'business' %}
+{% block businessFields %}
+{# Determine if we should show business fields #}
+{% set showBusiness = isBusiness is defined ? isBusiness : (form is defined and form.accountType is defined and form.accountType.vars.value == 'business') %}
+{% set businessForm = businessForm is defined ? businessForm : (form is defined and form.business is defined ? form.business : null) %}
+
+{% if showBusiness and businessForm %}
+<div class="space-y-2 p-4 bg-base-200 rounded-lg">
+    <div class="text-sm font-semibold text-primary mb-2">Business Account Fields</div>
+
+    {{ form_row(businessForm.companyName) }}
+    {{ form_row(businessForm.taxId) }}
+    {{ form_row(businessForm.companyAddress) }}
+</div>
+{% elseif showBusiness %}
+{# Fallback for htmx partial when businessForm comes from standalone form #}
 <div class="space-y-4 p-4 bg-base-200 rounded-lg">
     <div class="text-sm font-semibold text-primary">Business Account Fields</div>
-
-    {% if form is defined and form.companyName is defined %}
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">{{ form_label(form.companyName) }}</span>
-            </label>
-            {{ form_widget(form.companyName, {'attr': {'class': 'input input-bordered w-full' ~ (form_errors(form.companyName)|length > 0 ? ' input-error' : '')}}) }}
-            {% if form_errors(form.companyName)|length > 0 %}
-            <label class="label py-1">
-                <span class="label-text-alt text-error">{{ form_errors(form.companyName) }}</span>
-            </label>
-            {% endif %}
-        </div>
-
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">{{ form_label(form.taxId) }}</span>
-            </label>
-            {{ form_widget(form.taxId, {'attr': {'class': 'input input-bordered w-full' ~ (form_errors(form.taxId)|length > 0 ? ' input-error' : '')}}) }}
-            {% if form_errors(form.taxId)|length > 0 %}
-            <label class="label py-1">
-                <span class="label-text-alt text-error">{{ form_errors(form.taxId) }}</span>
-            </label>
-            {% endif %}
-        </div>
-
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">{{ form_label(form.companyAddress) }}</span>
-            </label>
-            {{ form_widget(form.companyAddress, {'attr': {'class': 'textarea textarea-bordered w-full' ~ (form_errors(form.companyAddress)|length > 0 ? ' textarea-error' : '')}}) }}
-            {% if form_errors(form.companyAddress)|length > 0 %}
-            <label class="label py-1">
-                <span class="label-text-alt text-error">{{ form_errors(form.companyAddress) }}</span>
-            </label>
-            {% endif %}
-        </div>
-    {% else %}
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">Company Name</span>
-            </label>
-            <input type="text" name="form[companyName]" class="input input-bordered w-full" placeholder="Enter company name...">
-        </div>
-
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">Tax ID / VAT Number</span>
-            </label>
-            <input type="text" name="form[taxId]" class="input input-bordered w-full" placeholder="Enter tax ID...">
-        </div>
-
-        <div class="form-control w-full">
-            <label class="label">
-                <span class="label-text">Company Address</span>
-            </label>
-            <textarea name="form[companyAddress]" class="textarea textarea-bordered w-full" rows="2" placeholder="Enter company address..."></textarea>
-        </div>
-    {% endif %}
+    <p class="text-sm text-base-content/70">Loading...</p>
 </div>
 {% else %}
 <div class="p-4 bg-base-200 rounded-lg text-sm text-base-content/70">
     <span class="badge badge-ghost">Personal</span> account selected - no additional fields required.
 </div>
-{% if form is defined %}
-    {% do form.companyName.setRendered() %}
-    {% do form.taxId.setRendered() %}
-    {% do form.companyAddress.setRendered() %}
+{% if form is defined and form.business is defined %}
+    {% do form.business.setRendered() %}
 {% endif %}
 {% endif %}
 {% endblock %}

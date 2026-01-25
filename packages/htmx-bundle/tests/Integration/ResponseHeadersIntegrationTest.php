@@ -36,7 +36,7 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('/dashboard', $response->headers->get('HX-Redirect'));
+        self::assertSame('/dashboard', $response->headers->get('HX-Redirect'));
     }
 
     public function testLocationHeader(): void
@@ -48,7 +48,7 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('/new-page', $response->headers->get('HX-Location'));
+        self::assertSame('/new-page', $response->headers->get('HX-Location'));
     }
 
     public function testPushUrlHeader(): void
@@ -63,7 +63,7 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('/updated-url', $response->headers->get('HX-Push-Url'));
+        self::assertSame('/updated-url', $response->headers->get('HX-Push-Url'));
     }
 
     public function testReplaceUrlHeader(): void
@@ -78,7 +78,7 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('/replaced-url', $response->headers->get('HX-Replace-Url'));
+        self::assertSame('/replaced-url', $response->headers->get('HX-Replace-Url'));
     }
 
     public function testRefreshHeader(): void
@@ -90,7 +90,7 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('true', $response->headers->get('HX-Refresh'));
+        self::assertSame('true', $response->headers->get('HX-Refresh'));
     }
 
     public function testRetargetHeader(): void
@@ -105,7 +105,7 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('#new-target', $response->headers->get('HX-Retarget'));
+        self::assertSame('#new-target', $response->headers->get('HX-Retarget'));
     }
 
     public function testReselectHeader(): void
@@ -120,7 +120,7 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('.content-area', $response->headers->get('HX-Reselect'));
+        self::assertSame('.content-area', $response->headers->get('HX-Reselect'));
     }
 
     public function testSimpleTriggerHeader(): void
@@ -132,7 +132,7 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('itemDeleted', $response->headers->get('HX-Trigger'));
+        self::assertSame('itemDeleted', $response->headers->get('HX-Trigger'));
     }
 
     public function testTriggerWithMultipleEvents(): void
@@ -145,9 +145,9 @@ class ResponseHeadersIntegrationTest extends TestCase
         $response = $this->responseFactory->create($htmxResponse);
 
         $trigger = $response->headers->get('HX-Trigger');
-        $this->assertStringContainsString('event1', $trigger);
-        $this->assertStringContainsString('event2', $trigger);
-        $this->assertStringContainsString('event3', $trigger);
+        self::assertStringContainsString('event1', $trigger);
+        self::assertStringContainsString('event2', $trigger);
+        self::assertStringContainsString('event3', $trigger);
     }
 
     public function testTriggerWithEventData(): void
@@ -160,11 +160,11 @@ class ResponseHeadersIntegrationTest extends TestCase
         $response = $this->responseFactory->create($htmxResponse);
 
         $trigger = $response->headers->get('HX-Trigger');
-        $this->assertJson($trigger);
+        self::assertJson($trigger);
         $decoded = json_decode($trigger, true);
-        $this->assertArrayHasKey('showMessage', $decoded);
-        $this->assertSame('Item saved', $decoded['showMessage']['message']);
-        $this->assertSame('success', $decoded['showMessage']['type']);
+        self::assertArrayHasKey('showMessage', $decoded);
+        self::assertSame('Item saved', $decoded['showMessage']['message']);
+        self::assertSame('success', $decoded['showMessage']['type']);
     }
 
     public function testTriggerAfterSwapHeader(): void
@@ -179,7 +179,7 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('animationComplete', $response->headers->get('HX-Trigger-After-Swap'));
+        self::assertSame('animationComplete', $response->headers->get('HX-Trigger-After-Swap'));
     }
 
     public function testTriggerAfterSettleHeader(): void
@@ -194,7 +194,7 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('contentSettled', $response->headers->get('HX-Trigger-After-Settle'));
+        self::assertSame('contentSettled', $response->headers->get('HX-Trigger-After-Settle'));
     }
 
     public function testReswapWithStyleOnly(): void
@@ -209,7 +209,7 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('outerHTML', $response->headers->get('HX-Reswap'));
+        self::assertSame('outerHTML', $response->headers->get('HX-Reswap'));
     }
 
     public function testReswapWithModifiers(): void
@@ -230,10 +230,10 @@ class ResponseHeadersIntegrationTest extends TestCase
         $response = $this->responseFactory->create($htmxResponse);
 
         $reswap = $response->headers->get('HX-Reswap');
-        $this->assertStringContainsString('innerHTML', $reswap);
-        $this->assertStringContainsString('swap:500ms', $reswap);
-        $this->assertStringContainsString('transition:true', $reswap);
-        $this->assertStringContainsString('focus-scroll:false', $reswap);
+        self::assertStringContainsString('innerHTML', $reswap);
+        self::assertStringContainsString('swap:500ms', $reswap);
+        self::assertStringContainsString('transition:true', $reswap);
+        self::assertStringContainsString('focus-scroll:false', $reswap);
     }
 
     public function testReswapWithScrollModifier(): void
@@ -252,8 +252,8 @@ class ResponseHeadersIntegrationTest extends TestCase
         $response = $this->responseFactory->create($htmxResponse);
 
         $reswap = $response->headers->get('HX-Reswap');
-        $this->assertStringContainsString('beforeend', $reswap);
-        $this->assertStringContainsString('scroll:#scroll-target:top', $reswap);
+        self::assertStringContainsString('beforeend', $reswap);
+        self::assertStringContainsString('scroll:#scroll-target:top', $reswap);
     }
 
     public function testMultipleHeadersCombined(): void
@@ -271,11 +271,11 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('/new-url', $response->headers->get('HX-Push-Url'));
-        $this->assertSame('#main-content', $response->headers->get('HX-Retarget'));
-        $this->assertSame('outerHTML', $response->headers->get('HX-Reswap'));
-        $this->assertSame('contentUpdated', $response->headers->get('HX-Trigger'));
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame('/new-url', $response->headers->get('HX-Push-Url'));
+        self::assertSame('#main-content', $response->headers->get('HX-Retarget'));
+        self::assertSame('outerHTML', $response->headers->get('HX-Reswap'));
+        self::assertSame('contentUpdated', $response->headers->get('HX-Trigger'));
+        self::assertSame(200, $response->getStatusCode());
     }
 
     public function testHeadersWithNoContentResponse(): void
@@ -287,8 +287,8 @@ class ResponseHeadersIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(204, $response->getStatusCode());
-        $this->assertSame('itemDeleted', $response->headers->get('HX-Trigger'));
-        $this->assertEmpty($response->getContent());
+        self::assertSame(204, $response->getStatusCode());
+        self::assertSame('itemDeleted', $response->headers->get('HX-Trigger'));
+        self::assertEmpty($response->getContent());
     }
 }

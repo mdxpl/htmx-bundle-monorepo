@@ -13,6 +13,6 @@ class TransitionTest extends TestCase
     {
         $transition = new Transition();
 
-        $this->assertEquals('transition:true', $transition->__toString());
+        self::assertEquals('transition:true', $transition->__toString());
     }
 }

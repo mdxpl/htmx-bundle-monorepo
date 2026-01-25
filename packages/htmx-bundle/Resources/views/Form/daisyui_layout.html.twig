@@ -1,0 +1,358 @@
+{% use "form_div_layout.html.twig" %}
+
+{#
+ # DaisyUI Form Theme for Symfony Forms
+ #
+ # Pure DaisyUI styling without htmx-specific features.
+ # Extends Symfony's base div layout and applies DaisyUI classes.
+ #
+ # Usage in twig.yaml:
+ #   twig:
+ #     form_themes: ['@MdxplHtmx/Form/daisyui_layout.html.twig']
+ #}
+
+{# ============================================= #}
+{# Form Row - Main wrapper for each field       #}
+{# ============================================= #}
+{% block form_row %}
+{% apply spaceless %}
+    <div class="form-control w-full{% if not valid %} has-error{% endif %}">
+        {{- form_label(form) -}}
+        {{- form_widget(form) -}}
+        {{- form_help(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{% endapply %}
+{% endblock form_row %}
+
+{# ============================================= #}
+{# Labels                                        #}
+{# ============================================= #}
+{% block form_label %}
+{% apply spaceless %}
+    {% if label is not same as(false) %}
+        {% if not compound %}
+            {% set label_attr = label_attr|merge({'for': id}) %}
+        {% endif %}
+        {% if required %}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {% endif %}
+        {% if label is empty %}
+            {% if label_format is not empty %}
+                {% set label = label_format|replace({
+                    '%name%': name,
+                    '%id%': id,
+                }) %}
+            {% else %}
+                {% set label = name|humanize %}
+            {% endif %}
+        {% endif %}
+        <label class="label"{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            <span class="label-text">{{ translation_domain is same as(false) ? label : label|trans(label_translation_parameters, translation_domain) }}</span>
+        </label>
+    {% endif %}
+{% endapply %}
+{% endblock form_label %}
+
+{# ============================================= #}
+{# Errors                                        #}
+{# ============================================= #}
+{% block form_errors %}
+{% apply spaceless %}
+    {% if errors|length > 0 %}
+        <label class="label pt-1 pb-0">
+            <span class="label-text-alt text-error">
+                {% for error in errors %}
+                    {{ error.message }}{% if not loop.last %}<br>{% endif %}
+                {% endfor %}
+            </span>
+        </label>
+    {% endif %}
+{% endapply %}
+{% endblock form_errors %}
+
+{# ============================================= #}
+{# Help text                                     #}
+{# ============================================= #}
+{% block form_help %}
+{% apply spaceless %}
+    {% if help is not empty %}
+        {% set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' label-text-alt')|trim}) %}
+        <label class="label pt-0 pb-1">
+            <span id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
+                {%- if translation_domain is same as(false) -%}
+                    {%- if help_html is same as(false) -%}
+                        {{- help -}}
+                    {%- else -%}
+                        {{- help|raw -}}
+                    {%- endif -%}
+                {%- else -%}
+                    {%- if help_html is same as(false) -%}
+                        {{- help|trans(help_translation_parameters, translation_domain) -}}
+                    {%- else -%}
+                        {{- help|trans(help_translation_parameters, translation_domain)|raw -}}
+                    {%- endif -%}
+                {%- endif -%}
+            </span>
+        </label>
+    {% endif %}
+{% endapply %}
+{% endblock form_help %}
+
+{# ============================================= #}
+{# Text Input Widget                             #}
+{# ============================================= #}
+{% block form_widget_simple %}
+{% apply spaceless %}
+    {% set type = type|default('text') %}
+    {% set inputClass = 'input input-bordered w-full' %}
+    {% if not valid %}
+        {% set inputClass = inputClass ~ ' input-error' %}
+    {% endif %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' ' ~ inputClass)|trim}) %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock form_widget_simple %}
+
+{# ============================================= #}
+{# Textarea Widget                               #}
+{# ============================================= #}
+{% block textarea_widget %}
+{% apply spaceless %}
+    {% set textareaClass = 'textarea textarea-bordered w-full' %}
+    {% if not valid %}
+        {% set textareaClass = textareaClass ~ ' textarea-error' %}
+    {% endif %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' ' ~ textareaClass)|trim}) %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock textarea_widget %}
+
+{# ============================================= #}
+{# Select Widget (collapsed choice)              #}
+{# ============================================= #}
+{% block choice_widget_collapsed %}
+{% apply spaceless %}
+    {% set selectClass = 'select select-bordered w-full' %}
+    {% if not valid %}
+        {% set selectClass = selectClass ~ ' select-error' %}
+    {% endif %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' ' ~ selectClass)|trim}) %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock choice_widget_collapsed %}
+
+{# ============================================= #}
+{# Expanded Choice Widget (radio/checkbox group) #}
+{# ============================================= #}
+{% block choice_widget_expanded %}
+{% apply spaceless %}
+    <div {{ block('widget_container_attributes') }} class="flex flex-wrap gap-4">
+        {% for child in form %}
+            {{- form_row(child) -}}
+        {% endfor %}
+    </div>
+{% endapply %}
+{% endblock choice_widget_expanded %}
+
+{# ============================================= #}
+{# Checkbox Row                                  #}
+{# ============================================= #}
+{% block checkbox_row %}
+{% apply spaceless %}
+    <div class="form-control">
+        <label class="label cursor-pointer justify-start gap-3">
+            {{- form_widget(form) -}}
+            <span class="label-text">{{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) : '' }}</span>
+        </label>
+        {{- form_help(form) -}}
+        {{- form_errors(form) -}}
+    </div>
+{% endapply %}
+{% endblock checkbox_row %}
+
+{# ============================================= #}
+{# Checkbox Widget                               #}
+{# ============================================= #}
+{% block checkbox_widget %}
+{% apply spaceless %}
+    {% set checkboxClass = 'checkbox' %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' ' ~ checkboxClass)|trim}) %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock checkbox_widget %}
+
+{# ============================================= #}
+{# Radio Row (for expanded choices)              #}
+{# ============================================= #}
+{% block radio_row %}
+{% apply spaceless %}
+    <label class="label cursor-pointer justify-start gap-3">
+        {{- form_widget(form) -}}
+        <span class="label-text">{{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) : '' }}</span>
+    </label>
+{% endapply %}
+{% endblock radio_row %}
+
+{# ============================================= #}
+{# Radio Widget                                  #}
+{# ============================================= #}
+{% block radio_widget %}
+{% apply spaceless %}
+    {% set radioClass = 'radio' %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' ' ~ radioClass)|trim}) %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock radio_widget %}
+
+{# ============================================= #}
+{# Submit Button Widget                          #}
+{# ============================================= #}
+{% block submit_widget %}
+{% apply spaceless %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' btn btn-primary')|trim}) %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock submit_widget %}
+
+{# ============================================= #}
+{# Reset Button Widget                           #}
+{# ============================================= #}
+{% block reset_widget %}
+{% apply spaceless %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' btn btn-ghost')|trim}) %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock reset_widget %}
+
+{# ============================================= #}
+{# Button Widget (base button)                   #}
+{# ============================================= #}
+{% block button_widget %}
+{% apply spaceless %}
+    {% if attr.class is not defined or 'btn' not in attr.class %}
+        {% set attr = attr|merge({'class': (attr.class|default('') ~ ' btn')|trim}) %}
+    {% endif %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock button_widget %}
+
+{# ============================================= #}
+{# File Input Widget                             #}
+{# ============================================= #}
+{% block file_widget %}
+{% apply spaceless %}
+    {% set fileClass = 'file-input file-input-bordered w-full' %}
+    {% if not valid %}
+        {% set fileClass = fileClass ~ ' file-input-error' %}
+    {% endif %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' ' ~ fileClass)|trim}) %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock file_widget %}
+
+{# ============================================= #}
+{# Number Input Widget                           #}
+{# ============================================= #}
+{% block number_widget %}
+{% apply spaceless %}
+    {% set type = type|default('text') %}
+    {{ block('form_widget_simple') }}
+{% endapply %}
+{% endblock number_widget %}
+
+{# ============================================= #}
+{# Integer Input Widget                          #}
+{# ============================================= #}
+{% block integer_widget %}
+{% apply spaceless %}
+    {% set type = type|default('number') %}
+    {{ block('form_widget_simple') }}
+{% endapply %}
+{% endblock integer_widget %}
+
+{# ============================================= #}
+{# Money Widget                                  #}
+{# ============================================= #}
+{% block money_widget %}
+{% apply spaceless %}
+    {% set inputClass = 'input input-bordered w-full' %}
+    {% if not valid %}
+        {% set inputClass = inputClass ~ ' input-error' %}
+    {% endif %}
+    <label class="input input-bordered flex items-center gap-2 w-full{% if not valid %} input-error{% endif %}">
+        {% if money_pattern starts with '{{ widget }}' %}
+            <input type="text" {{ block('widget_attributes') }} value="{{ value }}" class="grow">
+            <span class="text-base-content/50">{{ money_pattern|form_encode_currency }}</span>
+        {% else %}
+            <span class="text-base-content/50">{{ money_pattern|form_encode_currency }}</span>
+            <input type="text" {{ block('widget_attributes') }} value="{{ value }}" class="grow">
+        {% endif %}
+    </label>
+{% endapply %}
+{% endblock money_widget %}
+
+{# ============================================= #}
+{# Percent Widget                                #}
+{# ============================================= #}
+{% block percent_widget %}
+{% apply spaceless %}
+    {% set inputClass = 'input input-bordered w-full' %}
+    {% if not valid %}
+        {% set inputClass = inputClass ~ ' input-error' %}
+    {% endif %}
+    <label class="input input-bordered flex items-center gap-2 w-full{% if not valid %} input-error{% endif %}">
+        <input type="text" {{ block('widget_attributes') }} value="{{ value }}" class="grow">
+        {% if symbol is not same as(false) %}<span class="text-base-content/50">{{ symbol|default('%') }}</span>{% endif %}
+    </label>
+{% endapply %}
+{% endblock percent_widget %}
+
+{# ============================================= #}
+{# Search Widget                                 #}
+{# ============================================= #}
+{% block search_widget %}
+{% apply spaceless %}
+    {% set type = type|default('search') %}
+    {{ block('form_widget_simple') }}
+{% endapply %}
+{% endblock search_widget %}
+
+{# ============================================= #}
+{# URL Widget                                    #}
+{# ============================================= #}
+{% block url_widget %}
+{% apply spaceless %}
+    {% set type = type|default('url') %}
+    {{ block('form_widget_simple') }}
+{% endapply %}
+{% endblock url_widget %}
+
+{# ============================================= #}
+{# Range Widget                                  #}
+{# ============================================= #}
+{% block range_widget %}
+{% apply spaceless %}
+    {% set rangeClass = 'range w-full' %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' ' ~ rangeClass)|trim}) %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock range_widget %}
+
+{# ============================================= #}
+{# Color Widget                                  #}
+{# ============================================= #}
+{% block color_widget %}
+{% apply spaceless %}
+    {% set type = type|default('color') %}
+    {% set attr = attr|merge({'class': (attr.class|default('') ~ ' h-12 w-full')|trim}) %}
+    {{ block('form_widget_simple') }}
+{% endapply %}
+{% endblock color_widget %}
+
+{# ============================================= #}
+{# Hidden Widget - no styling needed             #}
+{# ============================================= #}
+{% block hidden_widget %}
+    <input type="hidden" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+{% endblock hidden_widget %}

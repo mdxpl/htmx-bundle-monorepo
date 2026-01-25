@@ -91,6 +91,20 @@ This bundle only processes **main requests**. Sub-requests (ESI, `{{ render() }}
 
 This is intentional - sub-requests are internal Symfony requests that may inherit HTTP headers from the parent request, which would lead to incorrect htmx detection.
 
+Form Extensions
+============
+
+The bundle provides Form Type Extensions to easily add htmx functionality to your forms:
+
+- **[Form Extensions](form-extensions.md)** - HtmxTypeExtension, CascadingTypeExtension, ConditionalTypeExtension
+
+Form Themes
+============
+
+DaisyUI form themes for beautifully styled forms with minimal effort:
+
+- **[Form Themes](form-themes.md)** - DaisyUI and DaisyUI + htmx themes
+
 Examples
 ============
 

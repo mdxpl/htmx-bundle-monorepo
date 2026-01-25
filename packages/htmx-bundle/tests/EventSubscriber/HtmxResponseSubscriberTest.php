@@ -22,7 +22,7 @@ class HtmxResponseSubscriberTest extends TestCase
 {
     public function testGetSubscribedEvents(): void
     {
-        $this->assertSame(
+        self::assertSame(
             [KernelEvents::VIEW => ['onKernelView', 0]],
             HtmxResponseSubscriber::getSubscribedEvents(),
         );

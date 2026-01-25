@@ -41,13 +41,13 @@ class OutOfBandSwapsIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $content = $response->getContent();
 
-        $this->assertStringContainsString('Great success!', $content);
-        $this->assertStringContainsString('hx-swap-oob="true"', $content);
-        $this->assertStringContainsString('Item saved successfully!', $content);
-        $this->assertStringContainsString('alert-success', $content);
+        self::assertStringContainsString('Great success!', $content);
+        self::assertStringContainsString('hx-swap-oob="true"', $content);
+        self::assertStringContainsString('Item saved successfully!', $content);
+        self::assertStringContainsString('alert-success', $content);
     }
 
     /**
@@ -70,15 +70,15 @@ class OutOfBandSwapsIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $content = $response->getContent();
 
-        $this->assertStringContainsString('Great success!', $content);
-        $this->assertStringContainsString('Item added to cart!', $content);
-        $this->assertStringContainsString('id="cart-counter"', $content);
-        $this->assertStringContainsString('>5<', $content);
+        self::assertStringContainsString('Great success!', $content);
+        self::assertStringContainsString('Item added to cart!', $content);
+        self::assertStringContainsString('id="cart-counter"', $content);
+        self::assertStringContainsString('>5<', $content);
 
-        $this->assertSame(2, substr_count($content, 'hx-swap-oob="true"'));
+        self::assertSame(2, substr_count($content, 'hx-swap-oob="true"'));
     }
 
     /**
@@ -98,7 +98,7 @@ class OutOfBandSwapsIntegrationTest extends TestCase
         $response = $this->responseFactory->create($htmxResponse);
         $content = $response->getContent();
 
-        $this->assertStringContainsString(PHP_EOL . PHP_EOL, $content);
+        self::assertStringContainsString(PHP_EOL . PHP_EOL, $content);
     }
 
     /**
@@ -120,12 +120,12 @@ class OutOfBandSwapsIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $content = $response->getContent();
 
-        $this->assertStringContainsString('Background task completed', $content);
-        $this->assertStringContainsString('>10<', $content);
-        $this->assertStringNotContainsString('Great success!', $content);
+        self::assertStringContainsString('Background task completed', $content);
+        self::assertStringContainsString('>10<', $content);
+        self::assertStringNotContainsString('Great success!', $content);
     }
 
     /**
@@ -147,12 +147,12 @@ class OutOfBandSwapsIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(422, $response->getStatusCode());
+        self::assertSame(422, $response->getStatusCode());
         $content = $response->getContent();
 
-        $this->assertStringContainsString('Fix the errors in the form!', $content);
-        $this->assertStringContainsString('Please fix the errors', $content);
-        $this->assertStringContainsString('alert-danger', $content);
+        self::assertStringContainsString('Fix the errors in the form!', $content);
+        self::assertStringContainsString('Please fix the errors', $content);
+        self::assertStringContainsString('alert-danger', $content);
     }
 
     /**
@@ -174,8 +174,8 @@ class OutOfBandSwapsIntegrationTest extends TestCase
         $response = $this->responseFactory->create($htmxResponse);
         $content = $response->getContent();
 
-        $this->assertStringNotContainsString('Great success!', $content);
-        $this->assertStringNotContainsString('Should not appear', $content);
-        $this->assertStringContainsString('<form', $content);
+        self::assertStringNotContainsString('Great success!', $content);
+        self::assertStringNotContainsString('Should not appear', $content);
+        self::assertStringContainsString('<form', $content);
     }
 }

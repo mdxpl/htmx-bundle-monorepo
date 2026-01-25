@@ -13,6 +13,6 @@ class HtmxExtensionTest extends TestCase
     {
         $extension = new HtmxExtension();
 
-        $this->assertEquals('mdx_htmx', $extension->getAlias());
+        self::assertEquals('mdx_htmx', $extension->getAlias());
     }
 }

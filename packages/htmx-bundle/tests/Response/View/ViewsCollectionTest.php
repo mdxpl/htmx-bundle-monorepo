@@ -15,7 +15,7 @@ class ViewsCollectionTest extends TestCase
         $original = new ViewsCollection();
         $actual = $original->add(View::empty())->add(View::empty());
 
-        $this->assertCount(2, $actual);
+        self::assertCount(2, $actual);
     }
 
     public function testIsNoContentIfDoesNotHaveViews(): void
@@ -23,7 +23,7 @@ class ViewsCollectionTest extends TestCase
         $original = new ViewsCollection();
         $actual = $original->isNoContent();
 
-        $this->assertTrue($actual);
+        self::assertTrue($actual);
     }
 
     public function testIsNoContentIfAllViewsHaveNoTemplate(): void
@@ -31,7 +31,7 @@ class ViewsCollectionTest extends TestCase
         $original = new ViewsCollection(... [View::empty(), View::empty()]);
         $actual = $original->isNoContent();
 
-        $this->assertTrue($actual);
+        self::assertTrue($actual);
     }
 
     public function testIsNotNoContentIfHasAViewWithTemplate(): void
@@ -39,7 +39,7 @@ class ViewsCollectionTest extends TestCase
         $original = new ViewsCollection(... [View::empty(), View::template('template.html.twig')]);
         $actual = $original->isNoContent();
 
-        $this->assertFalse($actual);
+        self::assertFalse($actual);
     }
 
     public function testFirst(): void
@@ -50,6 +50,6 @@ class ViewsCollectionTest extends TestCase
         ]);
         $actual = $original->first();
 
-        $this->assertEquals('template.html.twig', $actual->template);
+        self::assertEquals('template.html.twig', $actual->template);
     }
 }

@@ -18,7 +18,7 @@ class HtmxResponseHeaderCollectionTest extends TestCase
             ->add(new ReplaceUrl('\test'))
             ->add(new Redirect('\\'));
 
-        $this->assertCount(2, $actual);
+        self::assertCount(2, $actual);
     }
 
     public function testFirst(): void
@@ -28,6 +28,6 @@ class HtmxResponseHeaderCollectionTest extends TestCase
             ->add(new ReplaceUrl('\test'))
             ->add(new Redirect('\\'));
 
-        $this->assertInstanceOf(ReplaceUrl::class, $actual->first());
+        self::assertInstanceOf(ReplaceUrl::class, $actual->first());
     }
 }

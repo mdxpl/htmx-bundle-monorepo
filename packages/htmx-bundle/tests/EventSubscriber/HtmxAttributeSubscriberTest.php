@@ -44,7 +44,7 @@ class HtmxAttributeSubscriberTest extends TestCase
             $subscriber = new HtmxOnlyAttributeSubscriber();
             $subscriber->onKernelController($event);
 
-            $this->assertTrue(true);
+            self::assertTrue(true);
         } catch (HttpException $e) {
             $shouldThrowsException
                 ? throw $e
@@ -94,7 +94,7 @@ class HtmxAttributeSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertSame(
+        self::assertSame(
             [KernelEvents::CONTROLLER => ['onKernelController']],
             HtmxOnlyAttributeSubscriber::getSubscribedEvents(),
         );
@@ -107,7 +107,7 @@ class HtmxAttributeSubscriberTest extends TestCase
         $subscriber = new HtmxOnlyAttributeSubscriber(enabled: false);
         $subscriber->onKernelController($event);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     public function testCustomStatusCodeAndMessage(): void
@@ -126,7 +126,7 @@ class HtmxAttributeSubscriberTest extends TestCase
         try {
             $subscriber->onKernelController($event);
         } catch (HttpException $e) {
-            $this->assertEquals(403, $e->getStatusCode());
+            self::assertEquals(403, $e->getStatusCode());
             throw $e;
         }
     }

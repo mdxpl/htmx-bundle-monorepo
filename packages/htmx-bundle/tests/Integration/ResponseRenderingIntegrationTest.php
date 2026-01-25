@@ -47,15 +47,15 @@ class ResponseRenderingIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $content = $response->getContent();
 
-        $this->assertStringContainsString('<nav>', $content);
-        $this->assertStringContainsString('hx-get="/simple-page/home"', $content);
-        $this->assertStringContainsString('hx-get="/simple-page/about"', $content);
-        $this->assertStringContainsString('<section id="pageContent">', $content);
-        $this->assertStringContainsString('<h1>Home</h1>', $content);
-        $this->assertStringContainsString('This is the home page', $content);
+        self::assertStringContainsString('<nav>', $content);
+        self::assertStringContainsString('hx-get="/simple-page/home"', $content);
+        self::assertStringContainsString('hx-get="/simple-page/about"', $content);
+        self::assertStringContainsString('<section id="pageContent">', $content);
+        self::assertStringContainsString('<h1>Home</h1>', $content);
+        self::assertStringContainsString('This is the home page', $content);
     }
 
     /**
@@ -78,14 +78,14 @@ class ResponseRenderingIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $content = $response->getContent();
 
-        $this->assertStringContainsString('<title>About</title>', $content);
-        $this->assertStringContainsString('<section id="pageContent">', $content);
-        $this->assertStringContainsString('<h1>About</h1>', $content);
-        $this->assertStringContainsString('This is the about page', $content);
-        $this->assertStringNotContainsString('<nav>', $content);
+        self::assertStringContainsString('<title>About</title>', $content);
+        self::assertStringContainsString('<section id="pageContent">', $content);
+        self::assertStringContainsString('<h1>About</h1>', $content);
+        self::assertStringContainsString('This is the about page', $content);
+        self::assertStringNotContainsString('<nav>', $content);
     }
 
     /**
@@ -101,9 +101,9 @@ class ResponseRenderingIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('Great success!', $response->getContent());
-        $this->assertStringNotContainsString('<form', $response->getContent());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('Great success!', $response->getContent());
+        self::assertStringNotContainsString('<form', $response->getContent());
     }
 
     /**
@@ -124,13 +124,13 @@ class ResponseRenderingIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(422, $response->getStatusCode());
+        self::assertSame(422, $response->getStatusCode());
         $content = $response->getContent();
 
-        $this->assertStringContainsString('Fix the errors in the form!', $content);
-        $this->assertStringContainsString('<form', $content);
-        $this->assertStringContainsString('Name must be at least 2 characters', $content);
-        $this->assertStringContainsString('value="A"', $content);
+        self::assertStringContainsString('Fix the errors in the form!', $content);
+        self::assertStringContainsString('<form', $content);
+        self::assertStringContainsString('Name must be at least 2 characters', $content);
+        self::assertStringContainsString('value="A"', $content);
     }
 
     /**
@@ -146,13 +146,13 @@ class ResponseRenderingIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $content = $response->getContent();
 
-        $this->assertStringContainsString('<div id="formWrapper">', $content);
-        $this->assertStringContainsString('<form', $content);
-        $this->assertStringContainsString('hx-post="/demo"', $content);
-        $this->assertStringContainsString('hx-target="#formWrapper"', $content);
+        self::assertStringContainsString('<div id="formWrapper">', $content);
+        self::assertStringContainsString('<form', $content);
+        self::assertStringContainsString('hx-post="/demo"', $content);
+        self::assertStringContainsString('hx-target="#formWrapper"', $content);
     }
 
     /**
@@ -168,11 +168,11 @@ class ResponseRenderingIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $content = $response->getContent();
 
-        $this->assertStringContainsString('<form', $content);
-        $this->assertStringNotContainsString('<div id="formWrapper">', $content);
+        self::assertStringContainsString('<form', $content);
+        self::assertStringNotContainsString('<div id="formWrapper">', $content);
     }
 
     /**
@@ -193,16 +193,16 @@ class ResponseRenderingIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $content = $response->getContent();
 
-        $this->assertStringContainsString('<h1>An infinite scroll example</h1>', $content);
-        $this->assertStringContainsString('<div id="items"', $content);
-        $this->assertStringContainsString('Item 1', $content);
-        $this->assertStringContainsString('Item 2', $content);
-        $this->assertStringContainsString('Item 3', $content);
-        $this->assertStringContainsString('hx-get="/infinite-scroll?pageNumber=2"', $content);
-        $this->assertStringContainsString('hx-trigger="revealed"', $content);
+        self::assertStringContainsString('<h1>An infinite scroll example</h1>', $content);
+        self::assertStringContainsString('<div id="items"', $content);
+        self::assertStringContainsString('Item 1', $content);
+        self::assertStringContainsString('Item 2', $content);
+        self::assertStringContainsString('Item 3', $content);
+        self::assertStringContainsString('hx-get="/infinite-scroll?pageNumber=2"', $content);
+        self::assertStringContainsString('hx-trigger="revealed"', $content);
     }
 
     /**
@@ -223,15 +223,15 @@ class ResponseRenderingIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(200, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $content = $response->getContent();
 
-        $this->assertStringContainsString('Item 4', $content);
-        $this->assertStringContainsString('Item 5', $content);
-        $this->assertStringContainsString('Item 6', $content);
-        $this->assertStringContainsString('hx-get="/infinite-scroll?pageNumber=3"', $content);
-        $this->assertStringNotContainsString('<h1>An infinite scroll example</h1>', $content);
-        $this->assertStringNotContainsString('<div id="items"', $content);
+        self::assertStringContainsString('Item 4', $content);
+        self::assertStringContainsString('Item 5', $content);
+        self::assertStringContainsString('Item 6', $content);
+        self::assertStringContainsString('hx-get="/infinite-scroll?pageNumber=3"', $content);
+        self::assertStringNotContainsString('<h1>An infinite scroll example</h1>', $content);
+        self::assertStringNotContainsString('<div id="items"', $content);
     }
 
     /**
@@ -252,8 +252,8 @@ class ResponseRenderingIntegrationTest extends TestCase
         $response = $this->responseFactory->create($htmxResponse);
         $content = $response->getContent();
 
-        $this->assertSame(1, substr_count($content, 'hx-get='));
-        $this->assertSame(1, substr_count($content, 'hx-trigger="revealed"'));
+        self::assertSame(1, substr_count($content, 'hx-get='));
+        self::assertSame(1, substr_count($content, 'hx-trigger="revealed"'));
     }
 
     /**
@@ -270,7 +270,7 @@ class ResponseRenderingIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame('HX-Request', $response->headers->get('Vary'));
+        self::assertSame('HX-Request', $response->headers->get('Vary'));
     }
 
     /**
@@ -289,7 +289,7 @@ class ResponseRenderingIntegrationTest extends TestCase
 
         $response = $responseFactory->create($htmxResponse);
 
-        $this->assertNull($response->headers->get('Vary'));
+        self::assertNull($response->headers->get('Vary'));
     }
 
     /**
@@ -303,7 +303,7 @@ class ResponseRenderingIntegrationTest extends TestCase
 
         $response = $this->responseFactory->create($htmxResponse);
 
-        $this->assertSame(204, $response->getStatusCode());
-        $this->assertEmpty($response->getContent());
+        self::assertSame(204, $response->getStatusCode());
+        self::assertEmpty($response->getContent());
     }
 }

@@ -14,13 +14,13 @@ class ScrollingScrollTest extends TestCase
     {
         $scrollingScroll = new ScrollingScroll(ScrollingDirection::TOP);
 
-        $this->assertEquals('scroll:top', $scrollingScroll->__toString());
+        self::assertEquals('scroll:top', $scrollingScroll->__toString());
     }
 
     public function testScrollingScrollWithElement(): void
     {
         $scrollingScroll = new ScrollingScroll(ScrollingDirection::BOTTOM, '#element');
 
-        $this->assertEquals('scroll:#element:bottom', $scrollingScroll->__toString());
+        self::assertEquals('scroll:#element:bottom', $scrollingScroll->__toString());
     }
 }

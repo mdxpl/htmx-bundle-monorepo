@@ -14,9 +14,9 @@ class HtmxResponseBuilderFactoryTest extends TestCase
         $builder = new HtmxResponseBuilderFactory()->create(true);
         $htmxResponse = $builder->build();
 
-        $this->assertCount(0, $htmxResponse->views);
-        $this->assertCount(0, $htmxResponse->headers);
-        $this->assertEquals(204, $htmxResponse->responseCode);
+        self::assertCount(0, $htmxResponse->views);
+        self::assertCount(0, $htmxResponse->headers);
+        self::assertEquals(204, $htmxResponse->responseCode);
     }
 
     public function testCreateWithView(): void
@@ -24,9 +24,9 @@ class HtmxResponseBuilderFactoryTest extends TestCase
         $builder = new HtmxResponseBuilderFactory()->create(true)->view('view');
         $htmxResponse = $builder->build();
 
-        $this->assertCount(1, $htmxResponse->views);
-        $this->assertCount(0, $htmxResponse->headers);
-        $this->assertEquals(204, $htmxResponse->responseCode);
+        self::assertCount(1, $htmxResponse->views);
+        self::assertCount(0, $htmxResponse->headers);
+        self::assertEquals(204, $htmxResponse->responseCode);
     }
 
     public function testSuccess(): void
@@ -34,9 +34,9 @@ class HtmxResponseBuilderFactoryTest extends TestCase
         $builder = new HtmxResponseBuilderFactory()->success(true);
         $htmxResponse = $builder->build();
 
-        $this->assertCount(0, $htmxResponse->views);
-        $this->assertCount(0, $htmxResponse->headers);
-        $this->assertEquals(200, $htmxResponse->responseCode);
+        self::assertCount(0, $htmxResponse->views);
+        self::assertCount(0, $htmxResponse->headers);
+        self::assertEquals(200, $htmxResponse->responseCode);
     }
 
     public function testFailure(): void
@@ -44,8 +44,8 @@ class HtmxResponseBuilderFactoryTest extends TestCase
         $builder = new HtmxResponseBuilderFactory()->failure(true);
         $htmxResponse = $builder->build();
 
-        $this->assertCount(0, $htmxResponse->views);
-        $this->assertCount(0, $htmxResponse->headers);
-        $this->assertEquals(422, $htmxResponse->responseCode);
+        self::assertCount(0, $htmxResponse->views);
+        self::assertCount(0, $htmxResponse->headers);
+        self::assertEquals(422, $htmxResponse->responseCode);
     }
 }

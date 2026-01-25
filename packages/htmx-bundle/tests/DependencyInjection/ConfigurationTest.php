@@ -17,16 +17,16 @@ class ConfigurationTest extends TestCase
 
         $config = $processor->processConfiguration($configuration, []);
 
-        $this->assertTrue($config['htmx_only']['enabled']);
-        $this->assertEquals(404, $config['htmx_only']['status_code']);
-        $this->assertEquals('Not Found', $config['htmx_only']['message']);
-        $this->assertTrue($config['default_view_data']['enabled']);
-        $this->assertTrue($config['response']['vary_header']);
-        $this->assertFalse($config['response']['strict_mode']);
-        $this->assertTrue($config['csrf']['enabled']);
-        $this->assertEquals('mdx-htmx', $config['csrf']['token_id']);
-        $this->assertEquals('X-CSRF-Token', $config['csrf']['header_name']);
-        $this->assertEquals(['GET', 'HEAD', 'OPTIONS'], $config['csrf']['safe_methods']);
+        self::assertTrue($config['htmx_only']['enabled']);
+        self::assertEquals(404, $config['htmx_only']['status_code']);
+        self::assertEquals('Not Found', $config['htmx_only']['message']);
+        self::assertTrue($config['default_view_data']['enabled']);
+        self::assertTrue($config['response']['vary_header']);
+        self::assertFalse($config['response']['strict_mode']);
+        self::assertTrue($config['csrf']['enabled']);
+        self::assertEquals('mdx-htmx', $config['csrf']['token_id']);
+        self::assertEquals('X-CSRF-Token', $config['csrf']['header_name']);
+        self::assertEquals(['GET', 'HEAD', 'OPTIONS'], $config['csrf']['safe_methods']);
     }
 
     public function testCustomConfiguration(): void
@@ -57,16 +57,16 @@ class ConfigurationTest extends TestCase
             ],
         ]);
 
-        $this->assertFalse($config['htmx_only']['enabled']);
-        $this->assertEquals(403, $config['htmx_only']['status_code']);
-        $this->assertEquals('Forbidden', $config['htmx_only']['message']);
-        $this->assertFalse($config['default_view_data']['enabled']);
-        $this->assertFalse($config['response']['vary_header']);
-        $this->assertTrue($config['response']['strict_mode']);
-        $this->assertFalse($config['csrf']['enabled']);
-        $this->assertEquals('custom_token', $config['csrf']['token_id']);
-        $this->assertEquals('X-Custom-CSRF', $config['csrf']['header_name']);
-        $this->assertEquals(['GET'], $config['csrf']['safe_methods']);
+        self::assertFalse($config['htmx_only']['enabled']);
+        self::assertEquals(403, $config['htmx_only']['status_code']);
+        self::assertEquals('Forbidden', $config['htmx_only']['message']);
+        self::assertFalse($config['default_view_data']['enabled']);
+        self::assertFalse($config['response']['vary_header']);
+        self::assertTrue($config['response']['strict_mode']);
+        self::assertFalse($config['csrf']['enabled']);
+        self::assertEquals('custom_token', $config['csrf']['token_id']);
+        self::assertEquals('X-Custom-CSRF', $config['csrf']['header_name']);
+        self::assertEquals(['GET'], $config['csrf']['safe_methods']);
     }
 
     public function testCsrfCanBeDisabled(): void
@@ -80,6 +80,6 @@ class ConfigurationTest extends TestCase
             ],
         ]);
 
-        $this->assertFalse($config['csrf']['enabled']);
+        self::assertFalse($config['csrf']['enabled']);
     }
 }

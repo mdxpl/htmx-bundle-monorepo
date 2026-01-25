@@ -77,8 +77,8 @@ class StrictModeIntegrationTest extends TestCase
 
         $subscriber->onKernelView($event);
 
-        $this->assertInstanceOf(Response::class, $event->getResponse());
-        $this->assertSame(200, $event->getResponse()->getStatusCode());
+        self::assertInstanceOf(Response::class, $event->getResponse());
+        self::assertSame(200, $event->getResponse()->getStatusCode());
     }
 
     /**
@@ -125,7 +125,7 @@ class StrictModeIntegrationTest extends TestCase
 
         $subscriber->onKernelView($event);
 
-        $this->assertInstanceOf(Response::class, $event->getResponse());
+        self::assertInstanceOf(Response::class, $event->getResponse());
     }
 
     /**
@@ -148,8 +148,8 @@ class StrictModeIntegrationTest extends TestCase
 
         $subscriber->onKernelView($event);
 
-        $this->assertSame(204, $event->getResponse()->getStatusCode());
-        $this->assertSame('itemDeleted', $event->getResponse()->headers->get('HX-Trigger'));
+        self::assertSame(204, $event->getResponse()->getStatusCode());
+        self::assertSame('itemDeleted', $event->getResponse()->headers->get('HX-Trigger'));
     }
 
     /**
@@ -197,6 +197,6 @@ class StrictModeIntegrationTest extends TestCase
 
         $subscriber->onKernelView($event);
 
-        $this->assertInstanceOf(Response::class, $event->getResponse());
+        self::assertInstanceOf(Response::class, $event->getResponse());
     }
 }

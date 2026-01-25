@@ -13,6 +13,6 @@ class TriggerAfterSwapTest extends TestCase
     public function testGetType(): void
     {
         $triggerAfterSwap = new TriggerAfterSwap('demo-event');
-        $this->assertSame(HtmxResponseHeaderType::TRIGGER_AFTER_SWAP, $triggerAfterSwap->getType());
+        self::assertSame(HtmxResponseHeaderType::TRIGGER_AFTER_SWAP, $triggerAfterSwap->getType());
     }
 }
