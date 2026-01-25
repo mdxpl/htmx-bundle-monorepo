@@ -37,6 +37,7 @@ final class InfiniteScrollController extends AbstractController
             'currentPage' => $page,
             'nextPage' => $page + 1,
             'hasMore' => $hasMore,
+            'totalPages' => (int) ceil($totalItems / $itemsPerPage),
         ];
 
         $builder = HtmxResponseBuilder::create($htmx->isHtmx);

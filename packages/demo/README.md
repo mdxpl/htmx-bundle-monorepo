@@ -42,9 +42,6 @@ Demonstrates the `htmx` option on Symfony form fields:
 ### Infinite Scroll
 Load more content automatically as you scroll using `hx-trigger="revealed"`.
 
-### Active Search
-Real-time search with debouncing using `delay:300ms`.
-
 ### Click to Edit
 Inline editing of fields without page reload.
 
