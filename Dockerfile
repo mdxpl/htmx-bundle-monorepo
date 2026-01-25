@@ -1,3 +1,14 @@
+# Build assets with Vite
+FROM node:22-alpine AS assets-builder
+WORKDIR /build
+COPY packages/demo/package.json packages/demo/package-lock.json* ./
+RUN npm install
+COPY packages/demo/vite.config.js packages/demo/postcss.config.js packages/demo/tailwind.config.js ./
+COPY packages/demo/assets ./assets
+COPY packages/demo/templates ./templates
+RUN npm run build
+
+# PHP application
 FROM dunglas/frankenphp:1-php8.4-alpine AS base
 
 RUN install-php-extensions opcache intl
@@ -14,11 +25,14 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY packages/htmx-bundle ../htmx-bundle
 
 # Copy demo composer files and install dependencies
-COPY packages/demo/composer.json packages/demo/composer.lock* ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
+COPY packages/demo/composer.json ./
+RUN composer update --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
 
 # Copy demo source
 COPY packages/demo/ .
+
+# Copy built assets from assets-builder
+COPY --from=assets-builder /build/public/build ./public/build
 
 # Generate optimized autoloader
 RUN composer dump-autoload --optimize --classmap-authoritative
