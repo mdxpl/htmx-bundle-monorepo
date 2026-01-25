@@ -36,7 +36,6 @@ Asynchronous form submission with validation:
 ### Advanced Form (HtmxTypeExtension)
 Demonstrates the `htmx` option on Symfony form fields:
 - Live search / autocomplete with debouncing
-- Cascading selects (country → city)
 - Inline field validation on blur
 - Conditional fields based on selection
 
@@ -54,9 +53,6 @@ Auto-refresh content with `hx-trigger="every 2s"`.
 
 ### Delete Confirm
 Delete with confirmation dialog and toast notifications via `HX-Trigger`.
-
-### Cascading Selects
-Dependent dropdowns - select country to load cities dynamically.
 
 ### Builder Showcase
 Interactive demo of all `HtmxResponseBuilder` methods.

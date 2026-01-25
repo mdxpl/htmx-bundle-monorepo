@@ -54,14 +54,14 @@ class DemoController extends AbstractController
                 // Return success block
                 return $builder
                     ->success()
-                    ->viewBlock($template, 'successComponent', $viewData)
+                    ->viewBlock($template, 'success', $viewData)
                     ->build();
             }
 
             // Return form with errors (422 status for htmx to swap)
             return $builder
                 ->failure()
-                ->viewBlock($template, 'failureComponent', $viewData)
+                ->viewBlock($template, 'formContent', $viewData)
                 ->build();
         }
 
@@ -69,7 +69,7 @@ class DemoController extends AbstractController
         if ($htmxRequest->isHtmx) {
             return $builder
                 ->success()
-                ->viewBlock($template, 'formComponent', $viewData)
+                ->viewBlock($template, 'formContent', $viewData)
                 ->build();
         }
 
@@ -127,21 +127,15 @@ When the request comes from htmx, it will automatically return a specific block 
 
 {% block body %}
 <div id="formWrapper">
-    {{ block('formComponent') }}
+    {{ block('formContent') }}
 </div>
 {% endblock %}
 
-{% block failureComponent %}
-<p>Fix the errors in the form!</p>
-<hr>
-{{ block('formComponent') }}
-{% endblock %}
-
-{% block successComponent %}
+{% block success %}
 <p>Great success!</p>
 {% endblock %}
 
-{% block formComponent %}
+{% block formContent %}
 <form hx-post="{{ path('app_demo') }}"
       hx-target="#formWrapper"
 >
