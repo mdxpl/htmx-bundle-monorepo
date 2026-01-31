@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Cache(maxage: 86400, public: true)]
+#[Cache(maxage: 86400, public: true, vary: ['HX-Request'])]
 #[Route('/simple-page/{slug}', name: 'app_simple_page')]
 final class SimplePageController extends AbstractController
 {
