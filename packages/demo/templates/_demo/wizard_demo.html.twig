@@ -1,0 +1,194 @@
+{% block _main %}
+{{ block('wizard') }}
+{% endblock %}
+
+{% block wizard %}
+{% import "@MdxplHtmx/Form/wizard_tabs.html.twig" as wizardMacros %}
+{% set navStrategy = current_navigation_strategy.value|default('free') %}
+
+<div id="wizard-container">
+    <article>
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <small>Navigation:</small>
+                    {% set currentStepNameForUrl = wizard_current_step.name|default('account') %}
+                    <select style="width: auto; padding: 0.25rem 0.5rem;"
+                            hx-get="{{ path('app_wizard_step', {step: currentStepNameForUrl}) }}"
+                            hx-target="#wizard-container"
+                            hx-swap="innerHTML swap:150ms"
+                            hx-push-url="true"
+                            name="_nav">
+                        {% for strategy in navigation_strategies|default([]) %}
+                            <option value="{{ strategy.value }}" {{ navStrategy == strategy.value ? 'selected' : '' }}>
+                                {{ strategy.label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="button" class="outline btn-sm"
+                        style="color: var(--pico-del-color);"
+                        hx-post="{{ path('app_wizard_reset') }}"
+                        hx-target="#wizard-container"
+                        hx-swap="innerHTML swap:150ms"
+                        hx-confirm="Are you sure you want to reset the wizard? All data will be lost.">
+                    Reset
+                </button>
+            </div>
+        </header>
+
+        {% set urlParams = {} %}
+        {% if navStrategy != 'free' %}
+            {% set urlParams = urlParams|merge({_nav: navStrategy}) %}
+        {% endif %}
+
+        {% if form.vars.wizard is defined %}
+            {% set wizard = form.vars.wizard %}
+            <div class="wizard-tabs">
+                {% for step in wizard.steps %}
+                    <a class="wizard-tab {{ step.is_current ? 'active' : '' }} {{ step.has_errors ? 'has-error' : (step.is_completed ? 'completed' : '') }}"
+                       {% if step.can_navigate and not step.is_current %}
+                           hx-get="{{ path('app_wizard_step', {step: step.name}|merge(urlParams)) }}"
+                           hx-target="#wizard-container"
+                           hx-swap="innerHTML swap:150ms"
+                           hx-push-url="true"
+                       {% endif %}>
+                        {% if step.has_errors %}!{% elseif step.is_completed %}✓{% endif %}
+                        {{ step.label }}
+                    </a>
+                {% endfor %}
+                <small style="margin-left: auto;">Step {{ wizard.current_step + 1 }} of {{ wizard.steps|length }}</small>
+            </div>
+        {% endif %}
+
+        {% set currentStepName = form.vars.wizard.steps[form.vars.wizard.current_step].name|default('account') %}
+        {{ form_start(form, {
+            attr: {
+                'hx-post': path('app_wizard_step', {step: currentStepName}|merge(urlParams)),
+                'hx-target': '#wizard-container',
+                'hx-swap': 'innerHTML swap:150ms',
+                'novalidate': 'novalidate'
+            }
+        }) }}
+
+        {{ form_widget(form._submitted) }}
+
+        <div id="wizard-content">
+            {% if form.vars.wizard is defined %}
+                {% set currentStepName = form.vars.wizard.steps[form.vars.wizard.current_step].name %}
+
+                {% if currentStepName == 'account' %}
+                    {{ block('step_account') }}
+                {% elseif currentStepName == 'profile' %}
+                    {{ block('step_profile') }}
+                {% elseif currentStepName == 'preferences' %}
+                    {{ block('step_preferences') }}
+                {% elseif currentStepName == 'confirmation' %}
+                    {{ block('step_confirmation') }}
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <div class="wizard-nav">
+            {{ wizardMacros.navigation(form, {
+                backLabel: 'Previous',
+                nextLabel: 'Continue',
+                submitLabel: 'Complete Registration',
+                containerClass: '',
+                backClass: 'outline',
+                nextClass: '',
+                submitClass: ''
+            }) }}
+        </div>
+
+        {{ form_end(form, {render_rest: false}) }}
+    </article>
+</div>
+{% endblock %}
+
+{% block step_account %}
+<h3>Create Your Account</h3>
+<p><small>Enter your email and create a secure password.</small></p>
+
+{{ form_row(form.account.email) }}
+
+<div class="grid">
+    <div>{{ form_row(form.account.password) }}</div>
+    <div>{{ form_row(form.account.confirmPassword) }}</div>
+</div>
+
+<p><small><ins>Tip:</ins> Your password should be at least 8 characters long.</small></p>
+{% endblock %}
+
+{% block step_profile %}
+<h3>Tell Us About Yourself</h3>
+<p><small>Help us personalize your experience.</small></p>
+
+<div class="grid">
+    <div>{{ form_row(form.profile.firstName) }}</div>
+    <div>{{ form_row(form.profile.lastName) }}</div>
+</div>
+
+{{ form_row(form.profile.bio) }}
+{% endblock %}
+
+{% block step_preferences %}
+<h3>Set Your Preferences</h3>
+<p><small>Customize how you want to use the application.</small></p>
+
+{{ form_row(form.preferences.newsletter) }}
+
+<hr><p><small>Appearance</small></p>
+{{ form_row(form.preferences.theme) }}
+
+<hr><p><small>Notifications</small></p>
+{{ form_row(form.preferences.notifications) }}
+{% endblock %}
+
+{% block step_confirmation %}
+<h3>Review Your Information</h3>
+<p><small>Please review your registration details before completing.</small></p>
+
+{% set data = wizard_state.allData %}
+
+<figure>
+    <table>
+        <tbody>
+            <tr><th>Email</th><td>{{ data.account.email|default('—') }}</td></tr>
+            <tr><th>Name</th><td>{{ data.profile.firstName|default('—') }} {{ data.profile.lastName|default('') }}</td></tr>
+            <tr><th>Bio</th><td>{{ (data.profile.bio|default('—'))|slice(0, 100) }}{% if (data.profile.bio|default(''))|length > 100 %}...{% endif %}</td></tr>
+            <tr><th>Newsletter</th><td>{{ data.preferences.newsletter|default(false) ? 'Yes' : 'No' }}</td></tr>
+            <tr><th>Theme</th><td>{{ data.preferences.theme|default('system')|capitalize }}</td></tr>
+            <tr><th>Notifications</th><td>{{ (data.preferences.notifications|default('—'))|replace({'_': ' '})|capitalize }}</td></tr>
+        </tbody>
+    </table>
+</figure>
+
+{{ form_row(form.confirmation.confirm) }}
+{% endblock %}
+
+{% block success %}
+<article>
+    <header>
+        <h2 style="color: var(--pico-ins-color);">Registration Complete!</h2>
+    </header>
+
+    <p>Welcome, {{ data.profile.firstName|default('') }} {{ data.profile.lastName|default('') }}! Your account has been created successfully.</p>
+
+    <figure>
+        <table>
+            <tbody>
+                <tr><th>Email</th><td>{{ data.account.email|default('—') }}</td></tr>
+                <tr><th>Name</th><td>{{ data.profile.firstName|default('—') }} {{ data.profile.lastName|default('') }}</td></tr>
+                <tr><th>Newsletter</th><td>{{ data.preferences.newsletter|default(false) ? 'Subscribed' : 'Not subscribed' }}</td></tr>
+                <tr><th>Theme</th><td>{{ data.preferences.theme|default('system')|capitalize }}</td></tr>
+            </tbody>
+        </table>
+    </figure>
+
+    <footer>
+        <a href="{{ path('app_wizard') }}" role="button">Start New Registration</a>
+        <a href="{{ path('app_home') }}" role="button" class="outline">Back to Home</a>
+    </footer>
+</article>
+{% endblock %}

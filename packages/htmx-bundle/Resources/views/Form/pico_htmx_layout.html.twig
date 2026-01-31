@@ -1,0 +1,273 @@
+{% use "form_div_layout.html.twig" %}
+
+{#
+ # PicoCSS + htmx Form Theme for Symfony Forms
+ #
+ # Semantic HTML styling compatible with PicoCSS.
+ # Extends Symfony's base div layout.
+ #
+ # Usage in twig.yaml:
+ #   twig:
+ #     form_themes: ['@MdxplHtmx/Form/pico_htmx_layout.html.twig']
+ #}
+
+{# ============================================= #}
+{# Form Row - Main wrapper for each field       #}
+{# ============================================= #}
+{% block form_row %}
+{% apply spaceless %}
+    {% set hasHtmx = attr.get is defined or attr['hx-get'] is defined or attr['hx-post'] is defined or attr.post is defined %}
+    {% set hasCascadingWrapper = cascading is defined and cascading.wrapper_id is defined %}
+
+    {# Cascading wrapper for fields that are targets of cascading selects #}
+    {% if hasCascadingWrapper %}<div id="{{ cascading.wrapper_id }}">{% endif %}
+
+    <div class="form-field{% if not valid %} has-error{% endif %}" style="margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            {{- form_label(form) -}}
+            {% if hasHtmx %}
+                <span class="htmx-indicator" style="width: 16px; height: 16px;">
+                    <span class="loader-spin"></span>
+                </span>
+            {% endif %}
+        </div>
+        {{- form_widget(form) -}}
+        {{- form_help(form) -}}
+        {# Validation container for htmx inline validation #}
+        <div id="{{ id }}-validation">
+            {{- form_errors(form) -}}
+        </div>
+    </div>
+
+    {% if hasCascadingWrapper %}</div>{% endif %}
+{% endapply %}
+{% endblock form_row %}
+
+{# ============================================= #}
+{# Labels                                        #}
+{# ============================================= #}
+{% block form_label %}
+{% apply spaceless %}
+    {% if label is not same as(false) %}
+        {% if not compound %}
+            {% set label_attr = label_attr|merge({'for': id}) %}
+        {% endif %}
+        {% if required %}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {% endif %}
+        {% if label is empty %}
+            {% if label_format is not empty %}
+                {% set label = label_format|replace({
+                    '%name%': name,
+                    '%id%': id,
+                }) %}
+            {% else %}
+                {% set label = name|humanize %}
+            {% endif %}
+        {% endif %}
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+            {{ translation_domain is same as(false) ? label : label|trans(label_translation_parameters, translation_domain) }}
+        </label>
+    {% endif %}
+{% endapply %}
+{% endblock form_label %}
+
+{# ============================================= #}
+{# Errors                                        #}
+{# ============================================= #}
+{% block form_errors %}
+{% apply spaceless %}
+    {% if errors|length > 0 %}
+        <small class="error-text">
+            {% for error in errors %}
+                {{ error.message }}{% if not loop.last %}<br>{% endif %}
+            {% endfor %}
+        </small>
+    {% endif %}
+{% endapply %}
+{% endblock form_errors %}
+
+{# ============================================= #}
+{# Help text                                     #}
+{# ============================================= #}
+{% block form_help %}
+{% apply spaceless %}
+    {% if help is not empty %}
+        <small id="{{ id }}_help"{% with { attr: help_attr } %}{{ block('attributes') }}{% endwith %}>
+            {%- if translation_domain is same as(false) -%}
+                {%- if help_html is same as(false) -%}
+                    {{- help -}}
+                {%- else -%}
+                    {{- help|raw -}}
+                {%- endif -%}
+            {%- else -%}
+                {%- if help_html is same as(false) -%}
+                    {{- help|trans(help_translation_parameters, translation_domain) -}}
+                {%- else -%}
+                    {{- help|trans(help_translation_parameters, translation_domain)|raw -}}
+                {%- endif -%}
+            {%- endif -%}
+        </small>
+    {% endif %}
+{% endapply %}
+{% endblock form_help %}
+
+{# ============================================= #}
+{# Text Input Widget                             #}
+{# ============================================= #}
+{% block form_widget_simple %}
+{% apply spaceless %}
+    {% set type = type|default('text') %}
+    {% if not valid %}
+        {% set attr = attr|merge({'aria-invalid': 'true'}) %}
+    {% endif %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock form_widget_simple %}
+
+{# ============================================= #}
+{# Textarea Widget                               #}
+{# ============================================= #}
+{% block textarea_widget %}
+{% apply spaceless %}
+    {% if not valid %}
+        {% set attr = attr|merge({'aria-invalid': 'true'}) %}
+    {% endif %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock textarea_widget %}
+
+{# ============================================= #}
+{# Select Widget (collapsed choice)              #}
+{# ============================================= #}
+{% block choice_widget_collapsed %}
+{% apply spaceless %}
+    {% if not valid %}
+        {% set attr = attr|merge({'aria-invalid': 'true'}) %}
+    {% endif %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock choice_widget_collapsed %}
+
+{# ============================================= #}
+{# Expanded Choice Widget (radio/checkbox group) #}
+{# ============================================= #}
+{% block choice_widget_expanded %}
+{% apply spaceless %}
+    {% set wrapperAttr = '' %}
+    {% if id is defined %}
+        {% set wrapperAttr = ' id="' ~ id ~ '"' %}
+    {% endif %}
+    <fieldset{{ wrapperAttr|raw }}>
+        {% for child in form %}
+            {{- form_row(child) -}}
+        {% endfor %}
+    </fieldset>
+{% endapply %}
+{% endblock choice_widget_expanded %}
+
+{# ============================================= #}
+{# Checkbox Row                                  #}
+{# ============================================= #}
+{% block checkbox_row %}
+{% apply spaceless %}
+    <div class="form-field" style="margin-bottom: 1rem;">
+        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            {{- form_widget(form) -}}
+            {{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) : '' }}
+        </label>
+        {{- form_help(form) -}}
+        <div id="{{ id }}-validation">
+            {{- form_errors(form) -}}
+        </div>
+    </div>
+{% endapply %}
+{% endblock checkbox_row %}
+
+{# ============================================= #}
+{# Checkbox Widget                               #}
+{# ============================================= #}
+{% block checkbox_widget %}
+{% apply spaceless %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock checkbox_widget %}
+
+{# ============================================= #}
+{# Radio Row (for expanded choices)              #}
+{# ============================================= #}
+{% block radio_row %}
+{% apply spaceless %}
+    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-bottom: 0.25rem;">
+        {{- form_widget(form) -}}
+        {{ label is not same as(false) ? (translation_domain is same as(false) ? label : label|trans({}, translation_domain)) : '' }}
+    </label>
+{% endapply %}
+{% endblock radio_row %}
+
+{# ============================================= #}
+{# Radio Widget                                  #}
+{# ============================================= #}
+{% block radio_widget %}
+{% apply spaceless %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock radio_widget %}
+
+{# ============================================= #}
+{# Submit Button Widget                          #}
+{# ============================================= #}
+{% block submit_widget %}
+{% apply spaceless %}
+    <span style="display: inline-flex; align-items: center; gap: 0.5rem;">
+        {{- parent() -}}
+        <span class="htmx-indicator">
+            <span class="loader-spin"></span>
+        </span>
+    </span>
+{% endapply %}
+{% endblock submit_widget %}
+
+{# ============================================= #}
+{# Button Widget (base button)                   #}
+{# ============================================= #}
+{% block button_widget %}
+{% apply spaceless %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock button_widget %}
+
+{# ============================================= #}
+{# File Input Widget                             #}
+{# ============================================= #}
+{% block file_widget %}
+{% apply spaceless %}
+    {% if not valid %}
+        {% set attr = attr|merge({'aria-invalid': 'true'}) %}
+    {% endif %}
+    {{- parent() -}}
+{% endapply %}
+{% endblock file_widget %}
+
+{# ============================================= #}
+{# Compound Form Row (for nested types)          #}
+{# with conditional field wrapper support        #}
+{# ============================================= #}
+{% block form_widget_compound %}
+{% apply spaceless %}
+    {% if conditional is defined and conditional.wrapper_id is defined %}
+        <div id="{{ conditional.wrapper_id }}">
+            {{ parent() }}
+        </div>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endapply %}
+{% endblock form_widget_compound %}
+
+{# ============================================= #}
+{# Hidden Widget - no styling needed             #}
+{# ============================================= #}
+{% block hidden_widget %}
+    <input type="hidden" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+{% endblock hidden_widget %}

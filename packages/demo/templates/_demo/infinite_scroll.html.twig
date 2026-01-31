@@ -1,0 +1,40 @@
+{% block _main %}
+<div id="items-container" hx-indicator="#loading-indicator" hx-ext="preload">
+    {{ block('items') }}
+</div>
+
+<div id="loading-indicator" class="htmx-indicator" style="text-align: center; padding: 2rem;" aria-busy="true">
+    Loading...
+</div>
+{% endblock %}
+
+{% block items %}
+{% for item in items %}
+<article
+    {% if loop.last and hasMore %}
+        hx-get="{{ path('app_infinite_scroll', {'page': nextPage}) }}"
+        hx-trigger="revealed"
+        hx-swap="afterend"
+        hx-replace-url="true"
+        preload="init"
+    {% endif %}
+>
+    <header><strong>{{ item.title }}</strong></header>
+    <p>{{ item.description }}</p>
+    <footer>
+        <small>Page {{ currentPage }} of {{ totalPages }} | ID: {{ item.id }}</small>
+    </footer>
+</article>
+{% endfor %}
+
+{% if not hasMore %}
+<article>
+    <p><ins>You've reached the end!</ins> No more items to load.</p>
+    {% if currentPage > 1 %}
+    <footer>
+        <a href="{{ path('app_infinite_scroll') }}" role="button" class="outline">Back to start</a>
+    </footer>
+    {% endif %}
+</article>
+{% endif %}
+{% endblock %}

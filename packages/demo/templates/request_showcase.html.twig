@@ -1,299 +1,151 @@
-{% extends 'base.html.twig' %}
+{% extends 'demo.html.twig' %}
 
-{% block title %}Request Showcase - htmx-bundle Demo{% endblock %}
-{% block description %}Interactive demo of HtmxRequest properties: trigger, target, prompt, currentUrl, isBoosted, and history restoration.{% endblock %}
-{% block csrf %}{{ htmx_csrf_meta() }}{% endblock %}
+{% set demo_title = 'HtmxRequest Showcase' %}
+{% set demo_description = 'See what htmx sends in request headers. Click buttons on the left to update the table on the right.' %}
+{% set demo_controller = 'RequestShowcaseController.php' %}
+{% set demo_template = '_demo/request_showcase.html.twig' %}
 
-{% block body %}
-<div class="mb-6">
-    <h1 class="text-3xl font-bold">HtmxRequest Showcase</h1>
-    <p class="text-base-content/70">See what htmx sends in request headers. Click buttons on the left to update the table on the right.</p>
-</div>
+{% use '_demo/request_showcase.html.twig' %}
+{% set demo_csrf = true %}
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    {# Left column - Actions #}
-    <div class="space-y-4">
-        {# Trigger & Target Demo #}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title text-lg">Trigger & Target</h2>
-                <p class="text-sm text-base-content/70 mb-3">Different buttons set different <code class="badge badge-ghost badge-xs">trigger</code> and <code class="badge badge-ghost badge-xs">target</code> values</p>
-                <div class="flex flex-wrap gap-2">
-                    <button class="btn btn-primary btn-sm"
-                            id="btn-alpha"
-                            name="alpha-button"
-                            hx-post="{{ path('app_request_showcase_request') }}"
-                            hx-target="#action-result"
-                            hx-swap="innerHTML">
-                        id="btn-alpha" name="alpha-button"
-                    </button>
-                    <button class="btn btn-secondary btn-sm"
-                            id="btn-beta"
-                            name="beta-button"
-                            hx-post="{{ path('app_request_showcase_request') }}"
-                            hx-target="#action-result"
-                            hx-swap="innerHTML">
-                        id="btn-beta" name="beta-button"
-                    </button>
-                    <button class="btn btn-accent btn-sm"
-                            id="btn-gamma"
-                            hx-post="{{ path('app_request_showcase_request') }}"
-                            hx-target="#action-result"
-                            hx-swap="innerHTML">
-                        id="btn-gamma" (no name)
-                    </button>
-                </div>
+{% block demo_styles %}
+<style>
+    .result-box {
+        padding: 0.75rem;
+        background: var(--pico-card-sectionning-background-color);
+        border-radius: var(--pico-border-radius);
+        min-height: 50px;
+        font-size: 0.875rem;
+    }
+    .prop-name { font-family: monospace; color: var(--pico-primary); }
+    .prop-true { background: var(--pico-ins-color); color: #fff; }
+    .prop-false { background: var(--pico-muted-border-color); }
+    .prop-badge {
+        display: inline-block;
+        padding: 0.125rem 0.5rem;
+        border-radius: var(--pico-border-radius);
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block demo %}
+<div class="grid">
+    <div>
+        <article>
+            <header><strong>Trigger & Target</strong></header>
+            <p><small>Different buttons set different <code>trigger</code> and <code>target</code> values</small></p>
+            <div role="group">
+                <button id="btn-alpha"
+                        name="alpha-button"
+                        hx-post="{{ path('app_request_showcase_request') }}"
+                        hx-target="#action-result"
+                        hx-swap="innerHTML">
+                    id="btn-alpha"
+                </button>
+                <button class="secondary"
+                        id="btn-beta"
+                        name="beta-button"
+                        hx-post="{{ path('app_request_showcase_request') }}"
+                        hx-target="#action-result"
+                        hx-swap="innerHTML">
+                    id="btn-beta"
+                </button>
+                <button class="contrast"
+                        id="btn-gamma"
+                        hx-post="{{ path('app_request_showcase_request') }}"
+                        hx-target="#action-result"
+                        hx-swap="innerHTML">
+                    id="btn-gamma"
+                </button>
             </div>
-        </div>
+        </article>
 
-        {# Prompt Demo #}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title text-lg">Prompt</h2>
-                <p class="text-sm text-base-content/70 mb-3">Use <code class="badge badge-ghost badge-xs">hx-prompt</code> to get user input - value appears in <code class="badge badge-ghost badge-xs">prompt</code> property</p>
-                <div class="flex flex-wrap gap-2">
-                    <button class="btn btn-warning btn-sm"
-                            id="prompt-btn"
-                            hx-post="{{ path('app_request_showcase_prompt') }}"
-                            hx-prompt="Enter your name:"
-                            hx-target="#action-result"
-                            hx-swap="innerHTML">
-                        Try hx-prompt
-                    </button>
-                </div>
-            </div>
-        </div>
+        <article>
+            <header><strong>Prompt</strong></header>
+            <p><small>Use <code>hx-prompt</code> to get user input - value appears in <code>prompt</code> property</small></p>
+            <button class="outline"
+                    id="prompt-btn"
+                    hx-post="{{ path('app_request_showcase_prompt') }}"
+                    hx-prompt="Enter your name:"
+                    hx-target="#action-result"
+                    hx-swap="innerHTML">
+                Try hx-prompt
+            </button>
+        </article>
 
-        {# Current URL Demo #}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title text-lg">Current URL</h2>
-                <p class="text-sm text-base-content/70 mb-3">
-                    <code class="badge badge-ghost badge-xs">currentUrl</code> shows browser URL when request was made
-                </p>
-                <div class="flex flex-wrap gap-2">
-                    <button class="btn btn-error btn-sm"
-                            id="change-url-btn"
-                            hx-post="{{ path('app_request_showcase_url') }}"
-                            hx-target="#action-result"
-                            hx-swap="innerHTML">
-                        Change URL (replaceUrl)
-                    </button>
-                    <a href="{{ path('app_request_showcase') }}" class="btn btn-ghost btn-sm btn-outline">
-                        Reset URL
-                    </a>
-                </div>
-                <p class="text-xs text-base-content/50 mt-2">
-                    Click "Change URL", then click other buttons - currentUrl will show new URL
-                </p>
+        <article>
+            <header><strong>Current URL</strong></header>
+            <p><small><code>currentUrl</code> shows browser URL when request was made</small></p>
+            <div role="group">
+                <button class="outline"
+                        style="color: var(--pico-del-color); border-color: var(--pico-del-color);"
+                        id="change-url-btn"
+                        hx-post="{{ path('app_request_showcase_url') }}"
+                        hx-target="#action-result"
+                        hx-swap="innerHTML">
+                    Change URL (replaceUrl)
+                </button>
+                <a href="{{ path('app_request_showcase') }}" role="button" class="outline">Reset URL</a>
             </div>
-        </div>
+            <p><small>Click "Change URL", then click other buttons - currentUrl will show new URL</small></p>
+        </article>
 
-        {# History Restoration Demo #}
-        <div class="card bg-base-100 shadow-xl" hx-history="false">
-            <div class="card-body">
-                <h2 class="card-title text-lg">History Restoration</h2>
-                <p class="text-sm text-base-content/70 mb-3">
-                    Click button to push URL, then browser back - <code class="badge badge-ghost badge-xs">isForHistoryRestoration</code> = <code class="badge badge-success badge-xs">true</code>
-                </p>
-                <div class="flex flex-wrap gap-2">
-                    <button class="btn btn-info btn-sm"
-                            id="history-btn"
-                            hx-post="{{ path('app_request_showcase_history') }}"
-                            hx-target="#action-result"
-                            hx-swap="innerHTML">
-                        Push URL (then click browser back)
-                    </button>
-                </div>
-                <p class="text-xs text-base-content/50 mt-2">
-                    <code>hx-history="false"</code> disables htmx cache, forcing server request on back
-                </p>
-            </div>
-        </div>
+        <article hx-history="false">
+            <header><strong>History Restoration</strong></header>
+            <p><small>Click button to push URL, then browser back - <code>isForHistoryRestoration</code> = <kbd>true</kbd></small></p>
+            <button class="outline"
+                    style="color: var(--pico-primary); border-color: var(--pico-primary);"
+                    id="history-btn"
+                    hx-post="{{ path('app_request_showcase_history') }}"
+                    hx-target="#action-result"
+                    hx-swap="innerHTML">
+                Push URL (then click browser back)
+            </button>
+            <p><small><code>hx-history="false"</code> disables htmx cache, forcing server request on back</small></p>
+        </article>
 
-        {# Boosted Demo #}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title text-lg">Boosted Requests</h2>
-                <p class="text-sm text-base-content/70 mb-3">
-                    Compare <code class="badge badge-ghost badge-xs">hx-boost</code> link vs regular button - see <code class="badge badge-ghost badge-xs">isBoosted</code> difference
-                </p>
-                <div class="flex flex-wrap gap-2">
-                    <a href="{{ path('app_request_showcase_boosted') }}"
-                       class="btn btn-success btn-sm"
-                       id="boosted-link"
-                       hx-boost="true"
-                       hx-target="#action-result"
-                       hx-select="#boosted-response"
-                       hx-swap="innerHTML">
-                        Boosted Link (isBoosted=true)
-                    </a>
-                    <button class="btn btn-outline btn-sm"
-                            id="regular-btn"
-                            hx-post="{{ path('app_request_showcase_boosted') }}"
-                            hx-target="#action-result"
-                            hx-swap="innerHTML">
-                        Regular Button (isBoosted=false)
-                    </button>
-                </div>
+        <article>
+            <header><strong>Boosted Requests</strong></header>
+            <p><small>Compare <code>hx-boost</code> link vs regular button - see <code>isBoosted</code> difference</small></p>
+            <div role="group">
+                <a href="{{ path('app_request_showcase_boosted') }}"
+                   role="button"
+                   style="background: var(--pico-ins-color);"
+                   id="boosted-link"
+                   hx-boost="true"
+                   hx-target="#action-result"
+                   hx-select="#boosted-response"
+                   hx-swap="innerHTML">
+                    Boosted Link (isBoosted=true)
+                </a>
+                <button class="outline"
+                        id="regular-btn"
+                        hx-post="{{ path('app_request_showcase_boosted') }}"
+                        hx-target="#action-result"
+                        hx-swap="innerHTML">
+                    Regular Button (isBoosted=false)
+                </button>
             </div>
-        </div>
+        </article>
     </div>
 
-    {# Right column - Request Info #}
-    <div class="space-y-4">
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title text-lg">Response</h2>
-                <div id="action-result" class="p-3 bg-base-200 rounded min-h-[40px] text-sm">
-                    <span class="text-base-content/50">Click any button to see the response</span>
-                </div>
+    <div>
+        <article>
+            <header><strong>Response</strong></header>
+            <div id="action-result" class="result-box">
+                <small>Click any button to see the response</small>
             </div>
-        </div>
+        </article>
 
-        <div class="card bg-base-100 shadow-xl sticky top-4">
-            <div class="card-body">
-                <h2 class="card-title text-lg">HtmxRequest Properties</h2>
-                <p class="text-sm text-base-content/70 mb-3">Values from request headers - updates in real-time</p>
+        <article style="position: sticky; top: 1rem;">
+            <header><strong>HtmxRequest Properties</strong></header>
+            <p><small>Values from request headers - updates in real-time</small></p>
 
-                <div id="request-info" class="overflow-x-auto">
-                    {% block requestInfo %}
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Property</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="font-mono text-primary">isHtmx</td>
-                                <td><span class="badge {{ htmx.isHtmx ? 'badge-success' : 'badge-ghost' }}">{{ htmx.isHtmx ? 'true' : 'false' }}</span></td>
-                            </tr>
-                            <tr>
-                                <td class="font-mono text-primary">isBoosted</td>
-                                <td><span class="badge {{ htmx.isBoosted ? 'badge-success' : 'badge-ghost' }}">{{ htmx.isBoosted ? 'true' : 'false' }}</span></td>
-                            </tr>
-                            <tr>
-                                <td class="font-mono text-primary">currentUrl</td>
-                                <td class="font-mono text-xs break-all">{{ htmx.currentUrl ?? '(null)' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="font-mono text-primary">target</td>
-                                <td class="font-mono text-xs">{{ htmx.target ?? '(null)' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="font-mono text-primary">trigger</td>
-                                <td class="font-mono text-xs">{{ htmx.trigger ?? '(null)' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="font-mono text-primary">triggerName</td>
-                                <td class="font-mono text-xs">{{ htmx.triggerName ?? '(null)' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="font-mono text-primary">prompt</td>
-                                <td class="font-mono text-xs">{{ htmx.prompt ?? '(null)' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="font-mono text-primary">isForHistoryRestoration</td>
-                                <td><span class="badge {{ htmx.isForHistoryRestoration ? 'badge-success' : 'badge-ghost' }}">{{ htmx.isForHistoryRestoration ? 'true' : 'false' }}</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    {% endblock %}
-                </div>
+            <div id="request-info">
+                {{ block('requestInfo') }}
             </div>
-        </div>
+        </article>
     </div>
 </div>
-{% endblock %}
-
-{# Request info OOB update #}
-{% block requestInfoOob %}
-<div id="request-info" hx-swap-oob="true" class="overflow-x-auto">
-    <table class="table table-sm">
-        <thead>
-            <tr>
-                <th>Property</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td class="font-mono text-primary">isHtmx</td>
-                <td><span class="badge {{ htmx.isHtmx ? 'badge-success' : 'badge-ghost' }}">{{ htmx.isHtmx ? 'true' : 'false' }}</span></td>
-            </tr>
-            <tr>
-                <td class="font-mono text-primary">isBoosted</td>
-                <td><span class="badge {{ htmx.isBoosted ? 'badge-success' : 'badge-ghost' }}">{{ htmx.isBoosted ? 'true' : 'false' }}</span></td>
-            </tr>
-            <tr>
-                <td class="font-mono text-primary">currentUrl</td>
-                <td class="font-mono text-xs break-all">{{ htmx.currentUrl ?? '(null)' }}</td>
-            </tr>
-            <tr>
-                <td class="font-mono text-primary">target</td>
-                <td class="font-mono text-xs">{{ htmx.target ?? '(null)' }}</td>
-            </tr>
-            <tr>
-                <td class="font-mono text-primary">trigger</td>
-                <td class="font-mono text-xs">{{ htmx.trigger ?? '(null)' }}</td>
-            </tr>
-            <tr>
-                <td class="font-mono text-primary">triggerName</td>
-                <td class="font-mono text-xs">{{ htmx.triggerName ?? '(null)' }}</td>
-            </tr>
-            <tr>
-                <td class="font-mono text-primary">prompt</td>
-                <td class="font-mono text-xs">{{ htmx.prompt ?? '(null)' }}</td>
-            </tr>
-            <tr>
-                <td class="font-mono text-primary">isForHistoryRestoration</td>
-                <td><span class="badge {{ htmx.isForHistoryRestoration ? 'badge-success' : 'badge-ghost' }}">{{ htmx.isForHistoryRestoration ? 'true' : 'false' }}</span></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-{% endblock %}
-
-{# Action result - main swap content #}
-{% block actionResult %}
-<div class="text-success">
-    <span class="font-bold">Request received!</span>
-    trigger={{ htmx.trigger ?? 'null' }}, triggerName={{ htmx.triggerName ?? 'null' }}, target={{ htmx.target ?? 'null' }}
-</div>
-{% endblock %}
-
-{# Prompt result #}
-{% block promptResult %}
-<div class="text-success">
-    <span class="font-bold">Prompt value:</span> {{ promptValue }}
-</div>
-{% endblock %}
-
-{# URL result #}
-{% block urlResult %}
-<div class="text-error">
-    <span class="font-bold">URL replaced:</span> {{ newUrl }}<br>
-    <span class="text-base-content/70">Click other buttons - currentUrl will show this new URL</span>
-</div>
-{% endblock %}
-
-{# History result #}
-{% block historyResult %}
-<div class="text-info">
-    <span class="font-bold">URL pushed:</span> {{ newUrl }}<br>
-    <span class="text-base-content/70">Now click browser back to see isForHistoryRestoration = true</span>
-</div>
-{% endblock %}
-
-{# Boosted result #}
-{% block boostedResult %}
-<div id="boosted-response" class="text-success">
-    <span class="font-bold">Boosted request received!</span> isBoosted = {{ htmx.isBoosted ? 'true' : 'false' }}
-</div>
-{% endblock %}
-
-{% block sourceCode %}
-{% include '_source_code.html.twig' with {controller: 'RequestShowcaseController.php', template: 'request_showcase.html.twig'} %}
 {% endblock %}

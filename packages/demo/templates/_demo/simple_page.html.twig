@@ -1,0 +1,35 @@
+{% block _main %}
+{{ block('pageNav') }}
+
+<div id="pageContent">
+    {{ block('pageContent') }}
+</div>
+{% endblock %}
+
+{% block pageNav %}
+<nav id="page-nav" hx-swap-oob="true">
+    <ul>
+        {% for slug, item in menu %}
+        <li>
+            <a href="{{ path('app_simple_page', {'slug': slug}) }}"
+               {{ currentSlug == slug ? 'aria-current="page"' : '' }}
+               hx-get="{{ path('app_simple_page', {'slug': slug}) }}"
+               hx-push-url="true"
+               hx-target="#pageContent"
+               hx-swap="innerHTML transition:true"
+               hx-indicator="#loader">
+                {{ item.name }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</nav>
+{% endblock %}
+
+{% block pageContent %}
+<title>{{ page.name }} - Simple Page Demo</title>
+<article>
+    <header><strong>{{ page.name }}</strong></header>
+    <p>{{ page.description }}</p>
+</article>
+{% endblock %}

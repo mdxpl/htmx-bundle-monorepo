@@ -29,10 +29,18 @@ final class SourceCodeExtension extends AbstractExtension
         if (!file_exists($fullPath)) {
             return "// File not found: {$relativePath}";
         }
-
         $content = file_get_contents($fullPath);
 
-        return $content !== false ? $content : '';
+        if ($content === false) {
+            return '';
+        }
+
+        // Strip {% block _main %}...{% endblock %} wrapper from _demo templates
+        if (str_starts_with($relativePath, 'templates/_demo/')) {
+            $content = preg_replace('/^{% block _main %}\n.*?{% endblock %}\n+/s', '', $content, 1) ?? '';
+        }
+
+        return $content;
     }
 
     public function getGithubUrl(string $relativePath, string $repo = 'mdxpl/htmx-bundle-demo'): string

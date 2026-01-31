@@ -8,9 +8,11 @@ use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Cache(maxage: 86400, public: true)]
 #[Route('/simple-page/{slug}', name: 'app_simple_page')]
 final class SimplePageController extends AbstractController
 {
@@ -35,8 +37,8 @@ final class SimplePageController extends AbstractController
         if ($htmx->isHtmx) {
             return $builder
                 ->success()
-                ->viewBlock('simple_page.html.twig', 'pageContentPartial', $viewData)
-                ->viewBlock('simple_page.html.twig', 'pageNavOob', $viewData)
+                ->viewBlock('simple_page.html.twig', 'pageContent', $viewData)
+                ->viewBlock('simple_page.html.twig', 'pageNav', $viewData)
                 ->build();
         }
 

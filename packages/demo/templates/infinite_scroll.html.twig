@@ -1,80 +1,28 @@
-{% extends 'base.html.twig' %}
+{% extends 'demo.html.twig' %}
 
-{% block title %}Infinite Scroll Demo - htmx-bundle{% endblock %}
-{% block description %}Infinite scroll demo with hx-trigger revealed - automatic content loading on scroll with URL updates and pagination.{% endblock %}
+{% set demo_title = 'Infinite Scroll' %}
+{% set demo_description = 'Scroll down to load more items automatically. Uses htmx preload extension to fetch next page in background.' %}
+{% set demo_controller = 'InfiniteScrollController.php' %}
+{% set demo_template = '_demo/infinite_scroll.html.twig' %}
 
-{% block body %}
-<div class="mb-6">
-    <h1 class="text-3xl font-bold">Infinite Scroll</h1>
-    <p class="text-base-content/70">Scroll down to load more items automatically. No custom JavaScript code needed!</p>
-    <div class="mt-3 px-4 py-3 bg-base-200 rounded-lg text-sm">
-        <span class="font-semibold">Tip:</span> You can navigate directly to any page via URL, e.g. <a href="{{ path('app_infinite_scroll', {'page': totalPages}) }}" class="link link-primary">jump to last page</a>.
-    </div>
-</div>
+{% use '_demo/infinite_scroll.html.twig' %}
 
+{% block demo_scripts %}
+<script src="https://unpkg.com/htmx-ext-preload@2.1.0/preload.js"></script>
+{% endblock %}
+
+{% block demo_header %}
+<p><small>Uses <kbd>preload="init"</kbd> to fetch next page immediately after current one loads. When you scroll down, the content is already cached - instant display!</small></p>
+<p><small><strong>Tip:</strong> You can navigate directly to any page via URL, e.g. <a href="{{ path('app_infinite_scroll', {'page': totalPages}) }}">jump to last page</a>.</small></p>
+{% endblock %}
+
+{% block demo %}
 {% if currentPage > 1 %}
-<div class="alert alert-warning mb-4">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 shrink-0">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-    </svg>
-    <span>You're viewing from page {{ currentPage }} of {{ totalPages }}. Earlier items are not loaded.</span>
-    <a href="{{ path('app_infinite_scroll') }}" class="btn btn-sm btn-primary">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
-        </svg>
-        Back to start
-    </a>
-</div>
+<article aria-label="Warning">
+    <p><mark>You're viewing from page {{ currentPage }} of {{ totalPages }}.</mark> Earlier items are not loaded.
+    <a href="{{ path('app_infinite_scroll') }}" role="button" class="outline btn-sm">Back to start</a></p>
+</article>
 {% endif %}
 
-<div id="items-container" hx-indicator="#loading-indicator" class="space-y-4">
-    {{ block('items') }}
-</div>
-
-<div id="loading-indicator" class="htmx-indicator flex justify-center py-8">
-    <span class="loading loading-spinner loading-lg"></span>
-</div>
-{% endblock %}
-
-{% block items %}
-{% for item in items %}
-<div class="card bg-base-100 shadow-xl"
-    {% if loop.last and hasMore %}
-        hx-get="{{ path('app_infinite_scroll', {'page': nextPage}) }}"
-        hx-trigger="revealed"
-        hx-swap="afterend"
-        hx-replace-url="true"
-    {% endif %}
->
-    <div class="card-body">
-        <h2 class="card-title">{{ item.title }}</h2>
-        <p>{{ item.description }}</p>
-        <div class="card-actions justify-end">
-            <div class="badge badge-outline">Page {{ currentPage }} of {{ totalPages }}</div>
-            <div class="badge badge-ghost">ID: {{ item.id }}</div>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-{% if not hasMore %}
-<div class="flex justify-center gap-4 mt-4">
-    <div class="alert alert-info flex-1">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        <span>You've reached the end! No more items to load.</span>
-    </div>
-    {% if currentPage > 1 %}
-    <a href="{{ path('app_infinite_scroll') }}" class="btn btn-primary btn-outline">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
-        </svg>
-        Back to start
-    </a>
-    {% endif %}
-</div>
-{% endif %}
-{% endblock %}
-
-{% block sourceCode %}
-{% include '_source_code.html.twig' with {controller: 'InfiniteScrollController.php', template: 'infinite_scroll.html.twig'} %}
+{{ block('_main') }}
 {% endblock %}

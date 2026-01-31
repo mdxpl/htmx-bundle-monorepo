@@ -1,94 +1,16 @@
-{% extends 'base.html.twig' %}
+{% extends 'demo.html.twig' %}
 
-{% block title %}Polling / Live Updates - htmx-bundle Demo{% endblock %}
-{% block description %}Live polling demo with auto-refreshing stats every 2 seconds using hx-trigger every 2s - no JavaScript code needed.{% endblock %}
+{% set demo_title = 'Polling / Live Updates' %}
+{% set demo_description = 'Watch the stats update automatically every 2 seconds.' %}
+{% set demo_controller = 'PollingController.php' %}
+{% set demo_template = '_demo/polling.html.twig' %}
 
-{% block body %}
-<div class="mb-6">
-    <h1 class="text-3xl font-bold">Polling / Live Updates</h1>
-    <p class="text-base-content/70">Watch the stats update automatically every 2 seconds.</p>
-    <p class="text-base-content/70 text-sm mt-2">Uses <code class="badge badge-ghost badge-sm">hx-trigger="every 2s"</code> for automatic polling.</p>
-</div>
+{% use '_demo/polling.html.twig' %}
 
-<div id="stats-container"
-     hx-get="{{ path('app_polling_stats') }}"
-     hx-trigger="every 2s"
-     hx-swap="innerHTML">
-    {{ block('statsContent') }}
-</div>
-
-<div class="mt-6">
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title">How it works</h2>
-            <ul class="list-disc list-inside space-y-2">
-                <li>The stats container has <code class="badge badge-ghost">hx-trigger="every 2s"</code></li>
-                <li>htmx automatically sends a GET request every 2 seconds</li>
-                <li>Server returns only the stats block (partial HTML)</li>
-                <li>No JavaScript polling code needed!</li>
-            </ul>
-        </div>
-    </div>
-</div>
-
-{% include '_source_code.html.twig' with {controller: 'PollingController.php', template: 'polling.html.twig'} %}
+{% block demo_header %}
+<p><small>Uses <kbd>hx-trigger="every 2s"</kbd> for automatic polling.</small></p>
 {% endblock %}
 
-{% block statsContent %}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-    <div class="stat bg-base-100 rounded-box shadow">
-        <div class="stat-figure text-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-        </div>
-        <div class="stat-title">Visitors</div>
-        <div class="stat-value text-primary">{{ stats.visitors }}</div>
-        <div class="stat-desc">Online now</div>
-    </div>
-
-    <div class="stat bg-base-100 rounded-box shadow">
-        <div class="stat-figure text-secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-        </div>
-        <div class="stat-title">Orders</div>
-        <div class="stat-value text-secondary">{{ stats.orders }}</div>
-        <div class="stat-desc">Today</div>
-    </div>
-
-    <div class="stat bg-base-100 rounded-box shadow">
-        <div class="stat-figure text-accent">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        </div>
-        <div class="stat-title">Revenue</div>
-        <div class="stat-value text-accent">${{ stats.revenue }}</div>
-        <div class="stat-desc">Today</div>
-    </div>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title">CPU Usage</h2>
-            <progress class="progress progress-primary w-full" value="{{ stats.cpu }}" max="100"></progress>
-            <p class="text-right text-sm">{{ stats.cpu }}%</p>
-        </div>
-    </div>
-
-    <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title">Memory Usage</h2>
-            <progress class="progress progress-secondary w-full" value="{{ stats.memory }}" max="100"></progress>
-            <p class="text-right text-sm">{{ stats.memory }}%</p>
-        </div>
-    </div>
-</div>
-
-<div class="text-center mt-4 text-base-content/50 text-sm">
-    Last updated: {{ stats.updated_at }}
-</div>
+{% block demo %}
+{{ block('_main') }}
 {% endblock %}

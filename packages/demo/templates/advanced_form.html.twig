@@ -1,370 +1,162 @@
-{% extends 'base.html.twig' %}
+{% extends 'demo.html.twig' %}
 
-{% block title %}Advanced Form Demo - htmx-bundle{% endblock %}
-{% block description %}Demo of HtmxTypeExtension: live search, cascading selects, inline validation, and conditional fields with htmx.{% endblock %}
-{% block csrf %}{{ htmx_csrf_meta() }}{% endblock %}
+{% set demo_title = 'HtmxTypeExtension Demo' %}
+{% set demo_description = 'This demo showcases the htmx option available on all Symfony form fields via HtmxTypeExtension.' %}
+{% set demo_controller = 'AdvancedFormController.php' %}
+{% set demo_template = '_demo/advanced_form.html.twig' %}
 
-{% block body %}
-<div class="mb-6">
-    <h1 class="text-3xl font-bold">HtmxTypeExtension Demo</h1>
-    <p class="text-base-content/70">This demo showcases the <code class="badge badge-ghost">htmx</code> option available on all Symfony form fields via HtmxTypeExtension.</p>
-</div>
+{% use '_demo/advanced_form.html.twig' %}
+{% set demo_csrf = true %}
 
-<div id="form-wrapper">
-    {{ block('formContent') }}
-</div>
+{% block demo_styles %}
+<style>
+    .user-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        margin-top: 0.25rem;
+    }
+    .user-results ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        background: var(--pico-card-background-color);
+        border: 1px solid var(--pico-muted-border-color);
+        border-radius: var(--pico-border-radius);
+    }
+    .user-results li {
+        padding: 0;
+    }
+    .user-results a {
+        display: block;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+    }
+    .user-results a:hover {
+        background: var(--pico-primary-background);
+    }
+    .field-relative {
+        position: relative;
+    }
+    /* Inline validation messages */
+    .validation-message {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .validation-error {
+        color: var(--pico-del-color);
+    }
+    .validation-success {
+        color: var(--pico-ins-color);
+    }
+
+    /* Symfony form errors */
+    .form-error-message,
+    ul.form-errors li,
+    .invalid-feedback,
+    form ul:not([class]) li,
+    form .help-block {
+        color: var(--pico-del-color);
+        font-size: 0.875rem;
+    }
+    ul.form-errors,
+    form ul:not([class]) {
+        list-style: none;
+        padding: 0;
+        margin: 0.25rem 0 0 0;
+    }
+
+    /* Invalid input styling */
+    input:invalid,
+    select:invalid,
+    textarea:invalid,
+    input[aria-invalid="true"],
+    select[aria-invalid="true"],
+    textarea[aria-invalid="true"],
+    .is-invalid input,
+    .is-invalid select,
+    .is-invalid textarea {
+        border-color: var(--pico-del-color);
+    }
+    input:invalid:focus,
+    select:invalid:focus,
+    textarea:invalid:focus {
+        border-color: var(--pico-del-color);
+        box-shadow: 0 0 0 0.2rem rgba(var(--pico-del-color), 0.25);
+    }
+    .business-fields {
+        padding: 1rem;
+        background: var(--pico-card-sectionning-background-color);
+        border-radius: var(--pico-border-radius);
+        margin-top: 1rem;
+    }
+    .code-example {
+        background: var(--pico-card-sectionning-background-color);
+        padding: 1rem;
+        border-radius: var(--pico-border-radius);
+        overflow-x: auto;
+        font-size: 0.8rem;
+    }
+    .code-example pre {
+        margin: 0;
+        white-space: pre-wrap;
+    }
+
+    /* Error alert */
+    .alert-error {
+        background: var(--pico-del-color);
+        color: var(--pico-background-color);
+        padding: 1rem;
+        border-radius: var(--pico-border-radius);
+        margin-bottom: 1rem;
+    }
+</style>
 {% endblock %}
 
-{% block formContent %}
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    {# Left Column - Form #}
-    <div class="space-y-6">
-        {{ form_start(form, {
-            'attr': {
-                'hx-post': path('app_advanced_form'),
-                'hx-target': '#form-wrapper',
-                'hx-swap': 'innerHTML',
-                'autocomplete': 'off',
-                'novalidate': 'novalidate',
+{% block demo_header %}
+<p><small>Powered by <mark>PicoCSS</mark> + <mark>htmx</mark></small></p>
+{% endblock %}
+
+{% block demo %}
+{{ block('_main') }}
+{% endblock %}
+
+{% block demo_scripts %}
+<script>
+    function markInvalidFields() {
+        // Find all error lists from Symfony form rendering
+        document.querySelectorAll('ul.form-errors, .help-block.text-danger, li.form-error').forEach(function(errorEl) {
+            // Find the closest input/select/textarea
+            const container = errorEl.closest('.mb-3, div');
+            if (container) {
+                const input = container.querySelector('input, select, textarea');
+                if (input) {
+                    input.setAttribute('aria-invalid', 'true');
+                }
             }
-        }) }}
+        });
 
-        {% if not form.vars.valid and form.vars.submitted %}
-        <div id="form-error" class="alert alert-error shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>Please fix the validation errors below.</span>
-        </div>
-        {% endif %}
+        // Also check for Symfony's default error rendering (ul inside form row)
+        document.querySelectorAll('form ul:not(.user-results ul)').forEach(function(ul) {
+            if (ul.textContent.trim() && !ul.classList.contains('user-results')) {
+                const container = ul.closest('div');
+                if (container) {
+                    const input = container.querySelector('input, select, textarea');
+                    if (input && ul.querySelector('li')) {
+                        input.setAttribute('aria-invalid', 'true');
+                        ul.classList.add('form-errors');
+                    }
+                }
+            }
+        });
+    }
 
-        {# Section 1: Live Search / Autocomplete #}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">
-                    <span class="badge badge-primary">1</span>
-                    Live Search / Autocomplete
-                </h2>
-                <p class="text-sm text-base-content/70 mb-4">Type at least 2 characters to search users. Uses <code class="badge badge-ghost badge-sm">hx-trigger</code> with delay and condition.</p>
-                <p class="text-xs text-base-content/50 mb-4">Try: <span class="badge badge-outline badge-xs">john</span> <span class="badge badge-outline badge-xs">jane</span> <span class="badge badge-outline badge-xs">alice</span> <span class="badge badge-outline badge-xs">bob</span> <span class="badge badge-outline badge-xs">@example</span></p>
+    // Run on page load
+    markInvalidFields();
 
-                {# Custom: needs relative positioning for dropdown #}
-                <div class="relative">
-                    {{ form_row(form.user) }}
-                    <div id="user-results" class="absolute top-full left-0 right-0 z-10 mt-1"></div>
-                </div>
-
-                <div class="mt-2 text-xs text-base-content/50">
-                    <strong>htmx options:</strong> get, trigger, target, indicator, params, on::before-request
-                </div>
-            </div>
-        </div>
-
-        {# Section 2: Cascading Selects #}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">
-                    <span class="badge badge-primary">2</span>
-                    Cascading Selects
-                </h2>
-                <p class="text-sm text-base-content/70 mb-4">Select a country to load cities dynamically. Uses <code class="badge badge-ghost badge-sm">hx-on::config-request</code> to modify the URL.</p>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        {{ form_row(form.country) }}
-                    </div>
-                    <div>
-                        {{ form_row(form.city) }}
-                    </div>
-                </div>
-
-                <div class="mt-2 text-xs text-base-content/50">
-                    <strong>htmx options:</strong> get, trigger, target, on::config-request
-                </div>
-            </div>
-        </div>
-
-        {# Section 3: Inline Validation #}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">
-                    <span class="badge badge-primary">3</span>
-                    Inline Validation
-                </h2>
-                <p class="text-sm text-base-content/70 mb-4">Fields validate on blur. Server-side validation without full form submit.</p>
-
-                {{ form_row(form.email) }}
-                {{ form_row(form.username) }}
-
-                <div class="mt-2 text-xs text-base-content/50">
-                    <strong>htmx options:</strong> post, trigger, target, swap
-                </div>
-            </div>
-        </div>
-
-        {# Section 4: Conditional Fields with BusinessFieldsType #}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">
-                    <span class="badge badge-primary">4</span>
-                    Conditional Fields
-                </h2>
-                <p class="text-sm text-base-content/70 mb-4">Select account type to show/hide additional fields. Uses <code class="badge badge-ghost badge-sm">conditional</code> option from <code class="badge badge-ghost badge-sm">ConditionalTypeExtension</code>.</p>
-
-                {{ form_row(form.accountType) }}
-
-                {# Conditional field wrapper - ID set by ConditionalTypeExtension #}
-                <div id="{{ form.business.vars.conditional.wrapper_id|default('business-fields') }}" class="mt-4">
-                    {{ block('businessFields') }}
-                </div>
-
-                <div class="mt-2 text-xs text-base-content/50">
-                    <strong>conditional:</strong> trigger, endpoint (auto-configures htmx)
-                </div>
-            </div>
-        </div>
-
-        {# Submit - uses theme's loading indicator #}
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">
-                    <span class="badge badge-primary">5</span>
-                    Form Submit
-                </h2>
-                <p class="text-sm text-base-content/70 mb-4">The entire form submits via htmx using form_start attributes.</p>
-                <div class="alert alert-info text-sm py-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>On validation error, the page auto-scrolls to the error message via <code class="font-mono">triggerAfterSwap(['scrollTo' => '...'])</code> passed from the controller response.</span>
-                </div>
-
-                <div class="divider"></div>
-
-                {{ form_row(form.submit) }}
-            </div>
-        </div>
-
-        {{ form_end(form, {'render_rest': false}) }}
-    </div>
-
-    {# Right Column - Code Examples #}
-    <div class="space-y-6">
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">HtmxOptions Builder</h2>
-                <p class="text-sm text-base-content/70 mb-4">Use fluent builder API with <code class="badge badge-ghost badge-sm">HtmxOptions</code>:</p>
-
-                <div class="mockup-code text-xs">
-                    <pre><code class="language-php">use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
-use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
-
-$builder->add('search', TextType::class, [
-    'htmx' => HtmxOptions::create()
-        ->getRoute('app_search')
-        ->trigger(Trigger::keyup()->changed()->delay(300))
-        ->target('#results')
-        ->indicator('#spinner'),
-]);</code></pre>
-                </div>
-
-                <h3 class="font-semibold mt-4 mb-2">Available Methods</h3>
-                <div class="overflow-x-auto">
-                    <table class="table table-xs">
-                        <thead>
-                            <tr>
-                                <th>Method</th>
-                                <th>Attribute</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>get() / getRoute()</td><td>hx-get</td></tr>
-                            <tr><td>post() / postRoute()</td><td>hx-post</td></tr>
-                            <tr><td>trigger()</td><td>hx-trigger</td></tr>
-                            <tr><td>target()</td><td>hx-target</td></tr>
-                            <tr><td>swap()</td><td>hx-swap</td></tr>
-                            <tr><td>indicator()</td><td>hx-indicator</td></tr>
-                            <tr><td>include()</td><td>hx-include</td></tr>
-                            <tr><td>vals()</td><td>hx-vals</td></tr>
-                            <tr><td>confirm()</td><td>hx-confirm</td></tr>
-                            <tr><td>onBeforeRequest()</td><td>hx-on::before-request</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">Trigger Builder</h2>
-                <p class="text-sm text-base-content/70 mb-4">Build complex triggers with <code class="badge badge-ghost badge-sm">Trigger</code> class:</p>
-
-                <div class="mockup-code text-xs">
-                    <pre><code class="language-php">use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
-
-// keyup changed delay:300ms
-Trigger::keyup()->changed()->delay(300)
-
-// blur changed delay:500ms
-Trigger::blur()->changed()->delay(500)
-
-// change (for selects)
-Trigger::change()
-
-// keyup[target.value.length >= 2]
-Trigger::keyup()->condition('target.value.length >= 2')</code></pre>
-                </div>
-            </div>
-        </div>
-
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">Route with Placeholders</h2>
-                <p class="text-sm text-base-content/70 mb-4">Use placeholders for dynamic field values:</p>
-
-                <div class="mockup-code text-xs">
-                    <pre><code class="language-php">// Server-side: {name}, {id}, {full_name}
-HtmxOptions::create()
-    ->postRoute('app_validate', ['field' => '{name}'])
-    ->target('#{id}-validation')
-
-// Client-side: {value} (auto-generates JS)
-HtmxOptions::create()
-    ->getRoute('app_cities', ['country' => '{value}'])
-    ->trigger(Trigger::change())</code></pre>
-                </div>
-            </div>
-        </div>
-
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">Conditional Fields</h2>
-                <p class="text-sm text-base-content/70 mb-4">Use <code class="badge badge-ghost badge-sm">conditional</code> to show/hide fields:</p>
-
-                <div class="mockup-code text-xs">
-                    <pre><code class="language-php">$builder
-    ->add('accountType', ChoiceType::class, [
-        'choices' => [
-            'Personal' => 'personal',
-            'Business' => 'business',
-        ],
-        'expanded' => true,
-    ])
-    ->add('business', BusinessFieldsType::class, [
-        'conditional' => [
-            'trigger' => 'accountType',
-            'endpoint' => '/form/business-fields',
-        ],
-    ]);</code></pre>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block searchResults %}
-{% if results is defined and results|length > 0 %}
-<ul class="menu bg-base-200 rounded-box shadow-lg">
-    {% for user in results %}
-    <li>
-        <a href="#" onclick="document.querySelector('[name=\'form[user]\']').value = '{{ user.name }}'; this.closest('ul').remove(); return false;">
-            <div>
-                <div class="font-medium">{{ user.name }}</div>
-                <div class="text-xs text-base-content/50">{{ user.email }}</div>
-            </div>
-        </a>
-    </li>
-    {% endfor %}
-</ul>
-{% elseif results is defined %}
-<div class="bg-base-200 rounded-box p-3 text-sm text-base-content/70">
-    No users found
-</div>
-{% endif %}
-{% endblock %}
-
-{% block citySelect %}
-{# htmx response - replaces content inside #form_city-wrapper #}
-{{ form_row(cityField) }}
-{% endblock %}
-
-{% block fieldValidation %}
-{% if errors is defined and errors|length > 0 %}
-<label class="label py-1">
-    <span class="label-text-alt text-error flex items-center gap-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        {{ errors|first }}
-    </span>
-</label>
-{% elseif isValid is defined and isValid %}
-<label class="label py-1">
-    <span class="label-text-alt text-success flex items-center gap-1">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        Valid
-    </span>
-</label>
-{% endif %}
-{% endblock %}
-
-{% block businessFields %}
-{# Determine if we should show business fields #}
-{% set showBusiness = isBusiness is defined ? isBusiness : (form is defined and form.accountType is defined and form.accountType.vars.value == 'business') %}
-{% set businessForm = businessForm is defined ? businessForm : (form is defined and form.business is defined ? form.business : null) %}
-
-{% if showBusiness and businessForm %}
-<div class="space-y-2 p-4 bg-base-200 rounded-lg">
-    <div class="text-sm font-semibold text-primary mb-2">Business Account Fields</div>
-
-    {{ form_row(businessForm.companyName) }}
-    {{ form_row(businessForm.taxId) }}
-    {{ form_row(businessForm.companyAddress) }}
-</div>
-{% elseif showBusiness %}
-{# Fallback for htmx partial when businessForm comes from standalone form #}
-<div class="space-y-4 p-4 bg-base-200 rounded-lg">
-    <div class="text-sm font-semibold text-primary">Business Account Fields</div>
-    <p class="text-sm text-base-content/70">Loading...</p>
-</div>
-{% else %}
-<div class="p-4 bg-base-200 rounded-lg text-sm text-base-content/70">
-    <span class="badge badge-ghost">Personal</span> account selected - no additional fields required.
-</div>
-{% if form is defined and form.business is defined %}
-    {% do form.business.setRendered() %}
-{% endif %}
-{% endif %}
-{% endblock %}
-
-{% block submitSuccess %}
-<div class="card bg-success text-success-content shadow-xl">
-    <div class="card-body">
-        <h2 class="card-title">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Form Submitted Successfully!
-        </h2>
-
-        <div class="mt-4">
-            <h3 class="font-semibold mb-2">Submitted Data:</h3>
-            <div class="bg-success-content/10 rounded-lg p-4">
-                <pre class="text-sm whitespace-pre-wrap">{{ data|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
-            </div>
-        </div>
-
-        <div class="card-actions justify-end mt-4">
-            <button class="btn btn-outline"
-                    hx-get="{{ path('app_advanced_form') }}"
-                    hx-target="#form-wrapper"
-                    hx-swap="innerHTML">
-                Submit Another
-            </button>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block sourceCode %}
-{% include '_source_code.html.twig' with {controller: 'AdvancedFormController.php', template: 'advanced_form.html.twig'} %}
+    // Run after htmx swaps
+    document.body.addEventListener('htmx:afterSwap', markInvalidFields);
+</script>
 {% endblock %}

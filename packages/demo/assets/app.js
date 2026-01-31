@@ -1,79 +1,75 @@
-import './input.css';
+// Import htmx
 import htmx from 'htmx.org';
 
-// Make htmx globally available
+// Make htmx available globally
 window.htmx = htmx;
 
-// Enable htmx debug logging if enabled in localStorage
-if (localStorage.getItem('htmx-debug') === 'true') {
-    htmx.logAll();
-}
-
-// Load Prism only when code blocks are present (lazy loading)
-if (document.querySelector('pre code[class*="language-"]')) {
-    import('./prism.js');
-}
-
-// Handle 422 status for form validation errors
-document.body.addEventListener('htmx:beforeOnLoad', function(evt) {
-    if (evt.detail.xhr.status === 422) {
-        evt.detail.shouldSwap = true;
-        evt.detail.isError = false;
-    }
-});
-
-// Scroll to element when triggered from server
-document.body.addEventListener('scrollTo', function(evt) {
-    const selector = typeof evt.detail === 'string' ? evt.detail : (evt.detail?.value || evt.detail?.selector);
-    if (selector) {
-        const target = document.querySelector(selector);
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }
-});
-
-// Global CSRF token injection
+// CSRF token handling
 document.body.addEventListener('htmx:configRequest', function(event) {
-    const meta = document.querySelector('meta[name="csrf-token"]');
-    if (meta) {
-        event.detail.headers['X-CSRF-Token'] = meta.content;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        event.detail.headers['X-CSRF-Token'] = csrfToken.content;
     }
 });
 
-// Theme persistence
+// Handle 422 validation errors
+document.body.addEventListener('htmx:beforeSwap', function(event) {
+    if (event.detail.xhr.status === 422) {
+        event.detail.shouldSwap = true;
+        event.detail.isError = false;
+    }
+});
+
+// Scroll to element trigger
+document.body.addEventListener('scrollTo', function(event) {
+    const selector = event.detail.value || event.detail;
+    const element = document.querySelector(selector);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+});
+
+// Theme toggle
 const themeToggle = document.getElementById('theme-toggle');
 if (themeToggle) {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        themeToggle.checked = true;
-        document.documentElement.setAttribute('data-theme', 'light');
-    }
+    const savedTheme = localStorage.getItem('pico-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeToggle.checked = savedTheme === 'light';
+
     themeToggle.addEventListener('change', function() {
         const theme = this.checked ? 'light' : 'dark';
-        localStorage.setItem('theme', theme);
         document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('pico-theme', theme);
     });
 }
 
 // htmx debug toggle
 const debugToggle = document.getElementById('htmx-debug-toggle');
 if (debugToggle) {
-    debugToggle.checked = localStorage.getItem('htmx-debug') === 'true';
+    const debugEnabled = localStorage.getItem('htmx-debug') === 'true';
+    debugToggle.checked = debugEnabled;
+    if (debugEnabled) {
+        htmx.logAll();
+    }
+
     debugToggle.addEventListener('change', function() {
         localStorage.setItem('htmx-debug', this.checked);
-        location.reload();
+        if (this.checked) {
+            htmx.logAll();
+            console.log('%c[htmx] Debug logging enabled', 'color: #1095c1; font-weight: bold');
+        } else {
+            console.log('%c[htmx] Debug logging disabled (reload to apply)', 'color: #1095c1; font-weight: bold');
+        }
     });
 }
 
-// Code tabs functionality
+// Code tabs
 document.addEventListener('click', function(e) {
-    if (e.target.matches('.code-tab-btn')) {
+    if (e.target.classList.contains('code-tab-btn')) {
         const container = e.target.closest('.code-tabs');
-        container.querySelectorAll('.code-tab-btn').forEach(btn => btn.classList.remove('tab-active'));
-        container.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        e.target.classList.add('tab-active');
-        const target = container.querySelector(e.target.dataset.target);
-        if (target) target.classList.add('active');
+        container.querySelectorAll('.code-tab-btn').forEach(btn => btn.classList.add('outline'));
+        e.target.classList.remove('outline');
+        container.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelector(e.target.dataset.target).classList.add('active');
     }
 });

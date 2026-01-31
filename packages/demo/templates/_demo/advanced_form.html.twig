@@ -1,0 +1,286 @@
+{% block _main %}
+<div id="form-wrapper">
+    {{ block('formContent') }}
+</div>
+{% endblock %}
+
+{% block formContent %}
+<div class="grid">
+    <div>
+        {{ form_start(form, {
+            'attr': {
+                'hx-post': path(routePrefix),
+                'hx-target': '#form-wrapper',
+                'hx-swap': 'innerHTML',
+                'autocomplete': 'off',
+                'novalidate': 'novalidate',
+            }
+        }) }}
+
+        {% if not form.vars.valid and form.vars.submitted %}
+        <div id="form-error" class="alert-error">
+            <strong>Error:</strong> Please fix the validation errors below.
+        </div>
+        {% endif %}
+
+        <article>
+            <header>
+                <strong><kbd>1</kbd> Live Search / Autocomplete</strong>
+            </header>
+            <p><small>Type at least 2 characters to search users. Uses <code>hx-trigger</code> with delay and condition.</small></p>
+            <p><small>Try: <kbd>john</kbd> <kbd>jane</kbd> <kbd>alice</kbd> <kbd>bob</kbd> <kbd>@example</kbd></small></p>
+
+            <div class="field-relative">
+                {{ form_row(form.user) }}
+                <div id="user-results" class="user-results"></div>
+            </div>
+
+            <footer>
+                <small><strong>htmx options:</strong> get, trigger, target, indicator, params, on::before-request</small>
+            </footer>
+        </article>
+
+        <article>
+            <header>
+                <strong><kbd>2</kbd> Cascading Selects</strong>
+            </header>
+            <p><small>Select a country to load cities dynamically. Uses <code>hx-on::config-request</code> to modify the URL.</small></p>
+
+            <div class="grid">
+                <div>{{ form_row(form.country) }}</div>
+                <div>{{ form_row(form.city) }}</div>
+            </div>
+
+            <footer>
+                <small><strong>htmx options:</strong> get, trigger, target, on::config-request</small>
+            </footer>
+        </article>
+
+        <article>
+            <header>
+                <strong><kbd>3</kbd> Inline Validation</strong>
+            </header>
+            <p><small>Fields validate on blur. Server-side validation without full form submit.</small></p>
+
+            {{ form_row(form.email) }}
+            {{ form_row(form.username) }}
+
+            <footer>
+                <small><strong>htmx options:</strong> post, trigger, target, swap</small>
+            </footer>
+        </article>
+
+        <article>
+            <header>
+                <strong><kbd>4</kbd> Conditional Fields</strong>
+            </header>
+            <p><small>Select account type to show/hide additional fields. Uses <code>conditional</code> option from <code>ConditionalTypeExtension</code>.</small></p>
+
+            {{ form_row(form.accountType) }}
+
+            <div id="{{ form.business.vars.conditional.wrapper_id|default('business-fields') }}">
+                {{ block('businessFields') }}
+            </div>
+
+            <footer>
+                <small><strong>conditional:</strong> trigger, endpoint (auto-configures htmx)</small>
+            </footer>
+        </article>
+
+        <article>
+            <header>
+                <strong><kbd>5</kbd> Form Submit</strong>
+            </header>
+            <p><small>The entire form submits via htmx using form_start attributes.</small></p>
+            <p><small><ins>Info:</ins> On validation error, the page auto-scrolls to the error message via <code>triggerAfterSwap(['scrollTo' => '...'])</code> passed from the controller response.</small></p>
+
+            <hr>
+
+            {{ form_row(form.submit) }}
+        </article>
+
+        {{ form_end(form, {'render_rest': false}) }}
+    </div>
+
+    <div>
+        <article>
+            <header><strong>HtmxOptions Builder</strong></header>
+            <p><small>Use fluent builder API with <code>HtmxOptions</code>:</small></p>
+
+            <div class="code-example">
+                <pre><code>use Mdxpl\HtmxBundle\Form\Htmx\HtmxOptions;
+use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
+
+$builder->add('search', TextType::class, [
+    'htmx' => HtmxOptions::create()
+        ->getRoute('app_search')
+        ->trigger(Trigger::keyup()->changed()->delay(300))
+        ->target('#results')
+        ->indicator('#spinner'),
+]);</code></pre>
+            </div>
+
+            <h4>Available Methods</h4>
+            <table>
+                <thead>
+                    <tr><th>Method</th><th>Attribute</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>get() / getRoute()</td><td>hx-get</td></tr>
+                    <tr><td>post() / postRoute()</td><td>hx-post</td></tr>
+                    <tr><td>trigger()</td><td>hx-trigger</td></tr>
+                    <tr><td>target()</td><td>hx-target</td></tr>
+                    <tr><td>swap()</td><td>hx-swap</td></tr>
+                    <tr><td>indicator()</td><td>hx-indicator</td></tr>
+                    <tr><td>include()</td><td>hx-include</td></tr>
+                    <tr><td>vals()</td><td>hx-vals</td></tr>
+                    <tr><td>confirm()</td><td>hx-confirm</td></tr>
+                    <tr><td>onBeforeRequest()</td><td>hx-on::before-request</td></tr>
+                </tbody>
+            </table>
+        </article>
+
+        <article>
+            <header><strong>Trigger Builder</strong></header>
+            <p><small>Build complex triggers with <code>Trigger</code> class:</small></p>
+
+            <div class="code-example">
+                <pre><code>use Mdxpl\HtmxBundle\Form\Htmx\Trigger\Trigger;
+
+// keyup changed delay:300ms
+Trigger::keyup()->changed()->delay(300)
+
+// blur changed delay:500ms
+Trigger::blur()->changed()->delay(500)
+
+// change (for selects)
+Trigger::change()
+
+// keyup[target.value.length >= 2]
+Trigger::keyup()->condition('target.value.length >= 2')</code></pre>
+            </div>
+        </article>
+
+        <article>
+            <header><strong>Route with Placeholders</strong></header>
+            <p><small>Use placeholders for dynamic field values:</small></p>
+
+            <div class="code-example">
+                <pre><code>// Server-side: {name}, {id}, {full_name}
+HtmxOptions::create()
+    ->postRoute('app_validate', ['field' => '{name}'])
+    ->target('#{id}-validation')
+
+// Client-side: {value} (auto-generates JS)
+HtmxOptions::create()
+    ->getRoute('app_cities', ['country' => '{value}'])
+    ->trigger(Trigger::change())</code></pre>
+            </div>
+        </article>
+
+        <article>
+            <header><strong>Conditional Fields</strong></header>
+            <p><small>Use <code>conditional</code> to show/hide fields:</small></p>
+
+            <div class="code-example">
+                <pre><code>$builder
+    ->add('accountType', ChoiceType::class, [
+        'choices' => [
+            'Personal' => 'personal',
+            'Business' => 'business',
+        ],
+        'expanded' => true,
+    ])
+    ->add('business', BusinessFieldsType::class, [
+        'conditional' => [
+            'trigger' => 'accountType',
+            'endpoint' => '/form/business-fields',
+        ],
+    ]);</code></pre>
+            </div>
+        </article>
+    </div>
+</div>
+{% endblock %}
+
+{% block searchResults %}
+{% if results is defined and results|length > 0 %}
+<ul>
+    {% for user in results %}
+    <li>
+        <a href="#" onclick="document.querySelector('[name=\'form[user]\']').value = '{{ user.name }}'; this.closest('ul').remove(); return false;">
+            <strong>{{ user.name }}</strong><br>
+            <small>{{ user.email }}</small>
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% elseif results is defined %}
+<p><small>No users found</small></p>
+{% endif %}
+{% endblock %}
+
+{% block citySelect %}
+{{ form_row(cityField) }}
+{% endblock %}
+
+{% block fieldValidation %}
+{% if errors is defined and errors|length > 0 %}
+<div class="validation-message validation-error">
+    {{ errors|first }}
+</div>
+{% elseif isValid is defined and isValid %}
+<div class="validation-message validation-success">
+    Valid
+</div>
+{% endif %}
+{% endblock %}
+
+{% block businessFields %}
+{% set showBusiness = isBusiness is defined ? isBusiness : (form is defined and form.accountType is defined and form.accountType.vars.value == 'business') %}
+{% set businessForm = businessForm is defined ? businessForm : (form is defined and form.business is defined ? form.business : null) %}
+
+{% if showBusiness and businessForm %}
+<div class="business-fields">
+    <p><strong>Business Account Fields</strong></p>
+
+    {{ form_row(businessForm.companyName) }}
+    {{ form_row(businessForm.taxId) }}
+    {{ form_row(businessForm.companyAddress) }}
+</div>
+{% elseif showBusiness %}
+<div class="business-fields">
+    <p><strong>Business Account Fields</strong></p>
+    <p><small>Loading...</small></p>
+</div>
+{% else %}
+<div class="business-fields">
+    <kbd>Personal</kbd> account selected - no additional fields required.
+</div>
+{% if form is defined and form.business is defined %}
+    {% do form.business.setRendered() %}
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block submitSuccess %}
+<article>
+    <header>
+        <strong>Form Submitted Successfully!</strong>
+    </header>
+
+    <h4>Submitted Data:</h4>
+    <div class="code-example">
+        <pre>{{ data|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+    </div>
+
+    <footer>
+        <button class="outline"
+                hx-get="{{ path(routePrefix|default('app_advanced_form')) }}"
+                hx-target="#form-wrapper"
+                hx-swap="innerHTML">
+            Submit Another
+        </button>
+    </footer>
+</article>
+{% endblock %}

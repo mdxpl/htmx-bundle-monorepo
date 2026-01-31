@@ -32,6 +32,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/advanced-form')]
 final class AdvancedFormController extends AbstractController
 {
+    private const TEMPLATE = 'advanced_form.html.twig';
+
     private const USERS = [
         ['id' => 1, 'name' => 'John Doe', 'email' => 'john.doe@example.com'],
         ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane.smith@example.com'],
@@ -85,9 +87,6 @@ final class AdvancedFormController extends AbstractController
     #[Route('', name: 'app_advanced_form', methods: ['GET', 'POST'])]
     public function index(HtmxRequest $htmx, Request $request): HtmxResponse
     {
-        $template = 'advanced_form.html.twig';
-
-        // Check if this is a POST with business account type to enable business validation
         $formData = $request->request->all('form');
         $isBusiness = ($formData['accountType'] ?? 'personal') === 'business';
 
@@ -107,6 +106,7 @@ final class AdvancedFormController extends AbstractController
             'countries' => $countries,
             'cities' => $cities,
             'isBusiness' => $isBusiness,
+            'routePrefix' => 'app_advanced_form',
         ];
 
         $builder = HtmxResponseBuilder::create($htmx->isHtmx);
@@ -115,16 +115,15 @@ final class AdvancedFormController extends AbstractController
             if ($form->isValid()) {
                 return $builder
                     ->success()
-                    ->viewBlock($template, 'submitSuccess', ['data' => $form->getData()])
+                    ->viewBlock(self::TEMPLATE, 'submitSuccess', ['data' => $form->getData()])
                     ->build();
             }
 
-            // Recreate view data after validation errors
             $viewData['form'] = $form->createView();
 
             return $builder
                 ->failure()
-                ->viewBlock($template, 'formContent', $viewData)
+                ->viewBlock(self::TEMPLATE, 'formContent', $viewData)
                 ->triggerAfterSwap(['scrollTo' => '#form-error'])
                 ->build();
         }
@@ -132,13 +131,13 @@ final class AdvancedFormController extends AbstractController
         if ($htmx->isHtmx) {
             return $builder
                 ->success()
-                ->viewBlock($template, 'formContent', $viewData)
+                ->viewBlock(self::TEMPLATE, 'formContent', $viewData)
                 ->build();
         }
 
         return $builder
             ->success()
-            ->view($template, $viewData)
+            ->view(self::TEMPLATE, $viewData)
             ->build();
     }
 
@@ -161,7 +160,7 @@ final class AdvancedFormController extends AbstractController
 
         return HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
-            ->viewBlock('advanced_form.html.twig', 'searchResults', ['results' => $results])
+            ->viewBlock(self::TEMPLATE, 'searchResults', ['results' => $results])
             ->build();
     }
 
@@ -172,7 +171,6 @@ final class AdvancedFormController extends AbstractController
         $cities = $country !== null ? (self::LOCATIONS[$country]['cities'] ?? []) : [];
         $isEmpty = $cities === [];
 
-        // Create a standalone form with just the city field
         $cityForm = $this->createFormBuilder(options: ['csrf_protection' => false])
             ->add('city', ChoiceType::class, [
                 'label' => 'City',
@@ -184,7 +182,7 @@ final class AdvancedFormController extends AbstractController
 
         return HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
-            ->viewBlock('advanced_form.html.twig', 'citySelect', [
+            ->viewBlock(self::TEMPLATE, 'citySelect', [
                 'cityField' => $cityForm->get('city')->createView(),
             ])
             ->build();
@@ -211,7 +209,7 @@ final class AdvancedFormController extends AbstractController
 
         return HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
-            ->viewBlock('advanced_form.html.twig', 'fieldValidation', [
+            ->viewBlock(self::TEMPLATE, 'fieldValidation', [
                 'errors' => $errors,
                 'field' => $field,
                 'isValid' => $errors === [] && $value !== '',
@@ -227,7 +225,6 @@ final class AdvancedFormController extends AbstractController
         $formData = $request->query->all('form');
         $isBusiness = ($formData['accountType'] ?? 'personal') === 'business';
 
-        // Create a minimal form with just the business fields, using same structure as main form
         $form = $this->createFormBuilder(options: ['csrf_protection' => false])
             ->add('business', BusinessFieldsType::class, [
                 'is_required' => $isBusiness,
@@ -236,7 +233,7 @@ final class AdvancedFormController extends AbstractController
 
         return HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
-            ->viewBlock('advanced_form.html.twig', 'businessFields', [
+            ->viewBlock(self::TEMPLATE, 'businessFields', [
                 'businessForm' => $form->get('business')->createView(),
                 'isBusiness' => $isBusiness,
             ])
@@ -266,7 +263,7 @@ final class AdvancedFormController extends AbstractController
 
         return HtmxResponseBuilder::create($htmx->isHtmx)
             ->success()
-            ->viewBlock('advanced_form.html.twig', 'fieldValidation', [
+            ->viewBlock(self::TEMPLATE, 'fieldValidation', [
                 'errors' => $errors,
                 'field' => $field,
                 'isValid' => $errors === [] && $value !== '',
@@ -287,7 +284,6 @@ final class AdvancedFormController extends AbstractController
         $builder = $this->createFormBuilder(options: [
                 'csrf_protection' => false,
             ])
-            // Live Search field
             ->add('user', TextType::class, [
                 'required' => false,
                 'label' => 'Search Users',
@@ -309,7 +305,6 @@ final class AdvancedFormController extends AbstractController
                     ->indicator('#search-spinner')
                     ->onBeforeRequest('document.querySelector("#user-results").innerHTML = ""'),
             ])
-            // Cascading Selects - uses CascadingTypeExtension
             ->add('country', ChoiceType::class, [
                 'label' => 'Country',
                 'choices' => array_merge(['' => ''], $countries),
@@ -322,7 +317,6 @@ final class AdvancedFormController extends AbstractController
                 ],
             ]);
 
-        // Add city field dynamically based on country selection
         $addCityField = function (FormInterface $form, ?string $countryCode): void {
             $cities = $countryCode !== null ? (self::LOCATIONS[$countryCode]['cities'] ?? []) : [];
             $isEmpty = $cities === [];
@@ -338,14 +332,12 @@ final class AdvancedFormController extends AbstractController
             ]);
         };
 
-        // Set initial city field
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($addCityField): void {
             $data = $event->getData();
             $countryCode = \is_array($data) ? ($data['country'] ?? null) : null;
             $addCityField($event->getForm(), $countryCode);
         });
 
-        // Update city field when form is submitted
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($addCityField): void {
             $data = $event->getData();
             $countryCode = \is_array($data) ? ($data['country'] ?? null) : null;
@@ -353,7 +345,6 @@ final class AdvancedFormController extends AbstractController
         });
 
         $builder
-            // Email with inline validation
             ->add('email', EmailType::class, [
                 'label' => 'Email',
                 'required' => false,
@@ -368,7 +359,6 @@ final class AdvancedFormController extends AbstractController
                     ->target('#form_{name}-validation')
                     ->swap(SwapStyle::InnerHTML),
             ])
-            // Username with inline validation
             ->add('username', TextType::class, [
                 'label' => 'Username',
                 'required' => false,
@@ -384,7 +374,6 @@ final class AdvancedFormController extends AbstractController
                     ->target('#form_{name}-validation')
                     ->swap(SwapStyle::InnerHTML),
             ])
-            // Account Type with conditional fields
             ->add('accountType', ChoiceType::class, [
                 'label' => 'Account Type',
                 'choices' => [
@@ -394,7 +383,6 @@ final class AdvancedFormController extends AbstractController
                 'expanded' => true,
                 'data' => 'personal',
             ])
-            // Business fields (embedded form type) - conditionally shown via htmx
             ->add('business', BusinessFieldsType::class, [
                 'required' => false,
                 'is_required' => $requireBusinessFields,
