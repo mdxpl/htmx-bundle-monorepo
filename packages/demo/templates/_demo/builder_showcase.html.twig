@@ -1,0 +1,81 @@
+{% block _main %}
+{# See builder_showcase.html.twig for full demo layout #}
+{% endblock %}
+
+{% block logEntryOob %}
+<div id="log-list" hx-swap-oob="afterbegin">
+    <div class="log-entry">
+        <div class="log-method">{{ log.method }}</div>
+        <div class="log-desc">{{ log.description }}</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block logListOob %}
+<div id="log-list" hx-swap-oob="true" style="max-height: 400px; overflow-y: auto;">
+    {% if logs|length > 0 %}
+        {% for log in logs %}
+        <div class="log-entry">
+            <div class="log-method">{{ log.method }}</div>
+            <div class="log-desc">{{ log.description }}</div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p><small>Log cleared</small></p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block retargetContent %}
+<div style="color: var(--pico-ins-color); font-weight: bold;">✓ Content arrived here via retarget()!</div>
+{% endblock %}
+
+{% block newItem %}
+<kbd style="margin-right: 0.25rem;">Item #{{ itemId }}</kbd>
+{% endblock %}
+
+{% block transitionContent %}
+<div style="color: var(--pico-mark-background-color); font-weight: bold;">✨ Transitioned! ({{ "now"|date("H:i:s") }})</div>
+{% endblock %}
+
+{% block timingContent %}
+<div style="color: var(--pico-del-color); font-weight: bold;">⏱️ Delayed 1s! ({{ "now"|date("H:i:s") }})</div>
+{% endblock %}
+
+{% block reselectFullResponse %}
+<div id="ignored-part" style="color: var(--pico-del-color);">This part is ignored</div>
+<div id="selected-part" style="color: var(--pico-ins-color); font-weight: bold;">✓ Only this part was selected!</div>
+<div id="also-ignored" style="color: var(--pico-del-color);">This is also ignored</div>
+{% endblock %}
+
+{% block oobArea1 %}
+<div id="oob-area-1" hx-swap-oob="true" class="result-box" style="background: rgba(54, 211, 153, 0.2);">Updated 1! ✓</div>
+{% endblock %}
+
+{% block oobArea2 %}
+<div id="oob-area-2" hx-swap-oob="true" class="result-box" style="background: rgba(251, 189, 35, 0.2);">Updated 2! ✓</div>
+{% endblock %}
+
+{% block oobArea3 %}
+<div id="oob-area-3" hx-swap-oob="true" class="result-box" style="background: rgba(102, 26, 230, 0.2);">Updated 3! ✓</div>
+{% endblock %}
+
+{% block successResult %}
+<div style="background: var(--pico-ins-color); color: #fff; padding: 1rem; border-radius: var(--pico-border-radius);">
+    <strong>HTTP 200 OK</strong><br>
+    <small>success() - standard successful response</small>
+</div>
+{% endblock %}
+
+{% block failureResult %}
+<div style="background: var(--pico-del-color); color: #fff; padding: 1rem; border-radius: var(--pico-border-radius);">
+    <strong>HTTP 422 Unprocessable Entity</strong><br>
+    <small>failure() - validation errors (htmx still swaps)</small>
+</div>
+{% endblock %}
+
+{% block triggerResultOob %}
+<div id="trigger-result" hx-swap-oob="true" class="result-box" style="background: rgba(54, 211, 153, 0.2);">
+    <strong style="color: var(--pico-ins-color);">{{ triggerType }}:</strong> {{ message }} <small>({{ "now"|date("H:i:s") }})</small>
+</div>
+{% endblock %}

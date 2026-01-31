@@ -5,71 +5,22 @@
 {% endblock %}
 
 {% block formContent %}
-<div class="grid">
-    <div>
-        <article>
-            <header><strong>Registration Form</strong></header>
+{% if not form.vars.valid and form.vars.submitted %}
+<div class="alert-error">
+    <strong>Error:</strong> Please fix the validation errors below.
+</div>
+{% endif %}
 
-            {{ form_start(form, {
-                'attr': {
-                    'hx-post': path('app_form'),
-                    'hx-target': '#form-wrapper',
-                    'hx-swap': 'innerHTML',
-                    'novalidate': 'novalidate',
-                }
-            }) }}
-
-            {% if not form.vars.valid and form.vars.submitted %}
-            <div class="alert-error">
-                <strong>Error:</strong> Please fix the validation errors below.
-            </div>
-            {% endif %}
-
-            {{ form_row(form.name) }}
-            {{ form_row(form.email) }}
-            {{ form_row(form.password) }}
-            {{ form_row(form.bio) }}
-            {{ form_row(form.country) }}
-
-            <hr>
-            <p><small>Preferences</small></p>
-
-            {{ form_row(form.role) }}
-            {{ form_row(form.notifications) }}
-            {{ form_row(form.terms) }}
-
-            <div style="margin-top: 1rem;">
-                {{ form_row(form.submit) }}
-            </div>
-
-            {{ form_end(form) }}
-        </article>
-    </div>
-
-    <div>
-        <article>
-            <header><strong>Form Features</strong></header>
-            <ul>
-                <li>htmx form submission without page reload</li>
-                <li>Server-side validation with error display</li>
-                <li>CSRF protection via meta tag</li>
-                <li>Automatic form state preservation on error</li>
-            </ul>
-        </article>
-
-        <article>
-            <header><strong>Usage</strong></header>
-            <p><small>Add htmx attributes to form_start:</small></p>
-            <pre><code>{% verbatim %}{{ form_start(form, {
+{{ form_start(form, {
     'attr': {
         'hx-post': path('app_form'),
-        'hx-target': '#wrapper',
+        'hx-target': '#form-wrapper',
         'hx-swap': 'innerHTML',
+        'novalidate': 'novalidate',
     }
-}) }}{% endverbatim %}</code></pre>
-        </article>
-    </div>
-</div>
+}) }}
+{{ form_rest(form) }}
+{{ form_end(form) }}
 {% endblock %}
 
 {% block success %}

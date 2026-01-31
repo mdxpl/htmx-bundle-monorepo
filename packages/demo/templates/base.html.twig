@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{% block description %}Interactive demo of htmx-bundle for Symfony - forms, wizards, infinite scroll, live polling and more with htmx.{% endblock %}">
-    <title>{% block title %}htmx-bundle Demo{% endblock %}</title>
+    <meta name="description" content="{% block description %}htmx & Symfony integration demo - forms, wizards, infinite scroll, live polling and more.{% endblock %}">
+    <title>{% block title %}htmx & Symfony Integration Demo{% endblock %}</title>
     <link rel="stylesheet" href="{{ asset('styles/pico.min.css') }}">
     {% block importmap %}{{ importmap('app') }}{% endblock %}
     <style>
@@ -186,7 +186,7 @@
     <header class="container">
         <nav>
             <ul>
-                <li><a href="{{ path('app_home') }}"><strong>htmx-bundle Demo</strong></a></li>
+                <li><a href="{{ path('app_home') }}"><strong>htmx & Symfony Integration Demo</strong></a></li>
             </ul>
             <ul>
                 <li><a href="{{ path('app_home') }}" {% if app.request.attributes.get('_route') == 'app_home' %}aria-current="page"{% endif %}>Home</a></li>
@@ -220,7 +220,7 @@
 
     <footer class="container">
         <hr>
-        <p><small>htmx-bundle demo - <a href="https://github.com/mdxpl/htmx-bundle">View on GitHub</a></small></p>
+        <p><small>htmx & Symfony Integration Demo - <a href="https://github.com/mdxpl/htmx-bundle">View on GitHub</a></small></p>
     </footer>
 
     {% block javascripts %}{% endblock %}
