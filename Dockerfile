@@ -1,13 +1,3 @@
-# Build assets with Vite
-FROM node:22-alpine AS assets-builder
-WORKDIR /build
-COPY packages/demo/package.json packages/demo/package-lock.json* ./
-RUN npm install
-COPY packages/demo/vite.config.js packages/demo/postcss.config.js packages/demo/tailwind.config.js ./
-COPY packages/demo/assets ./assets
-COPY packages/demo/templates ./templates
-RUN npm run build
-
 # PHP application
 FROM dunglas/frankenphp:1-php8.4-alpine AS base
 
@@ -30,9 +20,6 @@ RUN composer update --no-dev --no-scripts --no-autoloader --prefer-dist --no-int
 
 # Copy demo source
 COPY packages/demo/ .
-
-# Copy built assets from assets-builder
-COPY --from=assets-builder /build/public/build ./public/build
 
 # Generate optimized autoloader
 RUN composer dump-autoload --optimize --classmap-authoritative
