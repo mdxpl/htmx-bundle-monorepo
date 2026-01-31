@@ -8,11 +8,9 @@ use Mdxpl\HtmxBundle\Request\HtmxRequest;
 use Mdxpl\HtmxBundle\Response\HtmxResponse;
 use Mdxpl\HtmxBundle\Response\HtmxResponseBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Cache(maxage: 86400, public: true, vary: ['HX-Request'])]
 #[Route('/simple-page/{slug}', name: 'app_simple_page')]
 final class SimplePageController extends AbstractController
 {
