@@ -24,8 +24,9 @@ COPY packages/demo/ .
 # Generate optimized autoloader
 RUN composer dump-autoload --optimize --classmap-authoritative
 
-# Install importmap vendor assets (htmx, etc.)
-RUN php bin/console importmap:install
+# Install importmap vendor assets and compile assets for production
+RUN php bin/console importmap:install && \
+    php bin/console asset-map:compile
 
 # Set permissions
 RUN mkdir -p /app/var && chown -R www-data:www-data /app/var
