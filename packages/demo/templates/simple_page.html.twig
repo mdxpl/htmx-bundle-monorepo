@@ -3,65 +3,149 @@
 {% block title %}{{ page.name }} - Simple Page Demo{% endblock %}
 {% block description %}Demo of htmx page navigation without full reloads using hx-swap-oob for simultaneous content and button updates.{% endblock %}
 
+{% block stylesheets %}
+<meta name="view-transition" content="same-origin">
+<style>
+    /* Tabs styling */
+    .tabs-wrapper {
+        display: flex;
+        justify-content: center;
+        border-bottom: 2px solid var(--pico-muted-border-color);
+    }
+    .tabs {
+        display: inline-flex;
+        gap: 0;
+        margin-bottom: -2px;
+    }
+    .tabs button {
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        padding: 0.75rem 1.25rem;
+        color: var(--pico-muted-color);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-radius: 0;
+    }
+    .tabs button:hover {
+        color: var(--pico-color);
+        background: var(--pico-card-sectionning-background-color);
+    }
+    .tabs button.active {
+        color: var(--pico-primary);
+        border-bottom-color: var(--pico-primary);
+        background: transparent;
+    }
+
+    /* Tab loading indicator */
+    .tabs button .loader {
+        display: none;
+        width: 14px;
+        height: 14px;
+        border: 2px solid var(--pico-muted-border-color);
+        border-top-color: var(--pico-primary);
+        border-radius: 50%;
+        margin-left: 0.5rem;
+        animation: spin 0.8s linear infinite;
+    }
+    .tabs button.htmx-request .loader {
+        display: inline-block;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Tab content */
+    .tab-panel {
+        padding: 1.5rem 0;
+    }
+
+    /* View Transitions */
+    #pageContent {
+        view-transition-name: page-content;
+    }
+    ::view-transition-old(page-content) {
+        animation: fade-out 0.2s ease-out;
+    }
+    ::view-transition-new(page-content) {
+        animation: fade-in 0.3s ease-in;
+    }
+    @keyframes fade-out {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-10px); }
+    }
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-<div class="mb-6">
-    <h1 class="text-3xl font-bold">Simple Page Navigation</h1>
-    <p class="text-base-content/70">Click the buttons below to load different pages without a full page reload.</p>
-    <p class="text-base-content/70 text-sm mt-2">Uses <code class="badge badge-ghost badge-sm">hx-swap-oob</code> to update both content and navigation buttons in a single response.</p>
-</div>
+<article>
+    <header>
+        <h1>Simple Page Navigation</h1>
+        <p>Click the buttons below to load different pages without a full page reload.</p>
+        <p><small>Uses <code>hx-swap-oob</code> to update both content and navigation buttons in a single response.</small></p>
+    </header>
+</article>
 
 {{ block('pageNav') }}
 
-<div id="pageContent">
+<div id="pageContent" class="tab-panel" role="tabpanel">
     {{ block('pageContentInner') }}
 </div>
+
+{{ block('sourceCode') }}
 {% endblock %}
 
 {% block pageNav %}
-<div id="page-nav" class="flex flex-wrap gap-2 mb-6">
-    {% for slug, item in menu %}
-    <button class="btn {{ currentSlug == slug ? 'btn-primary' : 'btn-outline' }}"
-            aria-current="{{ currentSlug == slug ? 'true' : 'false' }}"
-            hx-get="{{ path('app_simple_page', {'slug': slug}) }}"
-            hx-push-url="true"
-            hx-target="#pageContent"
-            hx-swap="innerHTML"
-            hx-indicator="#page-loading">
-        {{ item.name }}
-    </button>
-    {% endfor %}
-    <span id="page-loading" class="htmx-indicator">
-        <span class="loading loading-spinner loading-sm"></span>
-    </span>
+<div id="page-nav-wrapper">
+    <div class="tabs-wrapper">
+        <nav id="page-nav" class="tabs" role="tablist">
+            {% for slug, item in menu %}
+            <button role="tab"
+                    class="{{ currentSlug == slug ? 'active' : '' }}"
+                    aria-selected="{{ currentSlug == slug ? 'true' : 'false' }}"
+                    hx-get="{{ path('app_simple_page', {'slug': slug}) }}"
+                    hx-push-url="true"
+                    hx-target="#pageContent"
+                    hx-swap="innerHTML transition:true">
+                {{ item.name }}<span class="loader"></span>
+            </button>
+            {% endfor %}
+        </nav>
+    </div>
 </div>
 {% endblock %}
 
 {% block pageNavOob %}
-<div id="page-nav" hx-swap-oob="true" class="flex flex-wrap gap-2 mb-6">
-    {% for slug, item in menu %}
-    <button class="btn {{ currentSlug == slug ? 'btn-primary' : 'btn-outline' }}"
-            aria-current="{{ currentSlug == slug ? 'true' : 'false' }}"
-            hx-get="{{ path('app_simple_page', {'slug': slug}) }}"
-            hx-push-url="true"
-            hx-target="#pageContent"
-            hx-swap="innerHTML"
-            hx-indicator="#page-loading">
-        {{ item.name }}
-    </button>
-    {% endfor %}
-    <span id="page-loading" class="htmx-indicator">
-        <span class="loading loading-spinner loading-sm"></span>
-    </span>
+<div id="page-nav-wrapper" hx-swap-oob="true">
+    <div class="tabs-wrapper">
+        <nav id="page-nav" class="tabs" role="tablist">
+            {% for slug, item in menu %}
+            <button role="tab"
+                    class="{{ currentSlug == slug ? 'active' : '' }}"
+                    aria-selected="{{ currentSlug == slug ? 'true' : 'false' }}"
+                    hx-get="{{ path('app_simple_page', {'slug': slug}) }}"
+                    hx-push-url="true"
+                    hx-target="#pageContent"
+                    hx-swap="innerHTML transition:true">
+                {{ item.name }}<span class="loader"></span>
+            </button>
+            {% endfor %}
+        </nav>
+    </div>
 </div>
 {% endblock %}
 
 {% block pageContentInner %}
-<div class="card bg-base-100 shadow-xl">
-    <div class="card-body">
-        <h2 class="card-title">{{ page.name }}</h2>
-        <p>{{ page.description }}</p>
-    </div>
-</div>
+<article>
+    <header><strong>{{ page.name }}</strong></header>
+    <p>{{ page.description }}</p>
+</article>
 {% endblock %}
 
 {% block pageContentPartial %}

@@ -21,5 +21,8 @@ return static function (ContainerConfigurator $container): void {
         'validation' => [
             'email_validation_mode' => 'html5',
         ],
+        'asset_mapper' => [
+            'paths' => ['assets/'],
+        ],
     ]);
 };

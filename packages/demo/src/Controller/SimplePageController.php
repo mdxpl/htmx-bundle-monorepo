@@ -33,6 +33,8 @@ final class SimplePageController extends AbstractController
         $builder = HtmxResponseBuilder::create($htmx->isHtmx);
 
         if ($htmx->isHtmx) {
+            usleep(random_int(300_000, 1_200_000)); // 300-1200ms random delay for demo
+
             return $builder
                 ->success()
                 ->viewBlock('simple_page.html.twig', 'pageContentPartial', $viewData)

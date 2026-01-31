@@ -7,6 +7,6 @@ return static function (ContainerConfigurator $container): void {
         'default_path' => '%kernel.project_dir%/templates',
         'debug' => '%kernel.debug%',
         'strict_variables' => true,
-        'form_themes' => ['@MdxplHtmx/Form/daisyui_htmx_layout.html.twig'],
+        'form_themes' => ['@MdxplHtmx/Form/pico_htmx_layout.html.twig'],
     ]);
 };
