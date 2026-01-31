@@ -1,10 +1,14 @@
-{% extends 'base.html.twig' %}
+{% extends 'demo.html.twig' %}
 
-{% block title %}Request Showcase - htmx-bundle Demo{% endblock %}
-{% block description %}Interactive demo of HtmxRequest properties: trigger, target, prompt, currentUrl, isBoosted, and history restoration.{% endblock %}
+{% set demo_title = 'HtmxRequest Showcase' %}
+{% set demo_description = 'See what htmx sends in request headers. Click buttons on the left to update the table on the right.' %}
+{% set demo_controller = 'RequestShowcaseController.php' %}
+{% set demo_template = '_demo/request_showcase.html.twig' %}
 
-{% block stylesheets %}
-<meta name="csrf-token" content="{{ csrf_token('htmx') }}">
+{% use '_demo/request_showcase.html.twig' %}
+{% set demo_csrf = true %}
+
+{% block demo_styles %}
 <style>
     .result-box {
         padding: 0.75rem;
@@ -25,14 +29,7 @@
 </style>
 {% endblock %}
 
-{% block body %}
-<article>
-    <header>
-        <h1>HtmxRequest Showcase</h1>
-        <p>See what htmx sends in request headers. Click buttons on the left to update the table on the right.</p>
-    </header>
-</article>
-
+{% block demo %}
 <div class="grid">
     <div>
         <article>
@@ -146,142 +143,9 @@
             <p><small>Values from request headers - updates in real-time</small></p>
 
             <div id="request-info">
-                {% block requestInfo %}
-                <figure>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Property</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="prop-name">isHtmx</td>
-                                <td><span class="prop-badge {{ htmx.isHtmx ? 'prop-true' : 'prop-false' }}">{{ htmx.isHtmx ? 'true' : 'false' }}</span></td>
-                            </tr>
-                            <tr>
-                                <td class="prop-name">isBoosted</td>
-                                <td><span class="prop-badge {{ htmx.isBoosted ? 'prop-true' : 'prop-false' }}">{{ htmx.isBoosted ? 'true' : 'false' }}</span></td>
-                            </tr>
-                            <tr>
-                                <td class="prop-name">currentUrl</td>
-                                <td style="font-family: monospace; font-size: 0.75rem; word-break: break-all;">{{ htmx.currentUrl ?? '(null)' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="prop-name">target</td>
-                                <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.target ?? '(null)' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="prop-name">trigger</td>
-                                <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.trigger ?? '(null)' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="prop-name">triggerName</td>
-                                <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.triggerName ?? '(null)' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="prop-name">prompt</td>
-                                <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.prompt ?? '(null)' }}</td>
-                            </tr>
-                            <tr>
-                                <td class="prop-name">isForHistoryRestoration</td>
-                                <td><span class="prop-badge {{ htmx.isForHistoryRestoration ? 'prop-true' : 'prop-false' }}">{{ htmx.isForHistoryRestoration ? 'true' : 'false' }}</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </figure>
-                {% endblock %}
+                {{ block('requestInfo') }}
             </div>
         </article>
     </div>
 </div>
-
-{{ block('sourceCode') }}
-{% endblock %}
-
-{% block requestInfoOob %}
-<div id="request-info" hx-swap-oob="true">
-    <figure>
-        <table>
-            <thead>
-                <tr>
-                    <th>Property</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="prop-name">isHtmx</td>
-                    <td><span class="prop-badge {{ htmx.isHtmx ? 'prop-true' : 'prop-false' }}">{{ htmx.isHtmx ? 'true' : 'false' }}</span></td>
-                </tr>
-                <tr>
-                    <td class="prop-name">isBoosted</td>
-                    <td><span class="prop-badge {{ htmx.isBoosted ? 'prop-true' : 'prop-false' }}">{{ htmx.isBoosted ? 'true' : 'false' }}</span></td>
-                </tr>
-                <tr>
-                    <td class="prop-name">currentUrl</td>
-                    <td style="font-family: monospace; font-size: 0.75rem; word-break: break-all;">{{ htmx.currentUrl ?? '(null)' }}</td>
-                </tr>
-                <tr>
-                    <td class="prop-name">target</td>
-                    <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.target ?? '(null)' }}</td>
-                </tr>
-                <tr>
-                    <td class="prop-name">trigger</td>
-                    <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.trigger ?? '(null)' }}</td>
-                </tr>
-                <tr>
-                    <td class="prop-name">triggerName</td>
-                    <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.triggerName ?? '(null)' }}</td>
-                </tr>
-                <tr>
-                    <td class="prop-name">prompt</td>
-                    <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.prompt ?? '(null)' }}</td>
-                </tr>
-                <tr>
-                    <td class="prop-name">isForHistoryRestoration</td>
-                    <td><span class="prop-badge {{ htmx.isForHistoryRestoration ? 'prop-true' : 'prop-false' }}">{{ htmx.isForHistoryRestoration ? 'true' : 'false' }}</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </figure>
-</div>
-{% endblock %}
-
-{% block actionResult %}
-<div style="color: var(--pico-ins-color);">
-    <strong>Request received!</strong>
-    trigger={{ htmx.trigger ?? 'null' }}, triggerName={{ htmx.triggerName ?? 'null' }}, target={{ htmx.target ?? 'null' }}
-</div>
-{% endblock %}
-
-{% block promptResult %}
-<div style="color: var(--pico-ins-color);">
-    <strong>Prompt value:</strong> {{ promptValue }}
-</div>
-{% endblock %}
-
-{% block urlResult %}
-<div style="color: var(--pico-del-color);">
-    <strong>URL replaced:</strong> {{ newUrl }}<br>
-    <small>Click other buttons - currentUrl will show this new URL</small>
-</div>
-{% endblock %}
-
-{% block historyResult %}
-<div style="color: var(--pico-primary);">
-    <strong>URL pushed:</strong> {{ newUrl }}<br>
-    <small>Now click browser back to see isForHistoryRestoration = true</small>
-</div>
-{% endblock %}
-
-{% block boostedResult %}
-<div id="boosted-response" style="color: var(--pico-ins-color);">
-    <strong>Boosted request received!</strong> isBoosted = {{ htmx.isBoosted ? 'true' : 'false' }}
-</div>
-{% endblock %}
-
-{% block sourceCode %}
-{% include '_source_code.html.twig' with {controller: 'RequestShowcaseController.php', template: 'request_showcase.html.twig'} %}
 {% endblock %}

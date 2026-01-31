@@ -1,7 +1,8 @@
-{#
-    Source Code Component
-    Usage: {% include '_source_code.html.twig' with {controller: 'PollingController.php', template: 'polling.html.twig'} %}
-#}
+<link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/twig.min.js"></script>
+
 <article style="margin-top: 1.5rem;">
     <header>
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -15,14 +16,38 @@
 
     <div class="code-tabs">
         <div role="group" style="margin-bottom: 0;">
-            <button class="code-tab-btn contrast" data-target="#controller-code-{{ controller|replace({'.': '-'}) }}">Controller</button>
-            <button class="code-tab-btn outline" data-target="#template-code-{{ template|replace({'.': '-'}) }}">Template</button>
+            <button class="code-tab-btn secondary" data-target="#controller-code-{{ controller|replace({'.': '-'}) }}">Controller</button>
+            <button class="code-tab-btn outline secondary" data-target="#template-code-{{ template|replace({'.': '-', '/': '-'}) }}">Template</button>
         </div>
         <div id="controller-code-{{ controller|replace({'.': '-'}) }}" class="tab-content active">
             <pre style="margin: 0; border-radius: 0 0 var(--pico-border-radius) var(--pico-border-radius);"><code class="language-php">{{ source_code('src/Controller/' ~ controller) }}</code></pre>
         </div>
-        <div id="template-code-{{ template|replace({'.': '-'}) }}" class="tab-content">
+        <div id="template-code-{{ template|replace({'.': '-', '/': '-'}) }}" class="tab-content">
             <pre style="margin: 0; border-radius: 0 0 var(--pico-border-radius) var(--pico-border-radius);"><code class="language-twig">{{ source_code('templates/' ~ template) }}</code></pre>
         </div>
     </div>
 </article>
+
+<script>
+(function() {
+    const hljsTheme = document.getElementById('hljs-theme');
+    const darkTheme = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css';
+    const lightTheme = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css';
+
+    function setHljsTheme(isLight) {
+        hljsTheme.href = isLight ? lightTheme : darkTheme;
+    }
+
+    // Set initial theme from localStorage
+    setHljsTheme(localStorage.getItem('pico-theme') === 'light');
+    hljs.highlightAll();
+
+    // Listen for theme changes - use checkbox state directly
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('change', function() {
+            setHljsTheme(this.checked);
+        });
+    }
+})();
+</script>

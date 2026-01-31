@@ -1,0 +1,89 @@
+{% block _main %}
+{# See request_showcase.html.twig for full demo layout #}
+{% endblock %}
+
+{% block requestInfo %}
+<figure>
+    <table>
+        <thead>
+            <tr>
+                <th>Property</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="prop-name">isHtmx</td>
+                <td><span class="prop-badge {{ htmx.isHtmx ? 'prop-true' : 'prop-false' }}">{{ htmx.isHtmx ? 'true' : 'false' }}</span></td>
+            </tr>
+            <tr>
+                <td class="prop-name">isBoosted</td>
+                <td><span class="prop-badge {{ htmx.isBoosted ? 'prop-true' : 'prop-false' }}">{{ htmx.isBoosted ? 'true' : 'false' }}</span></td>
+            </tr>
+            <tr>
+                <td class="prop-name">currentUrl</td>
+                <td style="font-family: monospace; font-size: 0.75rem; word-break: break-all;">{{ htmx.currentUrl ?? '(null)' }}</td>
+            </tr>
+            <tr>
+                <td class="prop-name">target</td>
+                <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.target ?? '(null)' }}</td>
+            </tr>
+            <tr>
+                <td class="prop-name">trigger</td>
+                <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.trigger ?? '(null)' }}</td>
+            </tr>
+            <tr>
+                <td class="prop-name">triggerName</td>
+                <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.triggerName ?? '(null)' }}</td>
+            </tr>
+            <tr>
+                <td class="prop-name">prompt</td>
+                <td style="font-family: monospace; font-size: 0.75rem;">{{ htmx.prompt ?? '(null)' }}</td>
+            </tr>
+            <tr>
+                <td class="prop-name">isForHistoryRestoration</td>
+                <td><span class="prop-badge {{ htmx.isForHistoryRestoration ? 'prop-true' : 'prop-false' }}">{{ htmx.isForHistoryRestoration ? 'true' : 'false' }}</span></td>
+            </tr>
+        </tbody>
+    </table>
+</figure>
+{% endblock %}
+
+{% block requestInfoOob %}
+<div id="request-info" hx-swap-oob="true">
+    {{ block('requestInfo') }}
+</div>
+{% endblock %}
+
+{% block actionResult %}
+<div style="color: var(--pico-ins-color);">
+    <strong>Request received!</strong>
+    trigger={{ htmx.trigger ?? 'null' }}, triggerName={{ htmx.triggerName ?? 'null' }}, target={{ htmx.target ?? 'null' }}
+</div>
+{% endblock %}
+
+{% block promptResult %}
+<div style="color: var(--pico-ins-color);">
+    <strong>Prompt value:</strong> {{ promptValue }}
+</div>
+{% endblock %}
+
+{% block urlResult %}
+<div style="color: var(--pico-del-color);">
+    <strong>URL replaced:</strong> {{ newUrl }}<br>
+    <small>Click other buttons - currentUrl will show this new URL</small>
+</div>
+{% endblock %}
+
+{% block historyResult %}
+<div style="color: var(--pico-primary);">
+    <strong>URL pushed:</strong> {{ newUrl }}<br>
+    <small>Now click browser back to see isForHistoryRestoration = true</small>
+</div>
+{% endblock %}
+
+{% block boostedResult %}
+<div id="boosted-response" style="color: var(--pico-ins-color);">
+    <strong>Boosted request received!</strong> isBoosted = {{ htmx.isBoosted ? 'true' : 'false' }}
+</div>
+{% endblock %}

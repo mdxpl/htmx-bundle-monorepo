@@ -1,17 +1,22 @@
-{% extends 'base.html.twig' %}
+{% extends 'demo.html.twig' %}
 
-{% block title %}Infinite Scroll Demo - htmx-bundle{% endblock %}
-{% block description %}Infinite scroll demo with hx-trigger revealed - automatic content loading on scroll with URL updates and pagination.{% endblock %}
+{% set demo_title = 'Infinite Scroll' %}
+{% set demo_description = 'Scroll down to load more items automatically. Uses htmx preload extension to fetch next page in background.' %}
+{% set demo_controller = 'InfiniteScrollController.php' %}
+{% set demo_template = '_demo/infinite_scroll.html.twig' %}
 
-{% block body %}
-<article>
-    <header>
-        <h1>Infinite Scroll</h1>
-        <p>Scroll down to load more items automatically. No custom JavaScript code needed!</p>
-        <p><small><strong>Tip:</strong> You can navigate directly to any page via URL, e.g. <a href="{{ path('app_infinite_scroll', {'page': totalPages}) }}">jump to last page</a>.</small></p>
-    </header>
-</article>
+{% use '_demo/infinite_scroll.html.twig' %}
 
+{% block demo_scripts %}
+<script src="https://unpkg.com/htmx-ext-preload@2.1.0/preload.js"></script>
+{% endblock %}
+
+{% block demo_header %}
+<p><small>Uses <kbd>preload="init"</kbd> to fetch next page immediately after current one loads. When you scroll down, the content is already cached - instant display!</small></p>
+<p><small><strong>Tip:</strong> You can navigate directly to any page via URL, e.g. <a href="{{ path('app_infinite_scroll', {'page': totalPages}) }}">jump to last page</a>.</small></p>
+{% endblock %}
+
+{% block demo %}
 {% if currentPage > 1 %}
 <article aria-label="Warning">
     <p><mark>You're viewing from page {{ currentPage }} of {{ totalPages }}.</mark> Earlier items are not loaded.
@@ -19,47 +24,5 @@
 </article>
 {% endif %}
 
-<div id="items-container" hx-indicator="#loading-indicator">
-    {{ block('items') }}
-</div>
-
-<div id="loading-indicator" class="htmx-indicator" style="text-align: center; padding: 2rem;" aria-busy="true">
-    Loading...
-</div>
-
-{{ block('sourceCode') }}
-{% endblock %}
-
-{% block sourceCode %}
-{% include '_source_code.html.twig' with {controller: 'InfiniteScrollController.php', template: 'infinite_scroll.html.twig'} %}
-{% endblock %}
-
-{% block items %}
-{% for item in items %}
-<article
-    {% if loop.last and hasMore %}
-        hx-get="{{ path('app_infinite_scroll', {'page': nextPage}) }}"
-        hx-trigger="revealed"
-        hx-swap="afterend"
-        hx-replace-url="true"
-    {% endif %}
->
-    <header><strong>{{ item.title }}</strong></header>
-    <p>{{ item.description }}</p>
-    <footer>
-        <small>Page {{ currentPage }} of {{ totalPages }} | ID: {{ item.id }}</small>
-    </footer>
-</article>
-{% endfor %}
-
-{% if not hasMore %}
-<article>
-    <p><ins>You've reached the end!</ins> No more items to load.</p>
-    {% if currentPage > 1 %}
-    <footer>
-        <a href="{{ path('app_infinite_scroll') }}" role="button" class="outline">Back to start</a>
-    </footer>
-    {% endif %}
-</article>
-{% endif %}
+{{ block('_main') }}
 {% endblock %}

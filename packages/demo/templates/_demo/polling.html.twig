@@ -1,0 +1,56 @@
+{% block _main %}
+<div id="stats-container"
+     hx-get="{{ path('app_polling_stats') }}"
+     hx-trigger="every 2s"
+     hx-swap="innerHTML">
+    {{ block('statsContent') }}
+</div>
+
+<article>
+    <header><strong>How it works</strong></header>
+    <ul>
+        <li>The stats container has <code>hx-trigger="every 2s"</code></li>
+        <li>htmx automatically sends a GET request every 2 seconds</li>
+        <li>Server returns only the stats block (partial HTML)</li>
+        <li>No JavaScript polling code needed!</li>
+    </ul>
+</article>
+{% endblock %}
+
+{% block statsContent %}
+<div class="grid">
+    <article>
+        <header><strong>Visitors</strong></header>
+        <p style="font-size: 2rem; color: var(--pico-primary);">{{ stats.visitors }}</p>
+        <footer><small>Online now</small></footer>
+    </article>
+
+    <article>
+        <header><strong>Orders</strong></header>
+        <p style="font-size: 2rem; color: var(--pico-secondary);">{{ stats.orders }}</p>
+        <footer><small>Today</small></footer>
+    </article>
+
+    <article>
+        <header><strong>Revenue</strong></header>
+        <p style="font-size: 2rem; color: var(--pico-ins-color);">${{ stats.revenue }}</p>
+        <footer><small>Today</small></footer>
+    </article>
+</div>
+
+<div class="grid">
+    <article>
+        <header><strong>CPU Usage</strong></header>
+        <progress value="{{ stats.cpu }}" max="100"></progress>
+        <footer><small>{{ stats.cpu }}%</small></footer>
+    </article>
+
+    <article>
+        <header><strong>Memory Usage</strong></header>
+        <progress value="{{ stats.memory }}" max="100"></progress>
+        <footer><small>{{ stats.memory }}%</small></footer>
+    </article>
+</div>
+
+<p style="text-align: center;"><small>Last updated: {{ stats.updated_at }}</small></p>
+{% endblock %}

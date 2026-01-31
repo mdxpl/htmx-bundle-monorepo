@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ demo_title }} - htmx-bundle Demo{% endblock %}
+{% block description %}{{ demo_description }}{% endblock %}
+
+{% block stylesheets %}
+{% if demo_csrf|default(false) %}
+<meta name="csrf-token" content="{{ csrf_token('htmx') }}">
+{% endif %}
+{% block demo_styles %}{% endblock %}
+{% endblock %}
+
+{% block body %}
+<div id="loader"></div>
+
+<article>
+    <header>
+        <h1>{{ demo_title }}</h1>
+        <p>{{ demo_description }}</p>
+        {% block demo_header %}{% endblock %}
+    </header>
+</article>
+
+{% block demo %}{% endblock %}
+
+{% include '_source_code.html.twig' with {
+    controller: demo_controller,
+    template: demo_template
+} %}
+{% endblock %}
+
+{% block javascripts %}
+{% block demo_scripts %}{% endblock %}
+{% endblock %}

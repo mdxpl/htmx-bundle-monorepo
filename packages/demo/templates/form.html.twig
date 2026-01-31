@@ -1,115 +1,13 @@
-{% extends 'base.html.twig' %}
+{% extends 'demo.html.twig' %}
 
-{% block title %}Form Demo - htmx-bundle{% endblock %}
-{% block description %}Demo of Symfony form with htmx - styled inputs, validation states, and seamless form submission.{% endblock %}
+{% set demo_title = 'Simple Form Demo' %}
+{% set demo_description = 'This demo showcases Symfony forms with htmx submission. All form fields use standard Symfony form rendering.' %}
+{% set demo_controller = 'FormController.php' %}
+{% set demo_template = '_demo/form.html.twig' %}
+{% set demo_csrf = true %}
 
-{% block stylesheets %}
-<meta name="csrf-token" content="{{ csrf_token('htmx') }}">
-{% endblock %}
+{% use '_demo/form.html.twig' %}
 
-{% block body %}
-<article>
-    <header>
-        <h1>Simple Form Demo</h1>
-        <p>This demo showcases Symfony forms with htmx submission. All form fields use standard Symfony form rendering.</p>
-    </header>
-</article>
-
-<div id="form-wrapper">
-    {{ block('formContent') }}
-</div>
-
-{{ block('sourceCode') }}
-{% endblock %}
-
-{% block sourceCode %}
-{% include '_source_code.html.twig' with {controller: 'FormController.php', template: 'form.html.twig'} %}
-{% endblock %}
-
-{% block formContent %}
-<div class="grid">
-    <div>
-        <article>
-            <header><strong>Registration Form</strong></header>
-
-            {{ form_start(form, {
-                'attr': {
-                    'hx-post': path('app_form'),
-                    'hx-target': '#form-wrapper',
-                    'hx-swap': 'innerHTML',
-                    'novalidate': 'novalidate',
-                }
-            }) }}
-
-            {% if not form.vars.valid and form.vars.submitted %}
-            <div class="alert-error" style="background: var(--pico-del-color); color: var(--pico-background-color); padding: 1rem; border-radius: var(--pico-border-radius); margin-bottom: 1rem;">
-                <strong>Error:</strong> Please fix the validation errors below.
-            </div>
-            {% endif %}
-
-            {{ form_row(form.name) }}
-            {{ form_row(form.email) }}
-            {{ form_row(form.password) }}
-            {{ form_row(form.bio) }}
-            {{ form_row(form.country) }}
-
-            <hr>
-            <p><small>Preferences</small></p>
-
-            {{ form_row(form.role) }}
-            {{ form_row(form.notifications) }}
-            {{ form_row(form.terms) }}
-
-            <div style="margin-top: 1rem;">
-                {{ form_row(form.submit) }}
-            </div>
-
-            {{ form_end(form) }}
-        </article>
-    </div>
-
-    <div>
-        <article>
-            <header><strong>Form Features</strong></header>
-            <ul>
-                <li>htmx form submission without page reload</li>
-                <li>Server-side validation with error display</li>
-                <li>CSRF protection via meta tag</li>
-                <li>Automatic form state preservation on error</li>
-            </ul>
-        </article>
-
-        <article>
-            <header><strong>Usage</strong></header>
-            <p><small>Add htmx attributes to form_start:</small></p>
-            <pre><code>{% verbatim %}{{ form_start(form, {
-    'attr': {
-        'hx-post': path('app_form'),
-        'hx-target': '#wrapper',
-        'hx-swap': 'innerHTML',
-    }
-}) }}{% endverbatim %}</code></pre>
-        </article>
-    </div>
-</div>
-{% endblock %}
-
-{% block success %}
-<article>
-    <header>
-        <strong>Registration Successful!</strong>
-    </header>
-
-    <h4>Submitted Data:</h4>
-    <pre>{{ data|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
-
-    <footer>
-        <button class="outline"
-                hx-get="{{ path('app_form') }}"
-                hx-target="#form-wrapper"
-                hx-swap="innerHTML">
-            Submit Another
-        </button>
-    </footer>
-</article>
+{% block demo %}
+{{ block('_main') }}
 {% endblock %}

@@ -1,0 +1,145 @@
+{% block _main %}
+<div id="notification" style="margin-bottom: 1rem;">{{ block('notificationContent') }}</div>
+
+<article>
+    <header>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong>Projects</strong>
+            <button class="outline btn-sm"
+                    hx-post="{{ path('app_items_reset') }}"
+                    hx-target="#items-list"
+                    hx-swap="innerHTML">
+                Reset List
+            </button>
+        </div>
+    </header>
+
+    <div id="items-list">
+        {{ block('itemsList') }}
+    </div>
+</article>
+
+<article>
+    <header><strong>How it works</strong></header>
+    <ul>
+        <li><strong>Edit name:</strong> Click name to edit inline (min 3 chars, try empty to see error)</li>
+        <li><strong>Change status:</strong> Click badge to open dropdown</li>
+        <li><strong>Delete:</strong> <code>hx-confirm</code> shows native confirmation</li>
+        <li><strong>Notifications:</strong> <code>hx-swap-oob</code> with CSS animation</li>
+    </ul>
+</article>
+{% endblock %}
+
+{% block notificationContent %}{% endblock %}
+
+{% block notificationOob %}
+<div id="notification" hx-swap-oob="true" style="margin-bottom: 1rem;">
+    <div class="notification-alert {{ type == 'error' ? 'notification-error' : 'notification-success' }}">
+        <span>{{ message }}</span>
+        <button type="button" style="float: right; background: none; border: none; cursor: pointer;" onclick="this.closest('.notification-alert').parentElement.innerHTML = ''">
+            &times;
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block itemsList %}
+{% if items|length > 0 %}
+<figure>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr id="item-row-{{ item.id }}">
+                <td>{{ item.id }}</td>
+                <td id="item-name-{{ item.id }}">
+                    {{ block('viewName') }}
+                </td>
+                <td id="item-status-{{ item.id }}">
+                    {{ block('viewStatus') }}
+                </td>
+                <td>
+                    <button class="outline btn-sm"
+                            style="color: var(--pico-del-color); border-color: var(--pico-del-color);"
+                            hx-delete="{{ path('app_items_delete', {id: item.id}) }}"
+                            hx-target="#item-row-{{ item.id }}"
+                            hx-swap="outerHTML swap:300ms"
+                            hx-confirm="Are you sure you want to delete '{{ item.name }}'?">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</figure>
+{% else %}
+<p><ins>No items left.</ins> Click "Reset List" to restore.</p>
+{% endif %}
+{% endblock %}
+
+{% block viewName %}
+<span class="edit-link"
+     hx-get="{{ path('app_items_edit', {id: item.id}) }}"
+     hx-target="#item-name-{{ item.id }}"
+     hx-swap="innerHTML">
+    {{ item.name }}
+</span>
+{% endblock %}
+
+{% block editName %}
+<form style="display: flex; gap: 0.5rem; align-items: center;"
+      hx-put="{{ path('app_items_update', {id: item.id}) }}"
+      hx-target="#item-name-{{ item.id }}"
+      hx-swap="innerHTML">
+    <input type="text"
+           name="name"
+           value="{{ item.name }}"
+           style="width: 150px; padding: 0.25rem 0.5rem;"
+           autocomplete="off"
+           autofocus />
+    <button type="submit" class="btn-sm">Save</button>
+    <button type="button" class="outline btn-sm"
+            hx-get="{{ path('app_items') }}"
+            hx-target="#item-name-{{ item.id }}"
+            hx-select="#item-name-{{ item.id }} > *">
+        Cancel
+    </button>
+</form>
+{% endblock %}
+
+{% block viewStatus %}
+<details class="dropdown">
+    <summary>
+        <span class="status-badge status-{{ item.status }}">{{ item.status }}</span>
+    </summary>
+    <ul>
+        {% for status in ['active', 'pending', 'completed'] %}
+        <li>
+            <button hx-put="{{ path('app_items_status', {id: item.id}) }}"
+                    hx-vals='{"status": "{{ status }}"}'
+                    hx-target="#item-status-{{ item.id }}"
+                    hx-swap="innerHTML"
+                    onclick="this.closest('details').open = false">
+                {{ status|capitalize }}
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+</details>
+{% endblock %}
+
+{% block itemsListOob %}
+<div id="items-list" hx-swap-oob="true">
+    {{ block('itemsList') }}
+</div>
+{% endblock %}
+
+{% block empty %}{% endblock %}

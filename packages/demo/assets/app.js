@@ -67,12 +67,8 @@ if (debugToggle) {
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('code-tab-btn')) {
         const container = e.target.closest('.code-tabs');
-        container.querySelectorAll('.code-tab-btn').forEach(btn => {
-            btn.classList.remove('contrast');
-            btn.classList.add('outline');
-        });
+        container.querySelectorAll('.code-tab-btn').forEach(btn => btn.classList.add('outline'));
         e.target.classList.remove('outline');
-        e.target.classList.add('contrast');
         container.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
         document.querySelector(e.target.dataset.target).classList.add('active');
     }
